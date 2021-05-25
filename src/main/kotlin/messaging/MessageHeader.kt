@@ -1,4 +1,4 @@
-package messaging.message
+package messaging
 
 import messaging.MessageType
 
