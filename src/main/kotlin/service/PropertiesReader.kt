@@ -14,6 +14,12 @@ class PropertiesReader {
         private const val MainFolder = "main"
         private const val ResourcesFolder = "resources"
         private const val ServiceProperties = "service.properties"
+
+        fun create(): PropertiesReader {
+            val propertiesReader = PropertiesReader()
+            propertiesReader.init()
+            return propertiesReader
+        }
     }
 
     private val map: HashMap<String, String> = HashMap()
@@ -22,7 +28,7 @@ class PropertiesReader {
     var servicePort: Int = 7001
         private set
 
-    fun init() {
+    private fun init() {
         readPropertiesIntoMap(loadProperties())
     }
 

@@ -5,9 +5,8 @@ import java.net.InetSocketAddress
 
 fun main() {
     runBlocking {
-        val propertiesReader = PropertiesReader()
-        propertiesReader.init()
-        var service = Service(InetSocketAddress(propertiesReader.serviceAddress, propertiesReader.servicePort))
+        val propertiesReader = PropertiesReader.create()
+        var service = Service(propertiesReader.serviceAddress, propertiesReader.servicePort)
         println("Gossip-8 module has been started.")
     }
 }
