@@ -1,17 +1,31 @@
 package brahms
 
+import CommonUtils
+import Configs
 import peers.Peer
 
-class View(private val alpha: Float, private val beta: Float, private val gamma: Float, private val cache_size: Int) {
-    val history = History(cache_size)
-    val v: Set<Peer> = HashSet()
-    val vPush: Set<Peer> = HashSet()
-    val vPull: Set<Peer> = HashSet()
+object View {
+    private val cacheSize = Configs.getConfigs().cacheSize
+    var v: MutableSet<Peer> = HashSet()
+    var vPush: Set<Peer> = HashSet()
+    var vPull: Set<Peer> = HashSet()
+
+    //    TODO: sophisticated value
+    const val pushLimit: Int = 1000
 
     private fun update() {
         while (true) {
-
+            PushManager.push(CommonUtils.randomSubSet(v, Partitioner.pushSize))
+            PullManager.pull(CommonUtils.randomSubSet(v, Partitioner.pullSize))
+//          TODO:  wait rand secs
+            val waitTime = 4
+            if (vPush.size < waitTime * pushLimit) {
+                v = (CommonUtils.randomSubSet(vPush, Partitioner.pushSize) union
+                        CommonUtils.randomSubSet(vPull, Partitioner.pullSize) union
+                        History.get(Partitioner.historySize)).toMutableSet()
+            }
         }
     }
+
 
 }

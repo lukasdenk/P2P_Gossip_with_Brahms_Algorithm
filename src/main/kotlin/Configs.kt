@@ -1,21 +1,22 @@
 import peers.Peer
-import java.util.*
 
-class Configs {
+class Configs private constructor() {
     val self: Peer
 
     //    TODO: find good value
     val difficulty: Int = 4
     val cacheSize: Int
 
-    private constructor() {
-
-    }
-
     init {
 //        TODO: read from INI-File
-        self = Peer(UUID.randomUUID(), "test", "test")
+        self = Peer("test", "test", "k")
         cacheSize = 1
+    }
+
+    companion object {
+        fun getConfigs(): Configs {
+            return Configs()
+        }
     }
 
 

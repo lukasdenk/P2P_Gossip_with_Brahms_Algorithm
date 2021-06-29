@@ -2,20 +2,16 @@ package brahms
 
 import peers.Peer
 
-class History(n: Int) {
+object History {
+    val n = 50
     private val samplers = MutableList(n) { Sampler() }
 
     //    parallel?
-    fun next(peer: Peer) {
-        samplers.forEach {
-            it.next(peer)
-        }
-    }
-
-    //    parallel?
-    fun next(peers: List<Peer>) {
-        peers.forEach {
-            next(it)
+    fun next(peers: Set<Peer>) {
+        peers.forEach { p ->
+            samplers.forEach { s ->
+                s.next(p)
+            }
         }
     }
 

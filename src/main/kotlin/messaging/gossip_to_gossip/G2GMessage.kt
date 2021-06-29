@@ -1,5 +1,6 @@
 package messaging.gossip_to_gossip
 
-class G2GMessage {
+import peers.Peer
 
+open class G2GMessage(open val sender: Peer, open val receiver: Peer) {
 }
