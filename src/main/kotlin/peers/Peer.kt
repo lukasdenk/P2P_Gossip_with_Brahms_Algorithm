@@ -8,10 +8,7 @@ data class Peer(
 //    @Kyrylo: Why do you need Peers to be comparable?
 ) {
 
-    fun probe(): Boolean {
-//        TODO: test if Peer is online (not only the computer but the VoIP-program!)
-        return false
-    }
+    var online: Boolean = true
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
