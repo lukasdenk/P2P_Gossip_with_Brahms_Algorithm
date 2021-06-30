@@ -48,6 +48,7 @@ class Service(
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel) {
+        println("[Service] Channel is closed")
         if (!hasSpaceForNewConnections) {
             clientChannelList.remove(channel)
             accept()
@@ -76,14 +77,13 @@ class Service(
                                channelsList: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
             this.clientChannel = clientChannel
             channelsList.add(clientChannel)
-            println("ConnectionHandler: connection ${clientChannel.remoteAddress} is opened")
+            println("[ConnectionHandler] ${clientChannel.remoteAddress} has connected")
             readData()
             connectionAttemptFinished.invoke()
         }
 
         private fun readData() {
             if (clientChannel.isOpen) {
-                println("Socket channel ${clientChannel.remoteAddress} is opened, ready to read data")
                 clientChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer, communicationHandler)
             } else {
                 closeChannel()
@@ -91,13 +91,12 @@ class Service(
         }
 
         private fun closeChannel() {
-            println("ConnectionHandler: connection is closed")
             clientChannel.close()
             connectionClosed.invoke(clientChannel)
         }
 
         override fun failed(exc: Throwable, attachment: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
-            println("ConnectionHandler: connection ${clientChannel.remoteAddress} is failed to open")
+            println("[ConnectionHandler] ${clientChannel.remoteAddress} failed to connect")
             connectionAttemptFinished.invoke()
         }
 
@@ -111,9 +110,11 @@ class Service(
         private val isWorking: AtomicBoolean = AtomicBoolean(true)
 
         override fun completed(numberOfBytesRead: Int, buffer: ByteBuffer) {
+            if (!isWorking.get()) {
+                return
+            }
             if (numberOfBytesRead < 0) {
-                isWorking.set(false)
-                closeChannel.invoke()
+                stop()
                 return
             }
             val sb = StringBuilder()
@@ -121,23 +122,18 @@ class Service(
             buffer.position(0)
             buffer.get(arr, 0, arr.size)
             arr.map(Byte::toInt).map{ String.format("%02X", it) }.forEach { sb.append(it).append(" ") }
-            println("Some data received ($numberOfBytesRead): $sb")
-            if (isWorking.get()) {
-                readingCompleted.invoke()
-            } else {
-                closeChannel.invoke()
-            }
+            println("[CommunicationHandler] incoming msg ($numberOfBytesRead): $sb")
+            readingCompleted.invoke()
         }
 
         override fun failed(exc: Throwable?, attachment: ByteBuffer) {
-            println("Failed to read the data: $exc")
-            if (isWorking.getAndSet(false)) {
-                closeChannel.invoke()
-            }
+            println("[CommunicationHandler] Failed to read the data: $exc")
+            stop()
         }
 
         fun stop() {
             isWorking.set(false)
+            closeChannel.invoke()
         }
     }
 
