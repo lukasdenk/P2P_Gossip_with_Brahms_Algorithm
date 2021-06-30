@@ -6,7 +6,10 @@ fun ByteArray.sha256(): ByteArray {
     return sha256Instance.digest(this)
 }
 
-operator fun ByteArray.compareTo(other: ByteArray): Int {
+operator fun ByteArray.compareTo(other: ByteArray?): Int {
+    if (other == null) {
+        return 1
+    }
     val lengthComparison = this.size.compareTo(other.size)
     if (lengthComparison != 0) {
         return lengthComparison
