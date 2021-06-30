@@ -6,9 +6,9 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-fun main() {
+fun main(args: Array<String>) {
     runBlocking {
-        val propertiesReader = PropertiesReader.create()
+        val propertiesReader = PreferencesReader.create(args.getOrElse(1) { "" })
         val service = Service(propertiesReader.serviceAddress, propertiesReader.servicePort)
         service.start()
         println("Gossip-8 service has been started at" +
