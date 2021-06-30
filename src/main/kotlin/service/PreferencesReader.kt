@@ -57,12 +57,20 @@ class PreferencesReader(
         }
         if (preferences[Gossip, ApiAddress] != null) {
             val s = preferences[Gossip, ApiAddress]
-            serviceAddress = s.substring(0, s.indexOf(':'))
-            servicePort = Integer.parseInt(s.substring(s.indexOf(':') + 1))
+            if (hasIpV6Address(s)) {
+                serviceAddress = s.substring(s.indexOf('[') + 1, s.indexOf(']'))
+                servicePort = Integer.parseInt(s.substring(s.indexOf(']') + 2))
+            } else {
+                serviceAddress = s.substring(0, s.indexOf(':'))
+                servicePort = Integer.parseInt(s.substring(s.indexOf(':') + 1))
+            }
         }
         if (preferences[Gossip, CacheSize] != null) {
             cacheSize = Integer.parseInt(preferences[Gossip, CacheSize])
         }
     }
+
+    private fun hasIpV6Address(s: String): Boolean =
+        s.contains("[") && s.contains("]")
 
 }
