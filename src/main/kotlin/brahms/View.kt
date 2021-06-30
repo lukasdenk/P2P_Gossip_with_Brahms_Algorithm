@@ -1,6 +1,7 @@
 package brahms
 
 import Configs
+import kotlinx.coroutines.delay
 import peers.Peer
 import randomSubSet
 
@@ -13,12 +14,14 @@ object View {
     //    TODO: sophisticated value
     const val pushLimit: Int = 1000
 
-    private fun update() {
+    //    TODO: call at beginning
+    suspend fun update() {
         while (true) {
             PushManager.push(v.randomSubSet(Partitioner.pushSize))
             PullManager.pull(v.randomSubSet(Partitioner.pullSize))
-//          TODO:  wait rand secs (in coroutine)
-            val waitTime = 4
+//          TODO:  wait rand secs
+            val waitTime = 4L
+            delay(waitTime)
             if (vPush.size < waitTime * pushLimit) {
                 v = (vPush.randomSubSet(Partitioner.pushSize) union
                         vPull.randomSubSet(Partitioner.pullSize) union
