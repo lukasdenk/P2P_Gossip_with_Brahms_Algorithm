@@ -25,6 +25,7 @@ class Service(
     private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
     private val hasSpaceForNewConnections
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
+    private val waitingForConnection = AtomicBoolean(false)
 
     fun start() {
         accept()
@@ -32,6 +33,7 @@ class Service(
 
     @OptIn(ExperimentalTime::class)
     private fun accept() {
+        waitingForConnection.set(hasSpaceForNewConnections)
         if (!hasSpaceForNewConnections) {
             return
         }
@@ -48,12 +50,10 @@ class Service(
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel) {
-        println("[Service] Channel is closed")
-        if (!hasSpaceForNewConnections) {
-            clientChannelList.remove(channel)
+        clientChannelList.remove(channel)
+        if (!waitingForConnection.get()) {
+            println("[Service] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
             accept()
-        } else {
-            clientChannelList.remove(channel)
         }
     }
 
@@ -118,12 +118,17 @@ class Service(
                 return
             }
             val sb = StringBuilder()
-            val arr = ByteArray(buffer.position())
-            buffer.position(0)
-            buffer.get(arr, 0, arr.size)
+            val arr = toArray(buffer)
             arr.map(Byte::toInt).map{ String.format("%02X", it) }.forEach { sb.append(it).append(" ") }
             println("[CommunicationHandler] incoming msg ($numberOfBytesRead): $sb")
             readingCompleted.invoke()
+        }
+
+        private fun toArray(buffer: ByteBuffer): ByteArray {
+            val arr = ByteArray(buffer.position())
+            buffer.position(0)
+            buffer.get(arr, 0, arr.size)
+            return arr
         }
 
         override fun failed(exc: Throwable?, attachment: ByteBuffer) {
