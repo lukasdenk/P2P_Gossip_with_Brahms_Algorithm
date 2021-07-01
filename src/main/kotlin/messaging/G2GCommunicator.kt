@@ -4,7 +4,7 @@ import messaging.gossip_to_gossip.G2GMessage
 
 //TODO To be done by kyrylo
 
-class G2GCommunicator private constructor() {
+object G2GCommunicator {
     //    TODO: call listener's receive()-fun for incoming messages
     val listener: List<G2GMessageListener> = listOf()
 
@@ -12,9 +12,7 @@ class G2GCommunicator private constructor() {
 
     }
 
-    companion object {
-        val singleton: G2GCommunicator = G2GCommunicator()
-    }
+
 
 
 }

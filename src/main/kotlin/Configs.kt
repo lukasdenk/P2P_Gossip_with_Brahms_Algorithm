@@ -6,10 +6,13 @@ class Configs private constructor() {
     //    TODO: find good value
     val difficulty: Int = 4
     val cacheSize: Int
+    val probeTimeout = 4
+    val probeInterval = 5L
+    val kickInterval = 5L
 
     init {
 //        TODO: read from INI-File
-        self = Peer("test", "test", "k")
+        self = Peer(ByteArray(32), "test", "k")
         cacheSize = 1
     }
 

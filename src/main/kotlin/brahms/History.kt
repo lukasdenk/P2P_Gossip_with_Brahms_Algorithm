@@ -1,21 +1,21 @@
 package brahms
 
 import peers.Peer
+import randomSubSet
 
 object History {
     val n = 50
     private val samplers = MutableList(n) { Sampler() }
 
-    //    parallel?
     fun next(peers: Set<Peer>) {
-        peers.forEach { p ->
-            samplers.forEach { s ->
-                s.next(p)
+        samplers.parallelStream().forEach { s ->
+            peers.forEach {
+                s.next(it)
             }
         }
     }
 
     fun get(n: Int): Set<Peer> {
-        return samplers.mapNotNull(Sampler::get).shuffled().subList(0, n).toSet()
+        return samplers.mapNotNull(Sampler::get).randomSubSet(n)
     }
 }
