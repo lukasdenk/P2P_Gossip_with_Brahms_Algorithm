@@ -1,6 +1,7 @@
 package service
 
 object Constants {
-    const val PacketSize = 1400
-    const val MaxConnectionsAmount = 1
+    const val PacketSize: Int = 1400
+    const val MaxConnectionsAmount: Int = 1
+    const val MessageTimeoutInSec: Long = 100
 }

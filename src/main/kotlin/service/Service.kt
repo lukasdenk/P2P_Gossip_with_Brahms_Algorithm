@@ -6,9 +6,11 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.nio.channels.InterruptedByTimeoutException
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 
@@ -20,7 +22,10 @@ class Service(
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
-    private val clientChannelList = LinkedList<AsynchronousSocketChannel>()
+    private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
+    private val hasSpaceForNewConnections
+        get() = clientChannelList.size < Constants.MaxConnectionsAmount
+    private val waitingForConnection = AtomicBoolean(false)
 
     fun start() {
         accept()
@@ -28,7 +33,8 @@ class Service(
 
     @OptIn(ExperimentalTime::class)
     private fun accept() {
-        if (clientChannelList.size >= Constants.MaxConnectionsAmount) {
+        waitingForConnection.set(hasSpaceForNewConnections)
+        if (!hasSpaceForNewConnections) {
             return
         }
         socketConnectionsScope.launch {
@@ -36,7 +42,18 @@ class Service(
             serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
             serverChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
             serverChannel.bind(socketAddress)
-            serverChannel.accept(clientChannelList, ConnectionHandler { accept() })
+            serverChannel.accept(clientChannelList, ConnectionHandler(
+                connectionAttemptFinished = { accept() },
+                connectionClosed = this@Service::connectionClosed
+            ))
+        }
+    }
+
+    private fun connectionClosed(channel: AsynchronousSocketChannel) {
+        clientChannelList.remove(channel)
+        if (!waitingForConnection.get()) {
+            println("[Service] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
+            accept()
         }
     }
 
@@ -45,38 +62,83 @@ class Service(
     }
 
     private class ConnectionHandler(
-        private val callback: () -> Unit
-    ): CompletionHandler<AsynchronousSocketChannel, LinkedList<AsynchronousSocketChannel>> {
+        private val connectionAttemptFinished: () -> Unit,
+        private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
+    ): CompletionHandler<AsynchronousSocketChannel, ConcurrentLinkedQueue<AsynchronousSocketChannel>> {
+
+        private val buffer = ByteBuffer.allocate(Constants.PacketSize)
+        private lateinit var clientChannel: AsynchronousSocketChannel
+        private val communicationHandler = CommunicationHandler(
+            readingCompleted = { readData() },
+            closeChannel = { closeChannel() }
+        )
 
         override fun completed(clientChannel: AsynchronousSocketChannel,
-                               channelsList: LinkedList<AsynchronousSocketChannel>) {
-            println("Connection handler: connection accepted")
+                               channelsList: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
+            this.clientChannel = clientChannel
             channelsList.add(clientChannel)
-            if (clientChannel.isOpen) {
-                val buffer = ByteBuffer.allocate(Constants.PacketSize)
-                clientChannel.read(buffer, buffer, CommunicationHandler())
-            }
-            callback.invoke()
-            // TODO close connection after socket is closed and remove it from list
+            println("[ConnectionHandler] ${clientChannel.remoteAddress} has connected")
+            readData()
+            connectionAttemptFinished.invoke()
         }
 
-        override fun failed(exc: Throwable, attachment: LinkedList<AsynchronousSocketChannel>) {
-            callback.invoke()
+        private fun readData() {
+            if (clientChannel.isOpen) {
+                clientChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer, communicationHandler)
+            } else {
+                closeChannel()
+            }
+        }
+
+        private fun closeChannel() {
+            clientChannel.close()
+            connectionClosed.invoke(clientChannel)
+        }
+
+        override fun failed(exc: Throwable, attachment: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
+            println("[ConnectionHandler] ${clientChannel.remoteAddress} failed to connect")
+            connectionAttemptFinished.invoke()
         }
 
     }
 
-    private class CommunicationHandler: CompletionHandler<Int, ByteBuffer> {
+    private class CommunicationHandler(
+        private val readingCompleted: () -> Unit,
+        private val closeChannel: () -> Unit
+    ): CompletionHandler<Int, ByteBuffer> {
+
+        private val isWorking: AtomicBoolean = AtomicBoolean(true)
+
         override fun completed(numberOfBytesRead: Int, buffer: ByteBuffer) {
-            if (numberOfBytesRead < 0) {
+            if (!isWorking.get()) {
                 return
             }
-            println("Some data received ($numberOfBytesRead)")
-            // TODO As we have a message, start to wait for another one
+            if (numberOfBytesRead < 0) {
+                stop()
+                return
+            }
+            val sb = StringBuilder()
+            val arr = toArray(buffer)
+            arr.map(Byte::toInt).map{ String.format("%02X", it) }.forEach { sb.append(it).append(" ") }
+            println("[CommunicationHandler] incoming msg ($numberOfBytesRead): $sb")
+            readingCompleted.invoke()
+        }
+
+        private fun toArray(buffer: ByteBuffer): ByteArray {
+            val arr = ByteArray(buffer.position())
+            buffer.position(0)
+            buffer.get(arr, 0, arr.size)
+            return arr
         }
 
         override fun failed(exc: Throwable?, attachment: ByteBuffer) {
-            TODO("Not yet implemented")
+            println("[CommunicationHandler] Failed to read the data: $exc")
+            stop()
+        }
+
+        fun stop() {
+            isWorking.set(false)
+            closeChannel.invoke()
         }
     }
 
