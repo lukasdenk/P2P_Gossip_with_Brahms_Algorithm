@@ -5,4 +5,5 @@ object Constants {
     const val MaxConnectionsAmount: Int = 1
     const val MessageTimeoutInSec: Long = 100
     const val ReconnectionIntervalInSec: Long = 3
+    const val MaxReconnectAttempts: Int = 3
 }
