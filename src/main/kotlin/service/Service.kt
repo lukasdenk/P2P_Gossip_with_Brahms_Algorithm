@@ -83,6 +83,7 @@ class Service(
         }
 
         private fun readData() {
+            buffer.clear()
             if (clientChannel.isOpen) {
                 clientChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer, communicationHandler)
             } else {
