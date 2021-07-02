@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import service.Constants
 import java.net.InetSocketAddress
 import java.net.SocketAddress
-import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
@@ -16,11 +15,16 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
+/**
+ * @param write Writes first message as soon as connection established
+ */
 @ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
 class Client(
     gossipAddress: String,
-    gossipPort: Int
+    gossipPort: Int,
+    private val write: ((ByteArray) -> Unit) -> Unit,
+    private val read: (ByteArray, (ByteArray) -> Unit) -> Unit
 ) {
 
     private val socketScope  = CoroutineScope(Dispatchers.IO)
@@ -39,6 +43,8 @@ class Client(
         socketScope.launch {
             val socketChannel = AsynchronousSocketChannel.open()
             socketChannel.connect(gossipAddress, socketChannel, ConnectionHandler(
+                write,
+                read,
                 connectionFailed = { reconnect() }
             ))
         }
@@ -58,8 +64,8 @@ class Client(
     }
 
     private class ConnectionHandler(
-        private val connectionOpened: () -> Unit = {},
-        private val connectionClosed: () -> Unit = {},
+        private val firstWrite: ((ByteArray) -> Unit) -> Unit,
+        private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
         private val connectionFailed: () -> Unit = {}
     ) : CompletionHandler<Void, AsynchronousSocketChannel> {
 
@@ -69,26 +75,37 @@ class Client(
         override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
             println("[ConnectionHandler] Connected to ${socketChannel.remoteAddress}")
-            connectionOpened.invoke()
-            sendGossipAnnounce()
+            sendFirstMessage()
         }
 
-        private fun sendGossipAnnounce() {
+        private fun sendFirstMessage() {
             if (!socketChannel.isOpen) {
                 closeChannel()
                 return
             }
-            val dummyArray = "abcde".toByteArray()
-            val sb = StringBuilder()
-            dummyArray.map(Byte::toInt).map{ String.format("%02X", it) }.forEach { sb.append(it).append(" ") }
-            println("[ConnectionHandler] Sending gossip announce $sb")
+            firstWrite.invoke { bytes: ByteArray ->
+                write(bytes)
+            }
+        }
+
+        private fun write(bytes: ByteArray) {
+            log(bytes)
             socketChannel.write(
-                ByteBuffer.wrap(dummyArray),
+                ByteBuffer.wrap(bytes),
                 null,
                 WriteHandler(
                     writeCompleted = { readData() },
-                    writeFailed = { sendGossipAnnounce() }
+                    writeFailed = {
+                        println("[WriteHandler] write failed")
+                    }
                 )
+            )
+        }
+
+        private fun log(bytes: ByteArray) {
+            println(
+                "[WriteHandler] sent " +
+                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
             )
         }
 
@@ -102,15 +119,19 @@ class Client(
                 buffer,
                 buffer,
                 ReadHandler(
-                    readCompleted = { readData() },
-                    readFailed = { readData() }
+                    readCompleted = { bytes: ByteArray ->
+                        read.invoke(bytes, this::write)
+                    },
+                    readFailed = {
+                        println("[WriteHandler] read failed")
+                    },
+                    closeChannel = this::closeChannel
                 )
             )
         }
 
         private fun closeChannel() {
             socketChannel.close()
-            connectionClosed.invoke()
         }
 
         override fun failed(exc: Throwable?, socketChannel: AsynchronousSocketChannel) {
@@ -136,12 +157,33 @@ class Client(
     }
 
     private class ReadHandler(
-        private val readCompleted: () -> Unit = {},
-        private val readFailed: () -> Unit = {}
+        private val readCompleted: (ByteArray) -> Unit = {},
+        private val readFailed: () -> Unit = {},
+        private val closeChannel: () -> Unit = {}
     ): CompletionHandler<Int, ByteBuffer> {
 
-        override fun completed(result: Int, buffer: ByteBuffer) {
-            readCompleted.invoke()
+        override fun completed(numberOfBytesRead: Int, buffer: ByteBuffer) {
+            if (numberOfBytesRead < 0) {
+                closeChannel.invoke()
+                return
+            }
+            val data = readToArray(buffer)
+            log(data)
+            readCompleted.invoke(data)
+        }
+
+        private fun log(arr: ByteArray) {
+            println(
+                "[CommunicationHandler] incoming msg (${arr.size}): " +
+                    arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
+            )
+        }
+
+        private fun readToArray(buffer: ByteBuffer): ByteArray {
+            val arr = ByteArray(buffer.position())
+            buffer.position(0)
+            buffer.get(arr, 0, arr.size)
+            return arr
         }
 
         override fun failed(exc: Throwable, buffer: ByteBuffer) {

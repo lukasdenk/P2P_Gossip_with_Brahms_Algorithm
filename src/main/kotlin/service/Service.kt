@@ -6,14 +6,13 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
-import java.nio.channels.InterruptedByTimeoutException
-import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.ExperimentalTime
 
 
+@ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
 class Service(
     address: String,
@@ -32,7 +31,6 @@ class Service(
         accept()
     }
 
-    @OptIn(ExperimentalTime::class)
     private fun accept() {
         waitingForConnection.set(hasSpaceForNewConnections)
         if (!hasSpaceForNewConnections) {
@@ -109,24 +107,19 @@ class Service(
         private val closeChannel: () -> Unit
     ): CompletionHandler<Int, ByteBuffer> {
 
-        private val isWorking: AtomicBoolean = AtomicBoolean(true)
-
         override fun completed(numberOfBytesRead: Int, buffer: ByteBuffer) {
-            if (!isWorking.get()) {
-                return
-            }
             if (numberOfBytesRead < 0) {
-                stop()
+                closeChannel.invoke()
                 return
             }
             val sb = StringBuilder()
-            val arr = toArray(buffer)
+            val arr = readToArray(buffer)
             arr.map(Byte::toInt).map{ String.format("%02X", it) }.forEach { sb.append(it).append(" ") }
             println("[CommunicationHandler] incoming msg ($numberOfBytesRead): $sb")
             readingCompleted.invoke()
         }
 
-        private fun toArray(buffer: ByteBuffer): ByteArray {
+        private fun readToArray(buffer: ByteBuffer): ByteArray {
             val arr = ByteArray(buffer.position())
             buffer.position(0)
             buffer.get(arr, 0, arr.size)
@@ -135,13 +128,9 @@ class Service(
 
         override fun failed(exc: Throwable?, attachment: ByteBuffer) {
             println("[CommunicationHandler] Failed to read the data: $exc")
-            stop()
-        }
-
-        fun stop() {
-            isWorking.set(false)
             closeChannel.invoke()
         }
+
     }
 
 }
