@@ -36,11 +36,6 @@ private fun setupService(
     return Service(
         propertiesReader.serviceAddress,
         propertiesReader.servicePort,
-        read = { data: ByteArray, writer: (ByteArray) -> Unit ->
-            if (data.isNotEmpty()) {
-                // TODO to write something in response use writer
-                //  writer.invoke("qwerty".toByteArray())
-            }
-        }
+        read
     )
 }
