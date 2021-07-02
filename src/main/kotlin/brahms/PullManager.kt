@@ -13,14 +13,13 @@ import java.util.concurrent.ConcurrentHashMap
 object PullManager : G2GMessageListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
     var limit: Int = 0
-    private val communicator: G2GCommunicator = G2GCommunicator//.singleton
 
     fun pull(peers: Collection<Peer>) {
         requests.clear()
         peers.parallelStream().forEach {
             val pullRequest = PullRequest(Configs.getConfigs().self, it, limit)
             requests[it] = pullRequest
-            communicator.send(pullRequest)
+            G2GCommunicator.send(pullRequest)
         }
     }
 
@@ -28,7 +27,7 @@ object PullManager : G2GMessageListener {
         if (message is PullResponse && requests.containsKey(message.sender)) {
             History.next(message.neighbourSample)
         } else if (message is PullRequest) {
-            communicator.send(
+            G2GCommunicator.send(
                 PullResponse(
                     Configs.getConfigs().self,
                     message.sender,

@@ -21,16 +21,17 @@ class Sampler {
         peerHash.set(null)
     }
 
-    fun next(other: Peer) {
-        val otherHash = (other.hostkey + rand.get()).sha256()
+//    TODO: probe
+fun next(other: Peer) {
+    val otherHash = (other.hostkey + rand.get()).sha256()
 
-        synchronized(this) {
-            if (otherHash < peerHash.get()) {
-                peer.set(other)
-                peerHash.set(otherHash)
-            }
+    synchronized(this) {
+        if (otherHash < peerHash.get()) {
+            peer.set(other)
+            peerHash.set(otherHash)
         }
     }
+}
 
     fun get(): Peer? {
         if (peer.get()?.online == false) {
