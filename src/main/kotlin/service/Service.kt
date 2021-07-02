@@ -1,6 +1,7 @@
 package service
 
 import kotlinx.coroutines.*
+import utils.ParametersReader
 import java.net.*
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
@@ -9,6 +10,7 @@ import java.nio.channels.CompletionHandler
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 
@@ -21,6 +23,22 @@ class Service(
     private val firstWrite: ((ByteArray) -> Unit) -> Unit = {}
 ) {
 
+    companion object {
+        fun setupService(
+            consoleArgs: Array<String>,
+            read: (data: ByteArray, write: (ByteArray) -> Unit) -> Unit
+        ): Service {
+            val parametersReader = ParametersReader()
+            parametersReader.read(consoleArgs)
+            val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
+            return Service(
+                propertiesReader.serviceAddress,
+                propertiesReader.servicePort,
+                read
+            )
+        }
+    }
+
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
     private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
@@ -28,9 +46,12 @@ class Service(
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
     private val waitingForConnection = AtomicBoolean(false)
 
-    fun start() {
+    suspend fun start() {
         println("[${this::class.simpleName}] Gossip-8 service has been started at $socketAddress")
         accept()
+        while (true) {
+            delay(Duration.seconds(10))
+        }
     }
 
     private fun accept() {

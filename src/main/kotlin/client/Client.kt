@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import service.Constants
+import utils.ParametersReader
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.nio.ByteBuffer
@@ -27,15 +28,33 @@ class Client(
     private val read: (ByteArray, (ByteArray) -> Unit) -> Unit
 ) {
 
+    companion object {
+        fun setupClient(
+            consoleArgs: Array<String>,
+            firstWrite: ((ByteArray) -> Unit) -> Unit,
+            read: (data: ByteArray, write: (ByteArray) -> Unit) -> Unit
+        ): Client {
+            val parametersReader = ParametersReader()
+            parametersReader.read(consoleArgs)
+            return Client(
+                gossipAddress = parametersReader.gossipServiceAddress,
+                gossipPort = parametersReader.gossipServicePort,
+                firstWrite = firstWrite,
+                read = read
+            )
+        }
+    }
+
     private val socketScope  = CoroutineScope(Dispatchers.IO)
     private val gossipAddress: SocketAddress = InetSocketAddress(gossipAddress, gossipPort)
     private val reconnectedTimes = AtomicInteger(0)
     private val isUp = AtomicBoolean(true)
-    val up
-        get() = isUp.get()
 
-    fun start() {
+    suspend fun start() {
         connect()
+        while (isUp.get()) {
+            delay(Duration.seconds(10))
+        }
     }
 
     private fun connect() {

@@ -12,7 +12,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 fun main(args: Array<String>) {
     runBlocking {
-        val client = setupClient(
+        val client = Client.setupClient(
             consoleArgs = args,
             firstWrite = { writer ->
                 writer.invoke("abcde".toByteArray())
@@ -25,24 +25,5 @@ fun main(args: Array<String>) {
             }
         )
         client.start()
-        while (client.up) {
-            delay(Duration.seconds(10))
-        }
     }
-}
-
-@ExperimentalTime
-private fun setupClient(
-    consoleArgs: Array<String>,
-    firstWrite: ((ByteArray) -> Unit) -> Unit,
-    read: (data: ByteArray, write: (ByteArray) -> Unit) -> Unit
-): Client {
-    val parametersReader = ParametersReader()
-    parametersReader.read(consoleArgs)
-    return Client(
-        gossipAddress = parametersReader.gossipServiceAddress,
-        gossipPort = parametersReader.gossipServicePort,
-        firstWrite = firstWrite,
-        read = read
-    )
 }
