@@ -30,6 +30,7 @@ class Service(
     private val waitingForConnection = AtomicBoolean(false)
 
     fun start() {
+        println("[${this::class.simpleName}] Gossip-8 service has been started at $socketAddress")
         accept()
     }
 
