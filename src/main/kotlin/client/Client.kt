@@ -11,6 +11,7 @@ import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
@@ -25,16 +26,18 @@ class Client(
     private val socketScope  = CoroutineScope(Dispatchers.IO)
     private val gossipAddress: SocketAddress = InetSocketAddress(gossipAddress, gossipPort)
     private val reconnectedTimes = AtomicInteger(0)
+    private val isUp = AtomicBoolean(true)
+    val up
+        get() = isUp.get()
 
     fun start() {
         connect()
     }
 
     private fun connect() {
+        isUp.set(true)
         socketScope.launch {
             val socketChannel = AsynchronousSocketChannel.open()
-            socketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-            socketChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
             socketChannel.connect(gossipAddress, socketChannel, ConnectionHandler(
                 connectionFailed = { reconnect() }
             ))
@@ -42,13 +45,12 @@ class Client(
     }
 
     private fun reconnect() {
-        println("[Client] Failed to connect.")
-        if (reconnectedTimes.getAndAdd(1) > Constants.MaxReconnectAttempts) {
-            // TODO add callback to finish the program
+        if (reconnectedTimes.addAndGet(1) > Constants.MaxReconnectAttempts) {
             println("[Client] Was not able to connect to the gossip service.")
+            isUp.set(false)
             return
         }
-        println("[Client] Attempt to reconnect after ${Constants.ReconnectionIntervalInSec} sec")
+        println("[Client] Attempt #${reconnectedTimes.get()} to reconnect after ${Constants.ReconnectionIntervalInSec} sec")
         socketScope.launch {
             delay(Duration.Companion.seconds(Constants.ReconnectionIntervalInSec))
             connect()
@@ -64,8 +66,7 @@ class Client(
         private val buffer = ByteBuffer.allocate(Constants.PacketSize)
         private lateinit var socketChannel: AsynchronousSocketChannel
 
-        override fun completed(result: Void, socketChannel: AsynchronousSocketChannel) {
-            // TODO investigate why passed socket channel is null
+        override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
             println("[ConnectionHandler] Connected to ${socketChannel.remoteAddress}")
             connectionOpened.invoke()
@@ -112,7 +113,8 @@ class Client(
             connectionClosed.invoke()
         }
 
-        override fun failed(exc: Throwable, socketChannel: AsynchronousSocketChannel) {
+        override fun failed(exc: Throwable?, socketChannel: AsynchronousSocketChannel) {
+            println("[ConnectionHandler] failed to connect $exc")
             connectionFailed.invoke()
         }
 
