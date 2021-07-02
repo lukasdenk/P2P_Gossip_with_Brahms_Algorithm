@@ -23,7 +23,6 @@ class Service(
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
-    // TODO if we have ID for a client, change structure to a map
     private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
     private val hasSpaceForNewConnections
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
