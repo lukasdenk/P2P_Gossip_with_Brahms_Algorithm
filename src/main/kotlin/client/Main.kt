@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
         val client = Client(
             gossipAddress = parametersReader.gossipServiceAddress,
             gossipPort = parametersReader.gossipServicePort,
-            write = { writer ->
+            firstWrite = { writer ->
                 writer.invoke("abcde".toByteArray())
             },
             read = { data: ByteArray, writer: (ByteArray) -> Unit ->

@@ -16,14 +16,14 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 /**
- * @param write Writes first message as soon as connection established
+ * @param firstWrite Writes first message as soon as connection established
  */
 @ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
 class Client(
     gossipAddress: String,
     gossipPort: Int,
-    private val write: ((ByteArray) -> Unit) -> Unit,
+    private val firstWrite: ((ByteArray) -> Unit) -> Unit,
     private val read: (ByteArray, (ByteArray) -> Unit) -> Unit
 ) {
 
@@ -43,7 +43,7 @@ class Client(
         socketScope.launch {
             val socketChannel = AsynchronousSocketChannel.open()
             socketChannel.connect(gossipAddress, socketChannel, ConnectionHandler(
-                write,
+                firstWrite,
                 read,
                 connectionFailed = { reconnect() }
             ))
@@ -52,11 +52,11 @@ class Client(
 
     private fun reconnect() {
         if (reconnectedTimes.addAndGet(1) > Constants.MaxReconnectAttempts) {
-            println("[Client] Was not able to connect to the gossip service.")
+            println("[${this::class.simpleName}] Was not able to connect to the gossip service.")
             isUp.set(false)
             return
         }
-        println("[Client] Attempt #${reconnectedTimes.get()} to reconnect after ${Constants.ReconnectionIntervalInSec} sec")
+        println("[${this::class.simpleName}] Attempt #${reconnectedTimes.get()} to reconnect after ${Constants.ReconnectionIntervalInSec} sec")
         socketScope.launch {
             delay(Duration.Companion.seconds(Constants.ReconnectionIntervalInSec))
             connect()
@@ -74,7 +74,7 @@ class Client(
 
         override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
-            println("[ConnectionHandler] Connected to ${socketChannel.remoteAddress}")
+            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
             sendFirstMessage()
         }
 
@@ -89,23 +89,14 @@ class Client(
         }
 
         private fun write(bytes: ByteArray) {
-            log(bytes)
             socketChannel.write(
                 ByteBuffer.wrap(bytes),
-                null,
+                bytes,
                 WriteHandler(
-                    writeCompleted = { readData() },
-                    writeFailed = {
-                        println("[WriteHandler] write failed")
+                    writeCompleted = {
+                        readData()
                     }
                 )
-            )
-        }
-
-        private fun log(bytes: ByteArray) {
-            println(
-                "[WriteHandler] sent " +
-                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
             )
         }
 
@@ -123,7 +114,6 @@ class Client(
                         read.invoke(bytes, this::write)
                     },
                     readFailed = {
-                        println("[WriteHandler] read failed")
                     },
                     closeChannel = this::closeChannel
                 )
@@ -135,7 +125,7 @@ class Client(
         }
 
         override fun failed(exc: Throwable?, socketChannel: AsynchronousSocketChannel) {
-            println("[ConnectionHandler] failed to connect $exc")
+            println("[${this::class.simpleName}] failed to connect $exc")
             connectionFailed.invoke()
         }
 
@@ -144,13 +134,22 @@ class Client(
     private class WriteHandler(
         private val writeCompleted: () -> Unit = {},
         private val writeFailed: () -> Unit = {}
-    ): CompletionHandler<Int, Any?> {
+    ): CompletionHandler<Int, ByteArray> {
 
-        override fun completed(result: Int, attachment: Any?) {
+        override fun completed(result: Int, attachment: ByteArray) {
+            log(attachment)
             writeCompleted.invoke()
         }
 
-        override fun failed(exc: Throwable, attachment: Any?) {
+        private fun log(bytes: ByteArray) {
+            println(
+                "[${this::class.simpleName}] sent " +
+                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
+            )
+        }
+
+        override fun failed(exc: Throwable, attachment: ByteArray) {
+            println("[${this::class.simpleName}] write failed")
             writeFailed.invoke()
         }
 
@@ -174,7 +173,7 @@ class Client(
 
         private fun log(arr: ByteArray) {
             println(
-                "[CommunicationHandler] incoming msg (${arr.size}): " +
+                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
                     arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
             )
         }
@@ -187,6 +186,7 @@ class Client(
         }
 
         override fun failed(exc: Throwable, buffer: ByteBuffer) {
+            println("[${this::class.simpleName}] read failed")
             readFailed.invoke()
         }
 
