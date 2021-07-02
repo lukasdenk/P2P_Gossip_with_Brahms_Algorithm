@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import service.Constants
+import utils.Constants
 import utils.ParametersReader
 import java.net.InetSocketAddress
 import java.net.SocketAddress
