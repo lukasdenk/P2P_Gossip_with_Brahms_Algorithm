@@ -3,6 +3,7 @@ package messaging.gossip
 import brahms.messaging.P2PMessageListener
 import brahms.messaging.messages.P2PMessage
 import brahms.messaging.messages.SpreadMsg
+import peers.Peer
 
 object NotificationManager : APIMessageListener, P2PMessageListener {
     val subscribers: MutableMap<DataType, MutableSet<Port>> = HashMap()
@@ -15,7 +16,7 @@ object NotificationManager : APIMessageListener, P2PMessageListener {
         }
     }
 
-    override fun receive(msg: P2PMessage) {
+    override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is SpreadMsg) {
             notification = GossipNotification()
         }

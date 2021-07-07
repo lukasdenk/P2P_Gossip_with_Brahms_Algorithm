@@ -11,14 +11,14 @@ import java.time.LocalDateTime
 object ProbeManager : P2PMessageListener {
     val probes: HashMap<Peer, LocalDateTime> = LinkedHashMap()
 
-    override fun receive(msg: P2PMessage) {
+    override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is ProbeResponse) {
-            probes.remove(msg.sender)
+            probes.remove(sender)
         }
     }
 
     fun probe(peer: Peer) {
-        P2PCommunicator.send(ProbeRequest(Configs.getConfigs().self, peer))
+        P2PCommunicator.send(ProbeRequest(), peer)
         probes.put(peer, LocalDateTime.now())
     }
 

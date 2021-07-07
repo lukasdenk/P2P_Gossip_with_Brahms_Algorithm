@@ -14,9 +14,9 @@ object PushManager : P2PMessageListener {
         }
     }
 
-    override fun receive(msg: P2PMessage) {
+    override fun receive(msg: P2PMessage, sender:Peer) {
         if (msg is PushMsg && msg.isValid()) {
-            History.next(setOf(msg.sender))
+            History.next(setOf(sender))
         }
     }
 

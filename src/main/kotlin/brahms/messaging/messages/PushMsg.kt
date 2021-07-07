@@ -1,9 +1,7 @@
 package brahms.messaging.messages
 
-import peers.Peer
-
-data class PushMsg(override val sender: Peer, override val receiver: Peer, val work: Int) :
-    P2PMessage(sender, receiver) {
+data class PushMsg(val pow: Int) :
+    P2PMessage() {
     fun isValid(): Boolean {
 //        TODO: check PoW
         return false

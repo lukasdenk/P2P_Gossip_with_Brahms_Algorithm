@@ -1,6 +1,5 @@
 package brahms.messaging
 
-import Configs
 import brahms.History
 import brahms.View
 import brahms.messaging.messages.P2PMessage
@@ -17,22 +16,21 @@ object PullManager : P2PMessageListener {
     fun pull(peers: Collection<Peer>) {
         requests.clear()
         peers.parallelStream().forEach {
-            val pullRequest = PullRequest(Configs.getConfigs().self, it, limit)
+            val pullRequest = PullRequest(limit)
             requests[it] = pullRequest
-            P2PCommunicator.send(pullRequest)
+            P2PCommunicator.send(pullRequest, it)
         }
     }
 
-    override fun receive(msg: P2PMessage) {
-        if (msg is PullResponse && requests.containsKey(msg.sender)) {
+    override fun receive(msg: P2PMessage, sender : Peer) {
+        if (msg is PullResponse && requests.containsKey(sender)) {
             History.next(msg.neighbourSample)
         } else if (msg is PullRequest) {
             P2PCommunicator.send(
                 PullResponse(
-                    Configs.getConfigs().self,
-                    msg.sender,
                     View.view.randomSubSet(msg.limit)
-                )
+                ),
+                sender
             )
         }
     }
