@@ -1,11 +1,13 @@
-package brahms
+package brahms.messaging
 
 import Configs
+import brahms.History
+import brahms.View
+import brahms.messaging.messages.G2GMessage
+import brahms.messaging.messages.PullRequest
+import brahms.messaging.messages.PullResponse
 import messaging.G2GCommunicator
 import messaging.G2GMessageListener
-import messaging.gossip_to_gossip.G2GMessage
-import messaging.gossip_to_gossip.PullRequest
-import messaging.gossip_to_gossip.PullResponse
 import peers.Peer
 import randomSubSet
 import java.util.concurrent.ConcurrentHashMap

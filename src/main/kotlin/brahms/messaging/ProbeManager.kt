@@ -1,12 +1,12 @@
-package brahms
+package brahms.messaging
 
 import Configs
+import brahms.messaging.messages.G2GMessage
+import brahms.messaging.messages.ProbeRequest
+import brahms.messaging.messages.ProbeResponse
 import kotlinx.coroutines.delay
 import messaging.G2GCommunicator
 import messaging.G2GMessageListener
-import messaging.gossip_to_gossip.G2GMessage
-import messaging.gossip_to_gossip.ProbeRequest
-import messaging.gossip_to_gossip.ProbeResponse
 import peers.Peer
 import java.time.LocalDateTime
 

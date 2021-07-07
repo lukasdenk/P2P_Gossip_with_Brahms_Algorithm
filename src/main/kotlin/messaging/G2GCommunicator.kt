@@ -1,6 +1,6 @@
 package messaging
 
-import messaging.gossip_to_gossip.G2GMessage
+import brahms.messaging.messages.G2GMessage
 
 //TODO To be done by kyrylo
 

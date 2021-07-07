@@ -1,9 +1,10 @@
-package brahms
+package brahms.messaging
 
 import Configs
+import brahms.History
+import brahms.messaging.messages.G2GMessage
+import brahms.messaging.messages.PushRequest
 import messaging.G2GMessageListener
-import messaging.gossip_to_gossip.G2GMessage
-import messaging.gossip_to_gossip.PushRequest
 import peers.Peer
 
 object PushManager : G2GMessageListener {

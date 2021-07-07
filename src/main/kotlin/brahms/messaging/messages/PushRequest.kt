@@ -1,4 +1,4 @@
-package messaging.gossip_to_gossip
+package brahms.messaging.messages
 
 import peers.Peer
 
