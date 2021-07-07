@@ -1,6 +1,6 @@
-package brahms.messaging
+package messaging.p2p
 
-import brahms.messaging.messages.P2PMessage
+import messaging.p2p.messages.P2PMessage
 import peers.Peer
 
 //TODO To be done by kyrylo

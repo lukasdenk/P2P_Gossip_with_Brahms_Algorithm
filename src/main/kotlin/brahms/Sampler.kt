@@ -1,7 +1,7 @@
 package brahms
 
 import Configs
-import brahms.messaging.ProbeManager
+import messaging.p2p.manager.ProbeManager
 import compareTo
 import kotlinx.coroutines.delay
 import peers.Peer

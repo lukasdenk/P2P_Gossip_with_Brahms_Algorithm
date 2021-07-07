@@ -1,8 +1,14 @@
-package messaging.gossip
+package messaging.api.manager
 
-import brahms.messaging.P2PMessageListener
-import brahms.messaging.messages.P2PMessage
-import brahms.messaging.messages.SpreadMsg
+import messaging.api.*
+import messaging.api.messages.APIMessage
+import messaging.api.messages.GossipNotification
+import messaging.api.messages.GossipNotify
+import messaging.api.messages.GossipValidation
+import messaging.p2p.manager.SpreadManager
+import messaging.p2p.P2PMessageListener
+import messaging.p2p.messages.P2PMessage
+import messaging.p2p.messages.SpreadMsg
 import peers.Peer
 
 object NotificationManager : APIMessageListener, P2PMessageListener {

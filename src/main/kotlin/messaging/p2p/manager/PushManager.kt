@@ -1,9 +1,10 @@
-package brahms.messaging
+package messaging.p2p.manager
 
 import Configs
 import brahms.History
-import brahms.messaging.messages.P2PMessage
-import brahms.messaging.messages.PushMsg
+import messaging.p2p.messages.P2PMessage
+import messaging.p2p.messages.PushMsg
+import messaging.p2p.P2PMessageListener
 import peers.Peer
 
 object PushManager : P2PMessageListener {

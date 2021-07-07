@@ -1,4 +1,4 @@
-package messaging.gossip
+package messaging.api
 
 typealias DataType = Short
 typealias Port = Int

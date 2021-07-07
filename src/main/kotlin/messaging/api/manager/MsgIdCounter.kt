@@ -1,4 +1,6 @@
-package messaging.gossip
+package messaging.api.manager
+
+import messaging.api.MsgId
 
 object MsgIdCounter {
     var id: MsgId = 0

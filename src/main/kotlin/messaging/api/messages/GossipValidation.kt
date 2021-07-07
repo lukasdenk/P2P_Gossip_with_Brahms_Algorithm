@@ -1,4 +1,4 @@
-package messaging.gossip
+package messaging.api.messages
 
 class GossipValidation(
     val messageId: Short,

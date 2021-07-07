@@ -1,4 +1,6 @@
-package messaging.gossip
+package messaging.api.messages
+
+import messaging.api.DataType
 
 class GossipNotification(
     val messageId: Short,

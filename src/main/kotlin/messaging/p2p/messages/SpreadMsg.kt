@@ -1,6 +1,6 @@
-package brahms.messaging.messages
+package messaging.p2p.messages
 
-import messaging.gossip.DataType
+import messaging.api.DataType
 import kotlin.math.max
 
 class SpreadMsg(val dataType: DataType, var ttl: Int, val data: ByteArray) :

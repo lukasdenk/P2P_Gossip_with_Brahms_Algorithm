@@ -1,10 +1,12 @@
-package brahms.messaging
+package messaging.p2p.manager
 
 import Configs
-import brahms.messaging.messages.P2PMessage
-import brahms.messaging.messages.ProbeRequest
-import brahms.messaging.messages.ProbeResponse
 import kotlinx.coroutines.delay
+import messaging.p2p.messages.P2PMessage
+import messaging.p2p.messages.ProbeRequest
+import messaging.p2p.messages.ProbeResponse
+import messaging.p2p.P2PCommunicator
+import messaging.p2p.P2PMessageListener
 import peers.Peer
 import java.time.LocalDateTime
 

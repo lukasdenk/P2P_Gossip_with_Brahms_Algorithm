@@ -1,8 +1,8 @@
-package messaging.gossip
+package messaging.p2p.manager
 
 import brahms.View
-import brahms.messaging.P2PCommunicator
-import brahms.messaging.messages.SpreadMsg
+import messaging.p2p.messages.SpreadMsg
+import messaging.p2p.P2PCommunicator
 
 object SpreadManager {
     fun spread(msg: SpreadMsg?) {
