@@ -4,7 +4,6 @@ import Configs
 import brahms.History
 import brahms.messaging.messages.G2GMessage
 import brahms.messaging.messages.PushRequest
-import messaging.G2GMessageListener
 import peers.Peer
 
 object PushManager : G2GMessageListener {

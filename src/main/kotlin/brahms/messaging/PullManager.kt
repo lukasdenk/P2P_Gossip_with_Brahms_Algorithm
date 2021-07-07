@@ -6,8 +6,6 @@ import brahms.View
 import brahms.messaging.messages.G2GMessage
 import brahms.messaging.messages.PullRequest
 import brahms.messaging.messages.PullResponse
-import messaging.G2GCommunicator
-import messaging.G2GMessageListener
 import peers.Peer
 import randomSubSet
 import java.util.concurrent.ConcurrentHashMap

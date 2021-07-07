@@ -5,8 +5,6 @@ import brahms.messaging.messages.G2GMessage
 import brahms.messaging.messages.ProbeRequest
 import brahms.messaging.messages.ProbeResponse
 import kotlinx.coroutines.delay
-import messaging.G2GCommunicator
-import messaging.G2GMessageListener
 import peers.Peer
 import java.time.LocalDateTime
 
