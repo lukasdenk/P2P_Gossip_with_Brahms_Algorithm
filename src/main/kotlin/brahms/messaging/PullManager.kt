@@ -3,14 +3,14 @@ package brahms.messaging
 import Configs
 import brahms.History
 import brahms.View
-import brahms.messaging.messages.G2GMessage
+import brahms.messaging.messages.P2PMessage
 import brahms.messaging.messages.PullRequest
 import brahms.messaging.messages.PullResponse
 import peers.Peer
 import randomSubSet
 import java.util.concurrent.ConcurrentHashMap
 
-object PullManager : G2GMessageListener {
+object PullManager : P2PMessageListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
     var limit: Int = 0
 
@@ -19,19 +19,19 @@ object PullManager : G2GMessageListener {
         peers.parallelStream().forEach {
             val pullRequest = PullRequest(Configs.getConfigs().self, it, limit)
             requests[it] = pullRequest
-            G2GCommunicator.send(pullRequest)
+            P2PCommunicator.send(pullRequest)
         }
     }
 
-    override fun receive(message: G2GMessage) {
-        if (message is PullResponse && requests.containsKey(message.sender)) {
-            History.next(message.neighbourSample)
-        } else if (message is PullRequest) {
-            G2GCommunicator.send(
+    override fun receive(msg: P2PMessage) {
+        if (msg is PullResponse && requests.containsKey(msg.sender)) {
+            History.next(msg.neighbourSample)
+        } else if (msg is PullRequest) {
+            P2PCommunicator.send(
                 PullResponse(
                     Configs.getConfigs().self,
-                    message.sender,
-                    View.v.randomSubSet(message.limit)
+                    msg.sender,
+                    View.view.randomSubSet(msg.limit)
                 )
             )
         }

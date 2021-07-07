@@ -2,5 +2,5 @@ package messaging.gossip
 
 class GossipNotify(
     override val port: Int,
-    val dataType: Short
+    val dataType: DataType
 ) : APIMessage(port)

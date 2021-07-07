@@ -2,11 +2,11 @@ package brahms.messaging
 
 import Configs
 import brahms.History
-import brahms.messaging.messages.G2GMessage
-import brahms.messaging.messages.PushRequest
+import brahms.messaging.messages.P2PMessage
+import brahms.messaging.messages.PushMsg
 import peers.Peer
 
-object PushManager : G2GMessageListener {
+object PushManager : P2PMessageListener {
     val difficulty = Configs.getConfigs().difficulty
     fun push(peers: Collection<Peer>) {
         peers.parallelStream().forEach {
@@ -14,9 +14,9 @@ object PushManager : G2GMessageListener {
         }
     }
 
-    override fun receive(message: G2GMessage) {
-        if (message is PushRequest && message.isValid()) {
-            History.next(setOf(message.sender))
+    override fun receive(msg: P2PMessage) {
+        if (msg is PushMsg && msg.isValid()) {
+            History.next(setOf(msg.sender))
         }
     }
 

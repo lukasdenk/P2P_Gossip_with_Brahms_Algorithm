@@ -1,4 +1,5 @@
 package messaging.gossip
 
-class APIMessageListener {
+interface APIMessageListener {
+    fun receive(msg: APIMessage)
 }

@@ -9,7 +9,7 @@ import randomSubSet
 
 object View {
     private val cacheSize = Configs.getConfigs().cacheSize
-    var v: MutableSet<Peer> = HashSet()
+    var view: MutableSet<Peer> = HashSet()
     private var vPush: Set<Peer> = HashSet()
     private var vPull: Set<Peer> = HashSet()
 
@@ -19,13 +19,13 @@ object View {
     //    TODO: call at beginning
     suspend fun update() {
         while (true) {
-            PushManager.push(v.randomSubSet(Partitioner.pushSize))
-            PullManager.pull(v.randomSubSet(Partitioner.pullSize))
+            PushManager.push(view.randomSubSet(Partitioner.pushSize))
+            PullManager.pull(view.randomSubSet(Partitioner.pullSize))
 //          TODO:  wait rand secs
             val waitTime = 4L
             delay(waitTime)
             if (vPush.size < waitTime * pushLimit) {
-                v = (vPush.randomSubSet(Partitioner.pushSize) union
+                view = (vPush.randomSubSet(Partitioner.pushSize) union
                         vPull.randomSubSet(Partitioner.pullSize) union
                         History.get(Partitioner.historySize)).toMutableSet()
             }
