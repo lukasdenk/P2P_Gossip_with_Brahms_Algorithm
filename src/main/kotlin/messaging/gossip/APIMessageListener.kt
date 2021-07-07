@@ -1,5 +1,5 @@
 package messaging.gossip
 
 interface APIMessageListener {
-    fun receive(msg: APIMessage)
+    fun receive(msg: APIMessage, sender: Port)
 }

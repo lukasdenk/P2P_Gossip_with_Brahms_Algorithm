@@ -1,8 +1,11 @@
 package brahms.messaging.messages
 
 import messaging.gossip.DataType
+import kotlin.math.max
 
-data class SpreadMsg(val dataType: DataType, var ttl: Byte) :
+class SpreadMsg(val dataType: DataType, var ttl: Int, val data: ByteArray) :
     P2PMessage() {
-//    fun copy(sender: Peer, receiver: Peer) = SpreadMsg(sender, receiver)
+    fun decrementTtl() {
+        ttl = max(0, ttl - 1)
+    }
 }
