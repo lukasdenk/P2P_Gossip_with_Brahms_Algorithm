@@ -1,11 +1,11 @@
 package p2p.brahms
 
-import Configs
-import compareTo
 import kotlinx.coroutines.delay
+import main.Configs
+import main.compareTo
+import main.sha256
 import p2p.manager.ProbeManager
 import peers.Peer
-import sha256
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 

@@ -1,6 +1,6 @@
 package p2p.manager
 
-import Configs
+import main.Configs
 import messages.p2p.P2PMessage
 import messages.p2p.PushMsg
 import p2p.P2PMessageListener

@@ -1,8 +1,10 @@
-package service
+package tcp_communication.service
 
 import kotlinx.coroutines.*
 import utils.ParametersReader
-import java.net.*
+import java.net.InetSocketAddress
+import java.net.SocketAddress
+import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel

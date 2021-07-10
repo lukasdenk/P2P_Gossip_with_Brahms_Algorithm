@@ -1,5 +1,7 @@
 package p2p.brahms
 
+import main.Configs
+
 object Partitioner {
     val alpha = 0.3
     val beta = 0.5

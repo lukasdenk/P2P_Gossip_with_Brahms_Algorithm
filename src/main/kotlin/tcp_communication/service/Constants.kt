@@ -1,4 +1,4 @@
-package service
+package tcp_communication.service
 
 object Constants {
     const val PacketSize: Int = 1400

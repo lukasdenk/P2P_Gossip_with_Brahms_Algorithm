@@ -1,10 +1,10 @@
-package client
+package tcp_communication.client
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import service.Constants
+import tcp_communication.service.Constants
 import utils.ParametersReader
 import java.net.InetSocketAddress
 import java.net.SocketAddress

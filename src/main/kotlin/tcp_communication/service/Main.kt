@@ -1,9 +1,6 @@
-package service
+package tcp_communication.service
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import utils.ParametersReader
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime

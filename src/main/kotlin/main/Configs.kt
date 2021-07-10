@@ -1,3 +1,5 @@
+package main
+
 import peers.Peer
 
 class Configs private constructor() {

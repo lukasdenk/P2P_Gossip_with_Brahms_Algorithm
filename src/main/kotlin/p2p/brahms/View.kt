@@ -1,11 +1,11 @@
 package p2p.brahms
 
-import Configs
 import kotlinx.coroutines.delay
+import main.Configs
+import main.randomSubSet
 import p2p.manager.PullManager
 import p2p.manager.PushManager
 import peers.Peer
-import randomSubSet
 
 object View {
     private val cacheSize = Configs.getConfigs().cacheSize

@@ -1,5 +1,6 @@
 package p2p.manager
 
+import main.randomSubSet
 import messages.p2p.P2PMessage
 import messages.p2p.PullRequest
 import messages.p2p.PullResponse
@@ -8,7 +9,6 @@ import p2p.P2PMessageListener
 import p2p.brahms.History
 import p2p.brahms.View
 import peers.Peer
-import randomSubSet
 import java.util.concurrent.ConcurrentHashMap
 
 object PullManager : P2PMessageListener {

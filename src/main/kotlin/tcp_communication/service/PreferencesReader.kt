@@ -1,4 +1,4 @@
-package service
+package tcp_communication.service
 
 import org.ini4j.Ini
 import java.io.File

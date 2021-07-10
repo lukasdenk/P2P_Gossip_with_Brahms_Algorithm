@@ -1,3 +1,5 @@
+package main
+
 import java.security.MessageDigest
 import kotlin.math.min
 

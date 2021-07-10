@@ -1,7 +1,7 @@
 package p2p.manager
 
-import Configs
 import kotlinx.coroutines.delay
+import main.Configs
 import messages.p2p.P2PMessage
 import messages.p2p.ProbeRequest
 import messages.p2p.ProbeResponse

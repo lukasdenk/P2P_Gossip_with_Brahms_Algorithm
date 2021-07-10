@@ -1,12 +1,6 @@
-package client
+package tcp_communication.client
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import service.PreferencesReader
-import service.Service
-import utils.ParametersReader
-import java.nio.ByteBuffer
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime

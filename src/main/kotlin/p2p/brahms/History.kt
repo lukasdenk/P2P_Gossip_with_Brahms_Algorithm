@@ -1,7 +1,7 @@
 package p2p.brahms
 
+import main.randomSubSet
 import peers.Peer
-import randomSubSet
 
 object History {
     val n = 50
