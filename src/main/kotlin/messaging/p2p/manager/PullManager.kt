@@ -1,9 +1,12 @@
-package messaging.p2p.messages
+package messaging.p2p.manager
 
 import brahms.History
 import brahms.View
 import messaging.p2p.P2PCommunicator
 import messaging.p2p.P2PMessageListener
+import messaging.p2p.messages.P2PMessage
+import messaging.p2p.messages.PullRequest
+import messaging.p2p.messages.PullResponse
 import peers.Peer
 import randomSubSet
 import java.util.concurrent.ConcurrentHashMap

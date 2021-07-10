@@ -1,9 +1,9 @@
 package brahms
 
 import Configs
-import messaging.p2p.messages.PullManager
-import messaging.p2p.manager.PushManager
 import kotlinx.coroutines.delay
+import messaging.p2p.manager.PullManager
+import messaging.p2p.manager.PushManager
 import peers.Peer
 import randomSubSet
 
