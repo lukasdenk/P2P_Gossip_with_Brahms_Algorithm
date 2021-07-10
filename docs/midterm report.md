@@ -21,7 +21,8 @@ and `p2p` packages). They each contain:
 - an interface providing a method `receive` to receive API or P2P messages, respectively. The `communicator` (**
   specify!!!**) package calls this method to pass the appropriate incoming messages.
   
-Additionally, the `p2p` package contains the `Peer` class, representing a peer in the network.
+Additionally, the `p2p` package contains the `Peer` class, representing a peer in the network. Beside other members,
+this class contains the peer's address as well as whether the peer is online or not.
 
 ### The `api` package
 
@@ -59,9 +60,12 @@ class frequently updates its view from three sources:
 1. The current random subset of the history, provided by the `History` class.
 
 The `History` class holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of the
-elements in the current random subset. It is implemented similar to the pseudocode in the aforementioned paper. Each of
-our `Sampler` instances is furthermore responsible for regularly sending *probe request*s to the peer it is currently
-selecting.
+elements in the current random subset. It is implemented similar to the pseudocode in the aforementioned paper. However,
+we validate the availability of a `Sampler`'s peer differently:
+Whenever the `History` asks a `Sampler` for the peer the `Sampler` currently holds, the `Sampler` only returns the peer
+if its `online` variable is set to `true`. To update this variable, our `Sampler` instance is furthermore responsible
+for regularly sending *probe request*s to this peer. However, it does not send them directly but rather instructs
+the `ProbeManager` to do so.
 
 The `Probe`-, `Pull`- and `PushManager` are responsible for handling the sending and/or receiving of probe, pull or push
 messages, respectively. They all implement the listener interface from `messaging.p2p`.
