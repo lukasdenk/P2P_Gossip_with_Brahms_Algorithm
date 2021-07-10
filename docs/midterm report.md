@@ -1,3 +1,12 @@
+## Changes to our assumptions from Initial Report
+
+### Defined libraries in use
+
+We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html) 
+for networking connections management, 
+and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
+
+
 ## Architecture
 
 ### Overview
@@ -10,6 +19,15 @@ Our project consists of five modules:
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
+### The `main` module
+
+The `main` module serves as setup function for our service and consists of `CLI Reader` and `INI Reader` classes.
+Specifically, it does following:
+
+- Reads command line arguments
+- Reads INI file parameters
+- Initializes our communication modules with specified parameters.
+
 ### The `messaging` package
 
 The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be confused with the *main* `api`
@@ -20,6 +38,45 @@ and `p2p` packages). They each contain:
 - a superclass from which the message classes inherit.
 - an interface providing a method `receive` to receive API or P2P messages, respectively. The `communicator` (**
   specify!!!**) package calls this method to pass the appropriate incoming messages.
+
+### The `networking` package
+
+`Networking` package serves as transport functionality for module-to-module and gossip-to-gossip communication.
+Currently, it supports socket communication (read/write) and connections management 
+(restricting amount of incoming connections to api service).
+
+To manage socket communication we have used Kotlin coroutines and Java Non-blocking IO.
+These technologies will are explained in paragraph below.
+
+#### Coroutines
+
+We do networking with the help of coroutines. 
+Coroutines can be thought of as light-weight threads with a number of differences.
+As coroutines is such a broad topic, there will be explained only features we used in current project.
+(See [Kotlin Team documentation](https://kotlinlang.org/docs/coroutines-basics.html#your-first-coroutine) 
+for detailed explanation).
+
+##### Coroutine Scope
+We make use of a structured concurrency approach, making use of Coroutine Scope. 
+Coroutine Scope is a parent scope for all coroutines created with its help, 
+if we create 5 coroutines for module-to-module connections inside Communication Scope. 
+We can easily stop all the connections by simply stopping Communication Scope.
+In this way we do not have to keep track of created jobs.
+
+##### How we use coroutine scope
+In the current state of development, 
+we create one coroutine per module-to-module connection and keep it in Service Scope.
+In addition, we are planning to add functionality for one-message-connections, 
+to get or initiate a connection, receive or send a message, close the socket, and finish the coroutine.
+
+##### Asynchronous Socket Communication
+For socket communication use standard Java Non-blocking I/O library, 
+which is the most efficient choice for multi-service communication. 
+Instead of writing code for waiting for a message and blocking threads, 
+we define handlers that will start their work as soon as action 
+(Message receiving, connection establishment) happens. 
+In this way, we delegate message receiving and sending to the java library.
+We take care of the most important part - writing, reading, reacting to failure events.
 
 ### The `api` package
 
@@ -56,3 +113,30 @@ from three sources:
 
 1. Incoming push requests, provided and verified by the `PushManager`.
 1. 
+
+
+## Future Work. Features we could not finish so far.
+
+- We are planning to add functionality for one-message-connections, to get or initiate a connection, 
+  receive or send a message, close the socket, and finish the coroutine in our communication module.
+- After that, we combine communication and peer-to-peer protocol modules.
+
+## Workload Distribution
+
+- Kyrylo Vasylenko: Main Module and Communication Service
+
+## Effort spent for the project (please specify individual effort)
+
+- Kyrylo Vasylenko
+    - It took me up to two weeks to create the communication module in its current state.
+1/3 of the time was allocated for investigation of Java Non-Blocking I/O and coroutines approach.
+    - Almost 2/3 of the time was implementation (1/3) and debugging (1/3). I was setting up a python voip environment and communicating with a gossip client and gossip mockup, handling message\connection failures in the Communication Module.
+    - And I needed up to a day to create command line and INI file parsing modules.
+- Before starting to implement the Communication Module, I studied the following resources, which helped me to completely understand Async IO in Java and Coroutines approach in Kotlin.
+    - Non-blocking IO
+        - https://www.baeldung.com/java-io-vs-nio
+    - Why use coroutines
+        - https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
+    - Coroutine Scope
+        - https://elizarov.medium.com/structured-concurrency-722d765aa952
+        - https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc
