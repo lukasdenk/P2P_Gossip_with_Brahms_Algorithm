@@ -1,26 +1,26 @@
-package brahms
+package messaging.p2p.manager
 
 import Configs
 import kotlinx.coroutines.delay
-import messaging.G2GCommunicator
-import messaging.G2GMessageListener
-import messaging.gossip_to_gossip.G2GMessage
-import messaging.gossip_to_gossip.ProbeRequest
-import messaging.gossip_to_gossip.ProbeResponse
+import messaging.p2p.messages.P2PMessage
+import messaging.p2p.messages.ProbeRequest
+import messaging.p2p.messages.ProbeResponse
+import messaging.p2p.P2PCommunicator
+import messaging.p2p.P2PMessageListener
 import peers.Peer
 import java.time.LocalDateTime
 
-object ProbeManager : G2GMessageListener {
+object ProbeManager : P2PMessageListener {
     val probes: HashMap<Peer, LocalDateTime> = LinkedHashMap()
 
-    override fun receive(message: G2GMessage) {
-        if (message is ProbeResponse) {
-            probes.remove(message.sender)
+    override fun receive(msg: P2PMessage, sender: Peer) {
+        if (msg is ProbeResponse) {
+            probes.remove(sender)
         }
     }
 
     fun probe(peer: Peer) {
-        G2GCommunicator.send(ProbeRequest(Configs.getConfigs().self, peer))
+        P2PCommunicator.send(ProbeRequest(), peer)
         probes.put(peer, LocalDateTime.now())
     }
 
