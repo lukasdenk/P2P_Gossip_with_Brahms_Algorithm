@@ -6,9 +6,9 @@ Our project consists of five modules:
 
 1. Main
 1. The `messaging` package, which contains a package for API- and one for Peer-To-Peer- (p2p) messaging.
-1. Communicators
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
+1. Networking
 
 ### The `messaging` package
 
