@@ -125,7 +125,7 @@ from three sources:
 
 - Kyrylo Vasylenko: Main Module and Communication Service
 
-## Effort spent for the project (please specify individual effort)
+## Effort spent for the project
 
 - Kyrylo Vasylenko
     - It took me up to two weeks to create the communication module in its current state.
