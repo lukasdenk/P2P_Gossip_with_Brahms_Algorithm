@@ -253,6 +253,10 @@ Empty body
 - We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
   message, close the socket, and finish the coroutine in our communication module.
 - After that, we combine communication and peer-to-peer protocol modules.
+- We will further write tests to
+    - eliminate crashes of our module
+    - find good parameters for timeouts, needed proof of work and similar
+    - protect our peer from attacks
 
 ## Workload Distribution
 
@@ -285,6 +289,6 @@ Lukas Denk implements the `messaging`, `p2p` and `api` packages.
 
 ### Lukas Denk
 
-#### Research and Design
-
+Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
+midterm report.
     
