@@ -2,10 +2,6 @@
 
 ## Architecture
 
-### Content
-
-[Spec](#The Brahms algorithm)
-
 ### Overview
 
 Our project consists of five modules:
