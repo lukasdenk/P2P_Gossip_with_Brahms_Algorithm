@@ -1,6 +1,6 @@
 package messaging.p2p
 
-data class PushMsg(val pow: Int) :
+class PushMsg(val nonce: ByteArray) :
     P2PMessage() {
     fun isValid(): Boolean {
 //        TODO: check PoW
