@@ -4,7 +4,7 @@
 
 ### Overview
 
-Our project consists of five modules:
+Our project consists of five packages:
 
 1. Main
 1. The `messaging` package, which contains a package for API- and one for Peer-To-Peer- (p2p) messaging.
