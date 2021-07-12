@@ -261,7 +261,7 @@ Empty body
 
 ### Kyrylo Vasylenko
 
-`main` and `networking` packages
+Kyrylo Vasylenko implements `main` and `networking` packages.
 
 ### Lukas Denk
 
