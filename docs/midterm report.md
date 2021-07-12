@@ -16,8 +16,8 @@ and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
 Our project consists of five packages:
 
 1. The `main` module serves as setup function for our service and reads specified console and ini file parameters.
-1. The `messaging` package, which contains a package for API- and one for Peer-To-Peer- (p2p) messaging.
 1. The `networking` module serves as transport functionality for module-to-module and gossip-to-gossip communication.
+1. The `messaging` package, which contains a package for API- and one for Peer-To-Peer- (p2p) messaging.
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
@@ -29,6 +29,56 @@ Specifically, it does following:
 - Reads command line arguments
 - Reads INI file parameters
 - Initializes our communication modules with specified parameters.
+
+### The Networking package
+
+`Networking` package serves as transport functionality for module-to-module and gossip-to-gossip communication.
+Currently, it supports socket communication (read/write) and connections management
+(restricting amount of incoming connections to api service).
+
+To manage socket communication we have used Kotlin coroutines and Java Non-blocking IO. These technologies will are
+explained in paragraph below.
+
+#### Coroutines
+
+We do networking with the help of coroutines. Coroutines can be thought of as light-weight threads with a number of
+differences. As coroutines is such a broad topic, there will be explained only features we used in current project.
+(See [Kotlin Team documentation](https://kotlinlang.org/docs/coroutines-basics.html#your-first-coroutine)
+for detailed explanation).
+
+##### Coroutine Scope
+
+We make use of a structured concurrency approach, making use of Coroutine Scope. Coroutine Scope is a parent scope for
+all coroutines created with its help, if we create 5 coroutines for module-to-module connections inside Communication
+Scope. We can easily stop all the connections by simply stopping Communication Scope. In this way we do not have to keep
+track of created jobs.
+
+##### How we use coroutine scope
+
+In the current state of development, we create one coroutine per module-to-module connection and keep it in Service
+Scope. In addition, we are planning to add functionality for one-message-connections, to get or initiate a connection,
+receive or send a message, close the socket, and finish the coroutine.
+
+##### Asynchronous Socket Communication
+
+For socket communication use standard Java Non-blocking I/O library, which is the most efficient choice for
+multi-service communication. Instead of writing code for waiting for a message and blocking threads, we define handlers
+that will start their work as soon as action
+(Message receiving, connection establishment) happens. In this way, we delegate message receiving and sending to the
+java library. We take care of the most important part - writing, reading, reacting to failure events.
+
+### The API Package
+
+The main logic of the `api` package is in the `APIMessagesManager`. It implements the API communication as specified in
+the *specification* paper.  
+To receive messaging coming from other modules, the manager implements the `APIMessageListener` interface.  
+The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
+Therefore, it also implements the `P2PMessageListener` interface. The `networking` package is also liable for calling
+the `APIMessagesManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
+the `APIMessagesManager` then unsubscribes the corresponding module.  
+To send messages to other modules, the manager uses the `networking`
+package. Furthermore, it forwards validated knowledge of *Gossip Notification*s via the `SpreadManager` with a so
+called *spread message* (see section `p2p` package).
 
 ### The Messaging Package
 
@@ -47,58 +97,6 @@ The reason for separating the messages into an own package is that our module us
 
 The `p2p` package additionally contains the `Peer` class, representing a peer in the network. Beside other members, this
 class contains the peer's address as well as whether the peer is online or not.
-
-### The Networking package
-
-`Networking` package serves as transport functionality for module-to-module and gossip-to-gossip communication.
-Currently, it supports socket communication (read/write) and connections management 
-(restricting amount of incoming connections to api service).
-
-To manage socket communication we have used Kotlin coroutines and Java Non-blocking IO.
-These technologies will are explained in paragraph below.
-
-#### Coroutines
-
-We do networking with the help of coroutines. 
-Coroutines can be thought of as light-weight threads with a number of differences.
-As coroutines is such a broad topic, there will be explained only features we used in current project.
-(See [Kotlin Team documentation](https://kotlinlang.org/docs/coroutines-basics.html#your-first-coroutine) 
-for detailed explanation).
-
-##### Coroutine Scope
-We make use of a structured concurrency approach, making use of Coroutine Scope. 
-Coroutine Scope is a parent scope for all coroutines created with its help, 
-if we create 5 coroutines for module-to-module connections inside Communication Scope. 
-We can easily stop all the connections by simply stopping Communication Scope.
-In this way we do not have to keep track of created jobs.
-
-##### How we use coroutine scope
-In the current state of development, 
-we create one coroutine per module-to-module connection and keep it in Service Scope.
-In addition, we are planning to add functionality for one-message-connections, 
-to get or initiate a connection, receive or send a message, close the socket, and finish the coroutine.
-
-##### Asynchronous Socket Communication
-For socket communication use standard Java Non-blocking I/O library, 
-which is the most efficient choice for multi-service communication. 
-Instead of writing code for waiting for a message and blocking threads, 
-we define handlers that will start their work as soon as action 
-(Message receiving, connection establishment) happens. 
-In this way, we delegate message receiving and sending to the java library.
-We take care of the most important part - writing, reading, reacting to failure events.
-
-### The API Package
-
-The main logic of the `api` package is in the `APIMessagesManager`. It implements the API communication as specified in
-the *specification* paper.  
-To receive messaging coming from other modules, the manager implements the `APIMessageListener` interface.  
-The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
-Therefore, it also implements the `P2PMessageListener` interface. The `networking` package is also liable for calling
-the `APIMessagesManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
-the `APIMessagesManager` then unsubscribes the corresponding module.  
-To send messages to other modules, the manager uses the `networking`
-package. Furthermore, it forwards validated knowledge of *Gossip Notification*s via the `SpreadManager` with a so
-called *spread message* (see section `p2p` package).
 
 ### The P2P Package
 
