@@ -112,15 +112,15 @@ by Edward Bortnikov et al..
 As in the Brahms paper, we also refer to a peer's neighbourhood as its *view*. The Brahms algorithm frequently updates
 this view from three sources:
 
-1. It queries its neighbours about their view with so called *pull request* messages. Honest neighbours then answer with
-   a *pull response* message, containing their view.
-2. Additionally, the algorithm listens to other peer's *push request* messages. Each peer uses these requests to ask
-   another peer to include it in their view.
-3. Finally, each update contains a random subset of the *history* of the peer. This history consists of all the peers
-   contained in the push requests or pull responses the peer has ever received. Of course, an implementation never
-   maintains the whole history but only the current random subset. Additionally, Brahms regularly ensures that the peers
-   in the random subset are still online by sending them *probe request* messages. If there is no *probe response*
-   message answering the request, the algorithm removes this peer from the current random subset.
+- It queries its neighbours about their view with so called *pull request* messages. Honest neighbours then answer with
+  a *pull response* message, containing their view.
+- Additionally, the algorithm listens to other peer's *push request* messages. Each peer uses these requests to ask
+  another peer to include it in their view.
+- Finally, each update contains a random subset of the *history* of the peer. This history consists of all the peers
+  contained in the push requests or pull responses the peer has ever received. Of course, an implementation never
+  maintains the whole history but only the current random subset. Additionally, Brahms regularly ensures that the peers
+  in the random subset are still online by sending them *probe request* messages. If there is no *probe response*
+  message answering the request, the algorithm removes this peer from the current random subset.
 
 #### Message Types of the P2P Protocol
 
@@ -143,9 +143,9 @@ In our implementation, the `View` class maintains the peer's current view. At th
 the `Bootstrapper` class initializes the view by asking for pull responses from hardcoded peers. Afterwards, the `View`
 class frequently updates its view from three sources:
 
-1. `vPush`. This is a set containing the peers from all the received push requests since the last update round.
-1. `vPull`. A set consisting of the peers from all the pull responses since the last update round.
-1. The current random subset of the history, provided by the `History` class.
+- `vPush`. This is a set containing the peers from all the received push requests since the last update round.
+- `vPull`. A set consisting of the peers from all the pull responses since the last update round.
+- The current random subset of the history, provided by the `History` class.
 
 The `History` class holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of the
 elements in the current random subset. It is implemented similar to the pseudocode in the aforementioned paper. However,
@@ -199,9 +199,9 @@ Message type integer: 0
 
 | Field name | data type  | meaning                                             |
 |------------|------------|-----------------------------------------------------|
-| dataType   | integer    | the data type field, as specified in *GossipAnnounce* |
-| ttl        | integer    | TTL, as specified in *GossipAnnounce*                 |
-| data       | byte array | data, as specified in *GossipAnnounce*                |
+| dataType   | integer    | the data type field, as specified in *GOSSIP ANNOUNCE* |
+| ttl        | integer    | the TTL field, as specified in *GOSSIP ANNOUNCE*                 |
+| data       | byte array | the data field, as specified in *GOSSIP ANNOUNCE*                |
 
 #### Pull Request
 
@@ -251,6 +251,7 @@ Empty body
 - We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
   message, close the socket, and finish the coroutine in our communication module.
 - After that, we combine communication and peer-to-peer protocol modules.
+- Furthermore, we will use thread-safe libraries and synchronization to protect data which is used in different threads.
 - We will further write tests to
     - eliminate crashes of our module
     - find good parameters for timeouts, needed proof of work and similar
