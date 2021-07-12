@@ -23,8 +23,7 @@ and `p2p` *main* packages). They each contain:
   package* section.
 - The superclass `APIMessage` or `P2PMessage` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMessageListener` or `P2PMessageListener`, providing a method `receive` to receive API or P2P
-  messages, respectively. The `communicator` package calls this method to pass incoming API or P2P messages,
-  respectively.
+  messages, respectively. The `networking` package calls this method to pass incoming API or P2P messages, respectively.
 
 The reason for separating the messages into an own package is that our module uses them across multiple packages.
 
@@ -35,10 +34,13 @@ class contains the peer's address as well as whether the peer is online or not.
 
 The main logic of the `api` package is in the `APIMessagesManager`. It implements the API communication as specified in
 the *specification* paper.  
-To receive messaging coming from other modules, the manager implements the `APIMessageListener` interface. The manager
-is also responsible for forwarding incoming knowledge to the modules which have subscribed for it. Therefore, it also
-implements the `P2PMessageListener` interface. To send messages to other modules, the manager uses the `communication`
-module. Furthermore, the manager sends validated *Gossip Notification*s via the `SpreadManager` (for the `SpreadManager`
+To receive messaging coming from other modules, the manager implements the `APIMessageListener` interface.  
+The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
+Therefore, it also implements the `P2PMessageListener` interface. The `networking` package is also liable for calling
+the `APIMessagesManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
+the `APIMessagesManager` then unsubscribes the corresponding module. To send messages to other modules, the manager uses
+the `networking`
+package. Furthermore, it sends validated *Gossip Notification*s via the `SpreadManager` (for the `SpreadManager`
 , see section `p2p` package).
 
 ### The `p2p` package
@@ -116,16 +118,16 @@ Only then it updates the `View.vPush` set.
 ## P2P Protocol
 
 In this section, we provide a precise definition of the message formats on the network layer. The peers transport them
-as Json objects. The `communicator` package maps an incoming Json message to an instance of the message class it is
+as Json objects. The `networking` package maps an incoming Json message to an instance of the message class it is
 associated with. It then forwards the instance to each `APIMessageListener`. On the other hand, when another class
-instructs the `communicator` package to send a message instance, the mapping proceeds in the other direction. In this
+instructs the `networking` package to send a message instance, the mapping proceeds in the other direction. In this
 case, it maps the instance to a Json object before sending it to the message's destination.
 
 ### Core Message
 
-When the `communicator` package receives a Json message, it needs to know to which message class it should map the
-message to. Therefore, each Json message starts with the message type. The *body* field then contains the actual data of
-the message. Hence, each message is in the following format:
+When the `networking` package receives a Json message, it needs to know to which message class it should map the message
+to. Therefore, each Json message starts with the message type. The *body* field then contains the actual data of the
+message. Hence, each message is in the following format:
 
 | Field name   | data type   | meaning                                            |
 |--------------|-------------|----------------------------------------------------|
