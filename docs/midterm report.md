@@ -87,7 +87,7 @@ the `Bootstrapper` class initializes the view by asking for pull responses from 
 class frequently updates its view from three sources:
 
 1. `vPush`. This is a set containing the peers from all the received push requests since the last update round.
-1. `vPull`. A set consisting of the peers from all the *pull response*s since the last update round.
+1. `vPull`. A set consisting of the peers from all the pull responses since the last update round.
 1. The current random subset of the history, provided by the `History` class.
 
 The `History` class holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of the
@@ -105,13 +105,13 @@ Whenever the `ProbeManager` sends a probe request and does not receive a corresp
 the appropriate peer as offline and removes it from the current view.  
 The `PullManager` frequently sends pull requests to the peer's neighbours. If it does not receive an answer after a
 timeout, it sends the peer as offline and removes it from the current view. Otherwise, it adds the peers contained in
-the *pull response* to the `View.vPull` set.  
+the pull responseto the `View.vPull` set.  
 The `PushManager` regularly sends push requests to the peer's neighbourhood. To send a push request, the sender must
-always proof some work. This prevents a malicious peer from flooding the network with *push responses*. Therefore,
-before sending such a request, the manager must first hash the sender and receiver address, the current date and hour,
-and a nonce. The nonce must be chosen so that the resulting hash starts with a certain number of leading 0 bits. Every
-time the `PushManager` receives a push request, it validates whether hashing the mentioned values results in a correct
-hash. Only then it updates the `View.vPush` set.
+always proof some work. This prevents a malicious peer from flooding the network with push responses. Therefore, before
+sending such a request, the manager must first hash the sender and receiver address, the current date and hour, and a
+nonce. The nonce must be chosen so that the resulting hash starts with a certain number of leading 0 bits. Every time
+the `PushManager` receives a push request, it validates whether hashing the mentioned values results in a correct hash.
+Only then it updates the `View.vPush` set.
 
 ## P2P Protocol
 
