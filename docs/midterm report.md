@@ -21,7 +21,7 @@ Our project consists of five packages:
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
-### The `main` module
+### The Main module
 
 The `main` module serves as setup function for our service and consists of `CLI Reader` and `INI Reader` classes.
 Specifically, it does following:
@@ -30,7 +30,7 @@ Specifically, it does following:
 - Reads INI file parameters
 - Initializes our communication modules with specified parameters.
 
-### The `messaging` Package
+### The Messaging Package
 
 The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be confused with the `api`
 and `p2p` *main* packages). They each contain:
@@ -48,7 +48,7 @@ The reason for separating the messages into an own package is that our module us
 The `p2p` package additionally contains the `Peer` class, representing a peer in the network. Beside other members, this
 class contains the peer's address as well as whether the peer is online or not.
 
-### The `networking` package
+### The Networking package
 
 `Networking` package serves as transport functionality for module-to-module and gossip-to-gossip communication.
 Currently, it supports socket communication (read/write) and connections management 
@@ -87,7 +87,7 @@ we define handlers that will start their work as soon as action
 In this way, we delegate message receiving and sending to the java library.
 We take care of the most important part - writing, reading, reacting to failure events.
 
-### The `api` package
+### The API Package
 
 The main logic of the `api` package is in the `APIMessagesManager`. It implements the API communication as specified in
 the *specification* paper.  
@@ -100,7 +100,7 @@ To send messages to other modules, the manager uses the `networking`
 package. Furthermore, it forwards validated knowledge of *Gossip Notification*s via the `SpreadManager` with a so
 called *spread message* (see section `p2p` package).
 
-### The `p2p` package
+### The P2P Package
 
 The `p2p` package consists of the `SpreadManager` class, as well as the `brahms` package. The `SpreadManager` class is
 responsible for sending and receiving *spread message*s of the P2P protocol to or from other peers. Our module uses them
@@ -109,7 +109,7 @@ simplified version of the Brahms algorithm specified in [*Brahms: byzantine resi
 sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772)
 by Edward Bortnikov et al..
 
-#### The Brahms algorithm
+#### The Brahms Algorithm
 
 As in the Brahms paper, we also refer to a peer's neighbourhood as its *view*. The Brahms algorithm frequently updates
 this view from three sources:
@@ -124,7 +124,7 @@ this view from three sources:
    in the random subset are still online by sending them *probe request* messages. If there is no *probe response*
    message answering the request, the algorithm removes this peer from the current random subset.
 
-#### Message types of the P2P protocol
+#### Message Types of the P2P Protocol
 
 Our module represents every message of the P2P protocol in two formats: As the instance of a message class or as a Json
 object. The module operates with the first format for passing a message internally while it uses the second format on
@@ -139,7 +139,7 @@ Architecture* section, we always talk about the instance of a message class. The
 As already mentioned, our module uses the `SpreadMsg` to spread knowledge across the network. A peer needs the other
 messages to maintain its view with the Brahms algorithm (see section *The Brahms algorithm*).
 
-#### Implementation of the Brahms algorithm
+#### Implementation of the Brahms Algorithm
 
 In our implementation, the `View` class maintains the peer's current view. At the startup of our module,
 the `Bootstrapper` class initializes the view by asking for pull responses from hardcoded peers. Afterwards, the `View`
@@ -191,7 +191,7 @@ message. Hence, each message is in the following format:
 | message type | integer     | integer, indicating the type of the message        |
 | body         | Json object | described in the next subsection |
 
-### Body types of the core message
+### Body Types of the Core Message
 
 In this section, we outline the different body formats, representing the different message types.
 
@@ -268,7 +268,7 @@ Main package and Communication Service
 
 Lukas Denk implements the `messaging`, `p2p` and `api` packages.
 
-## Effort spent for the project
+## Effort Spent for the Project
 
 - Kyrylo Vasylenko
     - It took me up to two weeks to create the communication module in its current state. 1/3 of the time was allocated
