@@ -2,6 +2,10 @@
 
 ## Architecture
 
+### Content
+
+[Spec](#The Brahms algorithm)
+
 ### Overview
 
 Our project consists of five modules:
@@ -38,10 +42,10 @@ To receive messaging coming from other modules, the manager implements the `APIM
 The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
 Therefore, it also implements the `P2PMessageListener` interface. The `networking` package is also liable for calling
 the `APIMessagesManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
-the `APIMessagesManager` then unsubscribes the corresponding module. To send messages to other modules, the manager uses
-the `networking`
-package. Furthermore, it sends validated *Gossip Notification*s via the `SpreadManager` (for the `SpreadManager`
-, see section `p2p` package).
+the `APIMessagesManager` then unsubscribes the corresponding module.  
+To send messages to other modules, the manager uses the `networking`
+package. Furthermore, it forwards validated knowledge of *Gossip Notification*s via the `SpreadManager` with a so
+called *spread message* (see section `p2p` package).
 
 ### The `p2p` package
 
