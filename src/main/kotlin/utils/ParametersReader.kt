@@ -1,6 +1,6 @@
 package utils
 
-import tcp_communication.client.ClientMode
+import networking.client.ClientMode
 
 class ParametersReader {
 

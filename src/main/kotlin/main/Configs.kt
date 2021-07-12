@@ -1,6 +1,6 @@
 package main
 
-import peers.Peer
+import messaging.p2p.Peer
 
 class Configs private constructor() {
     val self: Peer

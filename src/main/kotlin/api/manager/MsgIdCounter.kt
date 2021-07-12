@@ -1,6 +1,6 @@
 package api.manager
 
-import messages.api.MsgId
+import messaging.api.MsgId
 
 object MsgIdCounter {
     var id: MsgId = 0
