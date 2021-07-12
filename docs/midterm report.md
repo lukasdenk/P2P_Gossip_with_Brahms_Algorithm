@@ -261,7 +261,7 @@ Empty body
 
 ### Kyrylo Vasylenko
 
-Main package and Communication Service
+`main` and `networking` packages
 
 ### Lukas Denk
 
