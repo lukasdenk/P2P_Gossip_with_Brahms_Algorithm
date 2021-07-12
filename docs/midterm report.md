@@ -15,24 +15,24 @@ and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
 
 Our project consists of five packages:
 
-1. The `main` module serves as setup function for our service and reads specified console and ini file parameters.
-1. The `networking` module serves as transport functionality for module-to-module and Peer-To-Peer- (P2P) communication.
+1. The `main` package serves as setup function for our service and reads specified console and ini file parameters.
+1. The `networking` package serves as transport functionality for module-to-module and Peer-To-Peer (P2P) communication.
 1. The `messaging` package, which contains a package for API- and one for P2P messaging.
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
-### The Main module
+### The Main Package
 
-The `main` module serves as setup function for our service and consists of `CLI Reader` and `INI Reader` classes.
+The `main` package serves as setup function for our service and consists of `CLI Reader` and `INI Reader` classes.
 Specifically, it does following:
 
 - Reads command line arguments
 - Reads INI file parameters
 - Initializes our communication modules with specified parameters.
 
-### The Networking package
+### The Networking Package
 
-`Networking` package serves as transport functionality for module-to-module and gossip-to-gossip communication.
+`Networking` package serves as transport functionality for module-to-module and P2P communication.
 Currently, it supports socket communication (read/write) and connections management
 (restricting amount of incoming connections to api service).
 
@@ -53,7 +53,7 @@ all coroutines created with its help, if we create 5 coroutines for module-to-mo
 Scope. We can easily stop all the connections by simply stopping Communication Scope. In this way we do not have to keep
 track of created jobs.
 
-##### How we use coroutine scope
+##### How We Use Coroutine Scope
 
 In the current state of development, we create one coroutine per module-to-module connection and keep it in Service
 Scope. In addition, we are planning to add functionality for one-message-connections, to get or initiate a connection,
@@ -246,7 +246,7 @@ Message type integer: 5
 
 Empty body
 
-## Future Work. Features we could not finish so far.
+## Future Work. Features We Could Not Finish So Far.
 
 - We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
   message, close the socket, and finish the coroutine in our communication module.
@@ -269,22 +269,17 @@ Lukas Denk implements the `messaging`, `p2p` and `api` packages.
 
 ## Effort Spent for the Project
 
-- Kyrylo Vasylenko
-    - It took me up to two weeks to create the communication module in its current state. 1/3 of the time was allocated
-      for investigation of Java Non-Blocking I/O and coroutines approach.
-    - Almost 2/3 of the time was implementation (1/3) and debugging (1/3). I was setting up a python voip environment
-      and communicating with a gossip client and gossip mockup, handling message\connection failures in the
-      Communication Module.
-    - And I needed up to a day to create command line and INI file parsing modules.
-- Before starting to implement the Communication Module, I studied the following resources, which helped me to
-  completely understand Async IO in Java and Coroutines approach in Kotlin.
-    - Non-blocking IO
-        - https://www.baeldung.com/java-io-vs-nio
-    - Why use coroutines
-        - https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
-    - Coroutine Scope
-        - https://elizarov.medium.com/structured-concurrency-722d765aa952
-        - https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc
+### Kyrylo Vasylenko
+Kyrylo Vasylenko spent up to 19 hours for `networking` package implementation. 
+About 6 hours were used for studying Java Non-Blocking I/O and coroutines approach.
+About 8 hours were spent on `networking` module manual testing with use of python gossip client and gossip mockup.
+And up to 5 hours were put into command line and windows INI file parsing modules.
+
+- Resources that were studied about Async IO in Java and Coroutines approach in Kotlin.
+    - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
+    - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
+    - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
+    - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
 
 ### Lukas Denk
 
