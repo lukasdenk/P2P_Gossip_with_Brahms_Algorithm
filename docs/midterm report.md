@@ -30,7 +30,7 @@ Specifically, it does following:
 - Reads INI file parameters
 - Initializes our communication modules with specified parameters.
 
-### The `messaging` package
+### The `messaging` Package
 
 The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be confused with the `api`
 and `p2p` *main* packages). They each contain:
@@ -246,26 +246,39 @@ Empty body
 
 Message type integer: 5
 
-Empty body 
+Empty body
 
 ## Future Work. Features we could not finish so far.
 
-- We are planning to add functionality for one-message-connections, to get or initiate a connection, 
-  receive or send a message, close the socket, and finish the coroutine in our communication module.
+- We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
+  message, close the socket, and finish the coroutine in our communication module.
 - After that, we combine communication and peer-to-peer protocol modules.
+- We will further write tests to
+    - eliminate crashes of our module
+    - find good parameters for timeouts, needed proof of work and similar
+    - protect our peer from attacks
 
 ## Workload Distribution
 
-- Kyrylo Vasylenko: Main Module and Communication Service
+### Kyrylo Vasylenko
+
+Main package and Communication Service
+
+### Lukas Denk
+
+Lukas Denk implements the `messaging`, `p2p` and `api` packages.
 
 ## Effort spent for the project
 
 - Kyrylo Vasylenko
-    - It took me up to two weeks to create the communication module in its current state.
-1/3 of the time was allocated for investigation of Java Non-Blocking I/O and coroutines approach.
-    - Almost 2/3 of the time was implementation (1/3) and debugging (1/3). I was setting up a python voip environment and communicating with a gossip client and gossip mockup, handling message\connection failures in the Communication Module.
+    - It took me up to two weeks to create the communication module in its current state. 1/3 of the time was allocated
+      for investigation of Java Non-Blocking I/O and coroutines approach.
+    - Almost 2/3 of the time was implementation (1/3) and debugging (1/3). I was setting up a python voip environment
+      and communicating with a gossip client and gossip mockup, handling message\connection failures in the
+      Communication Module.
     - And I needed up to a day to create command line and INI file parsing modules.
-- Before starting to implement the Communication Module, I studied the following resources, which helped me to completely understand Async IO in Java and Coroutines approach in Kotlin.
+- Before starting to implement the Communication Module, I studied the following resources, which helped me to
+  completely understand Async IO in Java and Coroutines approach in Kotlin.
     - Non-blocking IO
         - https://www.baeldung.com/java-io-vs-nio
     - Why use coroutines
@@ -273,3 +286,9 @@ Empty body
     - Coroutine Scope
         - https://elizarov.medium.com/structured-concurrency-722d765aa952
         - https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc
+
+### Lukas Denk
+
+Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
+midterm report.
+    
