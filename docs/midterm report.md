@@ -219,7 +219,7 @@ Message type integer: 2
 |------------|---------------|----------------------------------------------------------------------------|
 | view       | list of peers | the peer's view, with a maximum size of the limit of the corresponding *pull request*|
 
-Where a peer has the following format:
+A peer has the following format:
 
 | Field name | data type | meaning                    |
 |------------|-----------|----------------------------|
