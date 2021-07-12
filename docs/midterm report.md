@@ -16,8 +16,8 @@ and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
 Our project consists of five packages:
 
 1. The `main` module serves as setup function for our service and reads specified console and ini file parameters.
-1. The `networking` module serves as transport functionality for module-to-module and gossip-to-gossip communication.
-1. The `messaging` package, which contains a package for API- and one for Peer-To-Peer- (p2p) messaging.
+1. The `networking` module serves as transport functionality for module-to-module and Peer-To-Peer- (P2P) communication.
+1. The `messaging` package, which contains a package for API- and one for P2P messaging.
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
