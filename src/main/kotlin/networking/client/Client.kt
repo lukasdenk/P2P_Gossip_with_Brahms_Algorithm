@@ -46,6 +46,7 @@ class Client(
             socketChannel.connect(gossipAddress, socketChannel, ConnectionHandler(
                 firstWrite,
                 read,
+                connectionClosed = { println("closed the connection") },
                 connectionFailed = { reconnect() }
             ))
         }
@@ -67,6 +68,7 @@ class Client(
     private class ConnectionHandler(
         private val firstWrite: ((ByteArray) -> Unit) -> Unit,
         private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
+        private val connectionClosed: () -> Unit = {},
         private val connectionFailed: () -> Unit = {}
     ) : CompletionHandler<Void, AsynchronousSocketChannel> {
 
@@ -123,6 +125,7 @@ class Client(
 
         private fun closeChannel() {
             socketChannel.close()
+            connectionClosed.invoke()
         }
 
         override fun failed(exc: Throwable?, socketChannel: AsynchronousSocketChannel) {
