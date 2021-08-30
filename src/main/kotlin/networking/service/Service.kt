@@ -1,7 +1,6 @@
 package networking.service
 
 import kotlinx.coroutines.*
-import utils.Constants
 import utils.ParametersReader
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -25,22 +24,6 @@ class Service(
     private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
     private val firstWrite: ((ByteArray) -> Unit) -> Unit = {}
 ) {
-
-    companion object {
-        fun setupService(
-            consoleArgs: Array<String>,
-            read: (data: ByteArray, write: (ByteArray) -> Unit) -> Unit
-        ): Service {
-            val parametersReader = ParametersReader()
-            parametersReader.read(consoleArgs)
-            val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
-            return Service(
-                propertiesReader.serviceAddress,
-                propertiesReader.servicePort,
-                read
-            )
-        }
-    }
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)

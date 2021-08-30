@@ -1,13 +1,17 @@
 package networking.client
 
 import kotlinx.coroutines.runBlocking
+import utils.ParametersReader
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 fun main(args: Array<String>) {
     runBlocking {
-        val client = Client.setupClient(
-            consoleArgs = args,
+        val parametersReader = ParametersReader()
+        parametersReader.read(args)
+        val client = Client(
+            gossipAddress = parametersReader.gossipServiceAddress,
+            gossipPort = parametersReader.gossipServicePort,
             firstWrite = { writer ->
                 writer.invoke("abcde".toByteArray())
             },
