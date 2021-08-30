@@ -90,16 +90,6 @@ class Service(
             connectionAttemptFinished.invoke()
         }
 
-        private fun sendFirstMessage() {
-            if (!socketChannel.isOpen) {
-                closeChannel()
-                return
-            }
-            firstWrite.invoke { bytes: ByteArray ->
-                write(bytes)
-            }
-        }
-
         private fun write(bytes: ByteArray) {
             socketChannel.write(
                 ByteBuffer.wrap(bytes),
