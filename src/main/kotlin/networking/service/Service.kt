@@ -21,7 +21,7 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
+    private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
     private val firstWrite: ((ByteArray) -> Unit) -> Unit = {}
 ) {
 
@@ -73,7 +73,7 @@ class Service(
 
     private class ConnectionHandler(
         private val firstWrite: ((ByteArray) -> Unit) -> Unit,
-        private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
+        private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
         private val connectionAttemptFinished: () -> Unit,
         private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
     ): CompletionHandler<AsynchronousSocketChannel, ConcurrentLinkedQueue<AsynchronousSocketChannel>> {
@@ -106,7 +106,7 @@ class Service(
             buffer.clear()
             socketChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer,
                 ReadHandler(
-                    readCompleted = { bytes: ByteArray ->
+                    readCompleted = { bytes: ByteBuffer ->
                         read.invoke(bytes, this::write)
                     },
                     closeChannel = { closeChannel() }
@@ -151,7 +151,7 @@ class Service(
     }
 
     private class ReadHandler(
-        private val readCompleted: (ByteArray) -> Unit = {},
+        private val readCompleted: (ByteBuffer) -> Unit = {},
         private val closeChannel: () -> Unit
     ): CompletionHandler<Int, ByteBuffer> {
 
@@ -160,9 +160,9 @@ class Service(
                 closeChannel.invoke()
                 return
             }
-            val data = readToArray(buffer)
-            log(data)
-            readCompleted.invoke(data)
+            log(readToArray(buffer))
+            buffer.position(0)
+            readCompleted.invoke(buffer)
         }
 
         private fun log(arr: ByteArray) {

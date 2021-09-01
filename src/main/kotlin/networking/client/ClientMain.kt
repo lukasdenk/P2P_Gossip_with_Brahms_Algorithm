@@ -1,6 +1,7 @@
 package networking.client
 
 import kotlinx.coroutines.runBlocking
+import messaging.api.GossipAnnounce
 import utils.MessageParser
 import utils.ParametersReader
 import java.nio.ByteBuffer
@@ -15,7 +16,12 @@ fun main(args: Array<String>) {
             gossipAddress = parametersReader.gossipServiceAddress,
             gossipPort = parametersReader.gossipServicePort,
             firstWrite = { writer ->
-                writer.invoke("abcde".toByteArray())
+                val message = GossipAnnounce(
+                    timeToLive = 10,
+                    dataType = 1,
+                    data = byteArrayOf(1, 2, 3)
+                )
+                writer.invoke(message.toByteArray())
             },
             read = { buffer: ByteBuffer, writer: (ByteArray) -> Unit ->
                 println("Read message type: ${MessageParser().toApiMessage(buffer).javaClass.name}")
