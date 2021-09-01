@@ -24,7 +24,7 @@ class Client(
     gossipAddress: String,
     gossipPort: Int,
     private val firstWrite: ((ByteArray) -> Unit) -> Unit,
-    private val read: (ByteArray, (ByteArray) -> Unit) -> Unit
+    private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit
 ) {
 
     private val socketScope  = CoroutineScope(Dispatchers.IO)
@@ -67,7 +67,7 @@ class Client(
 
     private class ConnectionHandler(
         private val firstWrite: ((ByteArray) -> Unit) -> Unit,
-        private val read: (ByteArray, (ByteArray) -> Unit) -> Unit,
+        private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
         private val connectionClosed: () -> Unit = {},
         private val connectionFailed: () -> Unit = {}
     ) : CompletionHandler<Void, AsynchronousSocketChannel> {
@@ -113,7 +113,7 @@ class Client(
                 buffer,
                 buffer,
                 ReadHandler(
-                    readCompleted = { bytes: ByteArray ->
+                    readCompleted = { bytes: ByteBuffer ->
                         read.invoke(bytes, this::write)
                     },
                     readFailed = {
@@ -160,7 +160,7 @@ class Client(
     }
 
     private class ReadHandler(
-        private val readCompleted: (ByteArray) -> Unit = {},
+        private val readCompleted: (ByteBuffer) -> Unit = {},
         private val readFailed: () -> Unit = {},
         private val closeChannel: () -> Unit = {}
     ): CompletionHandler<Int, ByteBuffer> {
@@ -170,9 +170,9 @@ class Client(
                 closeChannel.invoke()
                 return
             }
-            val data = readToArray(buffer)
-            log(data)
-            readCompleted.invoke(data)
+            log(readToArray(buffer))
+            buffer.position(0)
+            readCompleted.invoke(buffer)
         }
 
         private fun log(arr: ByteArray) {
