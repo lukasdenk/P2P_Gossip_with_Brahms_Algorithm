@@ -8,6 +8,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.nio.channels.NotYetConnectedException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
@@ -21,7 +22,7 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (String, ByteBuffer) -> Unit
+    private val read: (SocketAddress, ByteBuffer) -> Unit
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
@@ -42,6 +43,7 @@ class Service(
 
     fun write(socketAddress: String, message: ByteArray) {
         clientChannelMap[socketAddress]?.write(ByteBuffer.wrap(message))
+            ?: throw IllegalStateException("Peer has not been connected")
     }
 
     private fun accept() {
@@ -87,7 +89,7 @@ class Service(
     }
 
     private class ConnectionHandler(
-        private val read: (String, ByteBuffer) -> Unit,
+        private val read: (SocketAddress, ByteBuffer) -> Unit,
         private val successfulConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val failedConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
@@ -123,7 +125,7 @@ class Service(
             socketChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer,
                 ReadHandler(
                     readCompleted = { bytes: ByteBuffer ->
-                        read.invoke(socketChannel.remoteAddress.toString(), bytes)
+                        read.invoke(socketChannel.remoteAddress, bytes)
                         // TODO readData()
                     },
                     closeChannel = { closeChannel() }

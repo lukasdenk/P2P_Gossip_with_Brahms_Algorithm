@@ -5,8 +5,8 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.p2p.Peer
 import p2p.brahms.P2PMessagesManager
-import utils.MessageParser
-import utils.ParametersReader
+import utils.*
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 import kotlin.time.ExperimentalTime
 
@@ -19,23 +19,37 @@ fun main(args: Array<String>) {
         val parametersReader = ParametersReader()
         parametersReader.read(args)
         val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
-        // TODO add method that can send messages to peers by port in service.
-        //  Throw an exception if peer is not connected anymore.
         ServicesManager.apiService = Service(
             address = propertiesReader.gossipServiceAddress,
             port = propertiesReader.gossipServicePort,
-            read = { address: String, data: ByteBuffer ->
-                APIMessagesManager.receive(MessageParser().toApiMessage(data), 8080)// TODO pass the port to the result
-                // P2PMessagesManager.receive(MessageParser().toPeerToPeerMessage(data), Peer()) // TODO add peer with ip and port
-                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from $address")
+            read = { address: SocketAddress, data: ByteBuffer ->
+                APIMessagesManager.receive(
+                    MessageParser().toApiMessage(data),
+                    portFromSocketAddressAsInt(address)
+                )
+                println(
+                    "Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from " +
+                            "${ipFromSocketAddress(socketAddress = address)}:" +
+                            portFromSocketAddressAsString(socketAddress = address)
+                )
             }
         )
         ServicesManager.p2pService = Service(
             address = propertiesReader.p2pServiceAddress,
             port = propertiesReader.p2pServicePort,
-            read = { address: String, data: ByteBuffer ->
-                // P2PMessagesManager.receive(MessageParser().toPeerToPeerMessage(data), Peer()) // TODO add peer with ip and port
-                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from $address")
+            read = { address: SocketAddress, data: ByteBuffer ->
+                P2PMessagesManager.receive(
+                    MessageParser().toPeerToPeerMessage(data),
+                    Peer(
+                        ipFromSocketAddress(address),
+                        portFromSocketAddressAsString(address)
+                    )
+                )
+                println(
+                    "Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from " +
+                            "${ipFromSocketAddress(socketAddress = address)}:" +
+                            portFromSocketAddressAsString(socketAddress = address)
+                )
             }
         )
         CoroutineScope(Dispatchers.IO).launch { ServicesManager.apiService.start() }

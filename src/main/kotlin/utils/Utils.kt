@@ -1,5 +1,6 @@
 package utils
 
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 
 fun ByteBuffer.readRemaining(): ByteArray {
@@ -9,4 +10,18 @@ fun ByteBuffer.readRemaining(): ByteArray {
         remaining[byteArrayPosition++] = this.get()
     }
     return remaining
+}
+
+fun ipFromSocketAddress(socketAddress: SocketAddress): String {
+    val address = socketAddress.toString().replace("/", "")
+    return address.substring(0, address.indexOf(":"))
+}
+
+fun portFromSocketAddressAsString(socketAddress: SocketAddress): String {
+    val address = socketAddress.toString().replace("\\", "")
+    return address.substring(address.indexOf(":") + 1)
+}
+
+fun portFromSocketAddressAsInt(socketAddress: SocketAddress): Int {
+    return Integer.parseInt(portFromSocketAddressAsString(socketAddress = socketAddress))
 }
