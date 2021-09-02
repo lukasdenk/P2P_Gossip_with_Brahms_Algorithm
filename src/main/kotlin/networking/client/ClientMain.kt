@@ -12,6 +12,7 @@ fun main(args: Array<String>) {
     runBlocking {
         val parametersReader = ParametersReader()
         parametersReader.read(args)
+        // TODO create send p2p message that doesn't care for an answer
         val client = Client(
             gossipAddress = parametersReader.gossipServiceAddress,
             gossipPort = parametersReader.gossipServicePort,
