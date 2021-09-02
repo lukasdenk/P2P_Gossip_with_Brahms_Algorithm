@@ -23,12 +23,13 @@ fun main(args: Array<String>) {
             address = propertiesReader.gossipServiceAddress,
             port = propertiesReader.gossipServicePort,
             read = { address: SocketAddress, data: ByteBuffer ->
+                val apiMessage = MessageParser().toApiMessage(data)
                 APIMessagesManager.receive(
-                    MessageParser().toApiMessage(data),
+                    apiMessage,
                     portFromSocketAddressAsInt(address)
                 )
                 println(
-                    "Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from " +
+                    "Received message of type: ${apiMessage.javaClass.name} from " +
                             "${ipFromSocketAddress(socketAddress = address)}:" +
                             portFromSocketAddressAsString(socketAddress = address)
                 )

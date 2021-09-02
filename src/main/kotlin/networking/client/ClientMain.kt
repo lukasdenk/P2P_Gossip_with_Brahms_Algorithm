@@ -14,18 +14,14 @@ fun main(args: Array<String>) {
     runBlocking {
         val parametersReader = ParametersReader()
         parametersReader.read(args)
-        val oneWayMessageClient = OneWayMessageClient(
-            address = parametersReader.gossipServiceAddress,
-            port = parametersReader.gossipServicePort,
-            write = { writer ->
-                val message = GossipAnnounce(
-                    timeToLive = 10,
-                    dataType = 1,
-                    data = byteArrayOf(1, 2, 3)
-                )
-                writer.invoke(message.toByteArray())
-            }
+        ClientsManager.write(
+            parametersReader.gossipServiceAddress,
+            parametersReader.gossipServicePort,
+            GossipAnnounce(
+                timeToLive = 10,
+                dataType = 1,
+                data = byteArrayOf(1, 2, 3)
+            ).toByteArray()
         )
-        oneWayMessageClient.start()
     }
 }

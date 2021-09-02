@@ -26,7 +26,7 @@ class OneWayMessageClient(
     private val write: ((ByteArray) -> Unit) -> Unit
 ) {
 
-    private val socketScope  = CoroutineScope(Dispatchers.IO)
+    private val socketScope = CoroutineScope(Dispatchers.IO)
     private val address: SocketAddress = InetSocketAddress(address, port)
     private val reconnectedTimes = AtomicInteger(0)
     private val isUp = AtomicBoolean(true)
@@ -44,7 +44,10 @@ class OneWayMessageClient(
             val socketChannel = AsynchronousSocketChannel.open()
             socketChannel.connect(address, socketChannel, ConnectionHandler(
                 write,
-                connectionClosed = { println("closed the connection") },
+                connectionClosed = {
+                    isUp.set(false)
+                    println("closed the connection")
+                },
                 connectionFailed = { reconnect() }
             ))
         }
@@ -114,7 +117,7 @@ class OneWayMessageClient(
     private class WriteHandler(
         private val writeCompleted: () -> Unit = {},
         private val writeFailed: () -> Unit = {}
-    ): CompletionHandler<Int, ByteArray> {
+    ) : CompletionHandler<Int, ByteArray> {
 
         override fun completed(result: Int, attachment: ByteArray) {
             log(attachment)
