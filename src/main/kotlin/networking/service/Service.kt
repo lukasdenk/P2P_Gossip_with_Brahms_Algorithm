@@ -21,7 +21,7 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit
+    private val read: (String, ByteBuffer) -> Unit
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
@@ -38,6 +38,10 @@ class Service(
         while (true) {
             delay(Duration.seconds(10))
         }
+    }
+
+    fun write(socketAddress: String, message: ByteArray) {
+        clientChannelMap[socketAddress]?.write(ByteBuffer.wrap(message))
     }
 
     private fun accept() {
@@ -83,7 +87,7 @@ class Service(
     }
 
     private class ConnectionHandler(
-        private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
+        private val read: (String, ByteBuffer) -> Unit,
         private val successfulConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val failedConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
@@ -119,7 +123,8 @@ class Service(
             socketChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer,
                 ReadHandler(
                     readCompleted = { bytes: ByteBuffer ->
-                        read.invoke(bytes, this::write)
+                        read.invoke(socketChannel.remoteAddress.toString(), bytes)
+                        // TODO readData()
                     },
                     closeChannel = { closeChannel() }
                 )

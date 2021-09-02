@@ -21,34 +21,24 @@ fun main(args: Array<String>) {
         val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
         // TODO add method that can send messages to peers by port in service.
         //  Throw an exception if peer is not connected anymore.
-        val apiService = Service(
+        ServicesManager.apiService = Service(
             address = propertiesReader.gossipServiceAddress,
             port = propertiesReader.gossipServicePort,
-            read = { data: ByteBuffer, writer: (ByteArray) -> Unit ->
-                // TODO check if it is P2P or API message
-                //  If this is P2P we call
-                //  If this is API we call
+            read = { address: String, data: ByteBuffer ->
                 APIMessagesManager.receive(MessageParser().toApiMessage(data), 8080)// TODO pass the port to the result
                 // P2PMessagesManager.receive(MessageParser().toPeerToPeerMessage(data), Peer()) // TODO add peer with ip and port
-                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name}")
-                if (data.capacity() > 0) {
-                    // TODO to write something in response use writer
-                    //  writer.invoke("qwerty".toByteArray())
-                }
+                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from $address")
             }
         )
-        val p2pService = Service(
+        ServicesManager.p2pService = Service(
             address = propertiesReader.p2pServiceAddress,
             port = propertiesReader.p2pServicePort,
-            read = { data: ByteBuffer, writer: (ByteArray) -> Unit ->
+            read = { address: String, data: ByteBuffer ->
                 // P2PMessagesManager.receive(MessageParser().toPeerToPeerMessage(data), Peer()) // TODO add peer with ip and port
-                if (data.capacity() > 0) {
-                    // TODO to write something in response use writer
-                    //  writer.invoke("qwerty".toByteArray())
-                }
+                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from $address")
             }
         )
-        CoroutineScope(Dispatchers.IO).launch { apiService.start() }
-        CoroutineScope(Dispatchers.IO).launch { p2pService.start() }.join()
+        CoroutineScope(Dispatchers.IO).launch { ServicesManager.apiService.start() }
+        CoroutineScope(Dispatchers.IO).launch { ServicesManager.p2pService.start() }.join()
     }
 }
