@@ -3,6 +3,8 @@ package networking.service
 import api.manager.APIMessagesManager
 import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
+import messaging.p2p.Peer
+import p2p.brahms.P2PMessagesManager
 import utils.MessageParser
 import utils.ParametersReader
 import java.nio.ByteBuffer
@@ -39,12 +41,7 @@ fun main(args: Array<String>) {
             address = propertiesReader.p2pServiceAddress,
             port = propertiesReader.p2pServicePort,
             read = { data: ByteBuffer, writer: (ByteArray) -> Unit ->
-                // TODO check if it is P2P or API message
-                //  If this is P2P we call
-                //  If this is API we call
-                APIMessagesManager.receive(MessageParser().toApiMessage(data), 8080)// TODO pass the port to the result
                 // P2PMessagesManager.receive(MessageParser().toPeerToPeerMessage(data), Peer()) // TODO add peer with ip and port
-                println("Received message of type: ${MessageParser().toApiMessage(data).javaClass.name}")
                 if (data.capacity() > 0) {
                     // TODO to write something in response use writer
                     //  writer.invoke("qwerty".toByteArray())

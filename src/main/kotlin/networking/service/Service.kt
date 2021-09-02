@@ -1,7 +1,6 @@
 package networking.service
 
 import kotlinx.coroutines.*
-import utils.ParametersReader
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.net.StandardSocketOptions
@@ -9,6 +8,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -21,12 +21,12 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
-    private val firstWrite: ((ByteArray) -> Unit) -> Unit = {}
+    private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
+    private val clientChannelMap = ConcurrentHashMap<String, AsynchronousSocketChannel>()
     private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
     private val hasSpaceForNewConnections
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
@@ -50,16 +50,27 @@ class Service(
             serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
             serverChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
             serverChannel.bind(socketAddress)
-            serverChannel.accept(clientChannelList, ConnectionHandler(
-                firstWrite = firstWrite,
-                read = read,
-                connectionAttemptFinished = { accept() },
-                connectionClosed = this@Service::connectionClosed
-            ))
+            serverChannel.accept(
+                clientChannelList, ConnectionHandler(
+                    read = read,
+                    successfulConnectionAttempt = { clientChannel ->
+                        clientChannelList.add(clientChannel)
+                        clientChannelMap[clientChannel.remoteAddress.toString()] = clientChannel
+                        accept()
+                    },
+                    failedConnectionAttempt = { clientChannel ->
+                        clientChannelList.remove(clientChannel)
+                        clientChannelMap.remove(clientChannel.remoteAddress.toString())
+                        accept()
+                    },
+                    connectionClosed = this@Service::connectionClosed
+                )
+            )
         }
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel) {
+        clientChannelMap.remove(channel.remoteAddress.toString())
         clientChannelList.remove(channel)
         if (!waitingForConnection.get()) {
             println("[${this::class.simpleName}] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
@@ -72,22 +83,23 @@ class Service(
     }
 
     private class ConnectionHandler(
-        private val firstWrite: ((ByteArray) -> Unit) -> Unit,
         private val read: (ByteBuffer, (ByteArray) -> Unit) -> Unit,
-        private val connectionAttemptFinished: () -> Unit,
+        private val successfulConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
+        private val failedConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
-    ): CompletionHandler<AsynchronousSocketChannel, ConcurrentLinkedQueue<AsynchronousSocketChannel>> {
+    ) : CompletionHandler<AsynchronousSocketChannel, Any?> {
 
         private val buffer = ByteBuffer.allocate(Constants.PacketSize)
         private lateinit var socketChannel: AsynchronousSocketChannel
 
-        override fun completed(clientChannel: AsynchronousSocketChannel,
-                               channelsList: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
+        override fun completed(
+            clientChannel: AsynchronousSocketChannel,
+            attachement: Any?
+        ) {
             this.socketChannel = clientChannel
-            channelsList.add(clientChannel)
             println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
             readData()
-            connectionAttemptFinished.invoke()
+            successfulConnectionAttempt.invoke(clientChannel)
         }
 
         private fun write(bytes: ByteArray) {
@@ -119,9 +131,9 @@ class Service(
             connectionClosed.invoke(socketChannel)
         }
 
-        override fun failed(exc: Throwable, attachment: ConcurrentLinkedQueue<AsynchronousSocketChannel>) {
+        override fun failed(exc: Throwable, attachment: Any?) {
             println("[${this::class.simpleName}] ${socketChannel.remoteAddress} failed to connect")
-            connectionAttemptFinished.invoke()
+            failedConnectionAttempt.invoke(socketChannel)
         }
 
     }
@@ -129,7 +141,7 @@ class Service(
     private class WriteHandler(
         private val writeCompleted: () -> Unit = {},
         private val writeFailed: () -> Unit = {}
-    ): CompletionHandler<Int, ByteArray> {
+    ) : CompletionHandler<Int, ByteArray> {
 
         override fun completed(result: Int, attachment: ByteArray) {
             log(attachment)
@@ -153,7 +165,7 @@ class Service(
     private class ReadHandler(
         private val readCompleted: (ByteBuffer) -> Unit = {},
         private val closeChannel: () -> Unit
-    ): CompletionHandler<Int, ByteBuffer> {
+    ) : CompletionHandler<Int, ByteBuffer> {
 
         override fun completed(numberOfBytesRead: Int, buffer: ByteBuffer) {
             if (numberOfBytesRead < 0) {

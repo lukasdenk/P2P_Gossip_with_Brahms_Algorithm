@@ -8,7 +8,7 @@ class ParametersReader {
         private set
     var gossipServiceAddress: String = "localhost"
         private set
-    var gossipServicePort: Int = 7001
+    var gossipServicePort: Int = 7002
         private set
     var clientMode: ClientMode = ClientMode.Announce
         private set
@@ -29,7 +29,7 @@ class ParametersReader {
                     gossipServiceAddress = args.getOrElse(i + 1) { "localhost" }
                 }
                 "-p" -> {
-                    gossipServicePort = Integer.parseInt(args.getOrElse(i + 1) { "7001" })
+                    gossipServicePort = Integer.parseInt(args.getOrElse(i + 1) { "7002" })
                 }
             }
         }
