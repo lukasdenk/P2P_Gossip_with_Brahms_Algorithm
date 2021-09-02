@@ -2,12 +2,10 @@ package messaging.p2p
 
 data class Peer(
 //    TODO: Store hostkey as Hexvalue
-    val hostkey: ByteArray,
     val ip: String,
     val port: String
 //    @Kyrylo: Why do you need Peers to be comparable?
 ) {
-
     var online: Boolean = true
 
     override fun equals(other: Any?): Boolean {
@@ -16,12 +14,17 @@ data class Peer(
 
         other as Peer
 
-        if (!hostkey.contentEquals(other.hostkey)) return false
+        if (ip != other.ip) return false
+        if (port != other.port) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return hostkey.contentHashCode()
+        var result = ip.hashCode()
+        result = 31 * result + port.hashCode()
+        return result
     }
+
+
 }
