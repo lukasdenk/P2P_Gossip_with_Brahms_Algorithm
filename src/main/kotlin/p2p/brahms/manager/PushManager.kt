@@ -1,6 +1,7 @@
 package p2p.brahms.manager
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import main.Configs
 import main.startsWithXLeadingZeroes
@@ -13,9 +14,9 @@ import p2p.brahms.PoW
 
 object PushManager : P2PMessageListener {
 
-    fun CoroutineScope.push(peers: Collection<Peer>) {
-        peers.parallelStream().forEach {
-            launch {
+    fun push(peers: Collection<Peer>) {
+        peers.forEach {
+            CoroutineScope(Dispatchers.Main).launch {
                 val nonce = PoW.work(it)
                 val msg = PushMsg(nonce)
 //                TODO: send
