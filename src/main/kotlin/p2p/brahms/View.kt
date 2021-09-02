@@ -1,5 +1,6 @@
 package p2p.brahms
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import main.Configs
 import main.randomSubSet
@@ -7,8 +8,10 @@ import messaging.p2p.Peer
 import p2p.brahms.manager.PullManager
 import p2p.brahms.manager.PushManager
 
+
 object View {
-    private val cacheSize = Configs.getConfigs().cacheSize
+    //    TODO: wozu cacheSize?
+    private val cacheSize = Configs.cacheSize
     var view: MutableSet<Peer> = HashSet()
     private var vPush: Set<Peer> = HashSet()
     private var vPull: Set<Peer> = HashSet()
@@ -17,7 +20,7 @@ object View {
     const val pushLimit: Int = 1000
 
     //    TODO: call at beginning
-    suspend fun update() {
+    suspend fun CoroutineScope.update() {
         while (true) {
             PushManager.push(view.randomSubSet(Partitioner.pushSize))
             PullManager.pull(view.randomSubSet(Partitioner.pullSize))
