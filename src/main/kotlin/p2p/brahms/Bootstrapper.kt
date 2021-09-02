@@ -1,9 +1,11 @@
 package p2p.brahms
 
-import messaging.p2p.Peer
+import main.Configs
 
-class Bootstrapper {
-    val seed: List<Peer> = listOf()
+object Bootstrapper {
 
-
+    //    TODO: in initializer class
+    fun bootstrap() {
+        View.view = Configs.seed
+    }
 }

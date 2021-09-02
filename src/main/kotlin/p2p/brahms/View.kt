@@ -26,12 +26,12 @@ object View {
             PullManager.pull(view.randomSubSet(Partitioner.pullSize))
 //          TODO:  wait rand secs
             val waitTime = 4L
-            delay(waitTime)
             if (vPush.size < waitTime * pushLimit) {
                 view = (vPush.randomSubSet(Partitioner.pushSize) union
                         vPull.randomSubSet(Partitioner.pullSize) union
                         History.get(Partitioner.historySize)).toMutableSet()
             }
+            delay(waitTime)
         }
     }
 

@@ -10,6 +10,7 @@ object Configs {
     val probeTimeout = 4
     val probeInterval = 5L
     val kickInterval = 5L
+    val seed: List<Peer> = listOf()
 
 
     val self = Peer("127.0.0.1", 1234)
