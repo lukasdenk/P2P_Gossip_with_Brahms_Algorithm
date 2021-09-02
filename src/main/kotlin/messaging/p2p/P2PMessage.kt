@@ -1,4 +1,3 @@
 package messaging.p2p
 
-open class P2PMessage() {
-}
+interface P2PMessage

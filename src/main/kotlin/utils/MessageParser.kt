@@ -1,14 +1,42 @@
 package utils
 
 import messaging.api.*
+import messaging.p2p.*
+import messaging.p2p.P2PUnknownMessage
 import java.nio.ByteBuffer
-import kotlin.experimental.and
 
 class MessageParser {
 
+    fun toPeerToPeerMessage(buffer: ByteBuffer): P2PMessage {
+        val type = buffer.int
+        return when(type) {
+            MessageType.SpreadMessage.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            MessageType.PullRequest.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            MessageType.PullResponse.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            MessageType.PushRequest.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            MessageType.ProbeRequest.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            MessageType.ProbeResponse.value.toInt() -> {
+                P2PUnknownMessage()
+            }
+            else -> {
+                P2PUnknownMessage()
+            }
+        }
+    }
+
     fun toApiMessage(buffer: ByteBuffer): APIMessage {
         if (buffer.remaining() < 8) {
-            return UnknownMessage.fromByteBuffer(buffer)
+            return GossipUnknownMessage.fromByteBuffer(buffer)
         }
         val size = buffer.short
         val type = buffer.short
@@ -26,7 +54,7 @@ class MessageParser {
                 GossipValidation.fromByteBuffer(buffer)
             }
             else -> {
-                UnknownMessage.fromByteBuffer(buffer)
+                GossipUnknownMessage.fromByteBuffer(buffer)
             }
         }
     }
