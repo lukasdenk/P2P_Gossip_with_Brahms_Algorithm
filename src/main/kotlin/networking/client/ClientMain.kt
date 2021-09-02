@@ -24,12 +24,10 @@ fun main(args: Array<String>) {
                 data = byteArrayOf(1, 2, 3)
             ).toByteArray()
         )
-/*
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
             ProbeRequest().toByteArray()
         )
-*/
     }
 }
