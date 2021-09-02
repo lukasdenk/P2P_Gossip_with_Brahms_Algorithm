@@ -13,6 +13,7 @@ class PreferencesReader(
         private const val Degree = "degree"
         private const val CacheSize = "cache_size"
         private const val ApiAddress = "api_address"
+        private const val P2PAddress = "p2p_address"
         private const val SrcFolder = "src"
         private const val MainFolder = "main"
         private const val ResourcesFolder = "resources"
@@ -25,9 +26,13 @@ class PreferencesReader(
         }
     }
 
-    var serviceAddress: String = "localhost"
+    var gossipServiceAddress: String = "localhost"
         private set
-    var servicePort: Int = 7001
+    var gossipServicePort: Int = 7001
+        private set
+    var p2pServiceAddress: String = "localhost"
+        private set
+    var p2pServicePort: Int = 7001
         private set
     var cacheSize: Int = 50
         private set
@@ -58,11 +63,21 @@ class PreferencesReader(
         if (preferences[Gossip, ApiAddress] != null) {
             val s = preferences[Gossip, ApiAddress]
             if (hasIpV6Address(s)) {
-                serviceAddress = s.substring(s.indexOf('[') + 1, s.indexOf(']'))
-                servicePort = Integer.parseInt(s.substring(s.indexOf(']') + 2))
+                gossipServiceAddress = s.substring(s.indexOf('[') + 1, s.indexOf(']'))
+                gossipServicePort = Integer.parseInt(s.substring(s.indexOf(']') + 2))
             } else {
-                serviceAddress = s.substring(0, s.indexOf(':'))
-                servicePort = Integer.parseInt(s.substring(s.indexOf(':') + 1))
+                gossipServiceAddress = s.substring(0, s.indexOf(':'))
+                gossipServicePort = Integer.parseInt(s.substring(s.indexOf(':') + 1))
+            }
+        }
+        if (preferences[Gossip, P2PAddress] != null) {
+            val s = preferences[Gossip, P2PAddress]
+            if (hasIpV6Address(s)) {
+                p2pServiceAddress = s.substring(s.indexOf('[') + 1, s.indexOf(']'))
+                p2pServicePort = Integer.parseInt(s.substring(s.indexOf(']') + 2))
+            } else {
+                p2pServiceAddress = s.substring(0, s.indexOf(':'))
+                p2pServicePort = Integer.parseInt(s.substring(s.indexOf(':') + 1))
             }
         }
         if (preferences[Gossip, CacheSize] != null) {
