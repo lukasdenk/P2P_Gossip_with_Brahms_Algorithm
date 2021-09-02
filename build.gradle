@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit:1.5.21'
-    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0-1.4-M3")
+    runtimeOnly "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt'
     implementation 'org.ini4j:ini4j:0.5.4'
 }

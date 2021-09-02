@@ -14,7 +14,7 @@ class Configs private constructor() {
 
     init {
 //        TODO: read from INI-File
-        self = Peer(ByteArray(32), "test", "k")
+        self = Peer("test", "k")
         cacheSize = 1
     }
 
