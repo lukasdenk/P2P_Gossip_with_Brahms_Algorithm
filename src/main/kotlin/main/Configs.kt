@@ -14,7 +14,7 @@ object Configs {
     val kickInterval = 5L
 
     //    TODO: read from configs
-    val seed: List<Peer> = listOf()
+    val seed: MutableSet<Peer> = mutableSetOf()
     val self = Peer("127.0.0.1", 1234)
 
 }
