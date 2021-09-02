@@ -6,11 +6,7 @@ import utils.toByteArray
 import java.nio.ByteBuffer
 
 @Serializable
-class PushMsg(val nonce: ByteArray) : P2PMessage {
-    fun isValid(): Boolean {
-//        TODO: check PoW
-        return false
-    }
+data class PushMsg(val nonce: Long) : P2PMessage() {
 
     override fun toByteArray(): ByteArray {
         val headerSize = Int.SIZE_BYTES

@@ -6,6 +6,7 @@ import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
 import p2p.brahms.manager.ProbeManager
+import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
@@ -22,31 +23,35 @@ class Sampler {
         peerHash.set(null)
     }
 
-//    TODO: probe
-fun next(other: Peer) {
-    val otherHash = (rand.get()).sha256()
+    fun next(other: Peer) {
+        val otherHash = (other.ip + rand.get()).toByteArray(Charset.forName("utf-8")).sha256()
 
-    synchronized(this) {
-        if (otherHash < peerHash.get()) {
-            peer.set(other)
-            peerHash.set(otherHash)
+        synchronized(this) {
+            if (otherHash < peerHash.get()) {
+                peer.set(other)
+                peerHash.set(otherHash)
+            }
         }
     }
-}
 
     fun get(): Peer? {
+        initializeIfOffline()
+        return peer.get()
+    }
+
+    private fun initializeIfOffline() {
         if (peer.get()?.online == false) {
             initialize()
         }
-        return peer.get()
     }
 
     //    TODO: call at beginning
     suspend fun probe() {
         while (true) {
-            delay(Configs.getConfigs().probeInterval)
+            delay(Configs.probeInterval)
 
             val peerInstance = peer.get()
+            initializeIfOffline()
             if (peerInstance != null) {
                 ProbeManager.probe(peerInstance)
             }

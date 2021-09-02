@@ -2,27 +2,19 @@ package main
 
 import messaging.p2p.Peer
 
-class Configs private constructor() {
-    val self: Peer
+object Configs {
 
     //    TODO: find good value
     val difficulty: Int = 4
-    val cacheSize: Int
+
+    //    TODO: what is cacheSize for?
+    val cacheSize: Int = -1
     val probeTimeout = 4
     val probeInterval = 5L
     val kickInterval = 5L
 
-    init {
-//        TODO: read from INI-File
-        self = Peer("test", "k")
-        cacheSize = 1
-    }
-
-    companion object {
-        fun getConfigs(): Configs {
-            return Configs()
-        }
-    }
-
+    //    TODO: read from configs
+    val seed: MutableSet<Peer> = mutableSetOf()
+    val self = Peer("127.0.0.1", 1234)
 
 }

@@ -23,7 +23,7 @@ object ProbeManager : P2PMessageListener {
     //    TODO: call at beginning
     suspend fun kick() {
         while (true) {
-            delay(Configs.getConfigs().kickInterval)
+            delay(Configs.kickInterval)
             val oldestTime = LocalDateTime.now().minusSeconds(4L)
             for (entry in probes) {
                 if (entry.value.isBefore(oldestTime)) {

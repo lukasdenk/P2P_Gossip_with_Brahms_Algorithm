@@ -26,6 +26,19 @@ operator fun ByteArray.compareTo(other: ByteArray?): Int {
     return 1
 }
 
+fun ByteArray.startsWithXLeadingZeroes(x: Int): Boolean {
+    if (this.size < x) {
+        return false
+    }
+    val zero: Byte = 0
+    for (i in 0..x) {
+        if (this[i] != zero) {
+            return false
+        }
+    }
+    return true
+}
+
 fun <T> Collection<T>.randomSubSet(n: Int): MutableSet<T> {
     val ceiling = min(n, this.size)
     return this.toList().shuffled().subList(0, ceiling).toMutableSet()
