@@ -3,10 +3,8 @@ package messaging.p2p
 import messaging.api.Port
 
 data class Peer(
-//    TODO: Store hostkey as Hexvalue
     val ip: String,
     val port: Port
-//    @Kyrylo: Why do you need Peers to be comparable?
 ) {
     var online: Boolean = true
 

@@ -26,7 +26,6 @@ object PushManager : P2PMessageListener {
     override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is PushMsg && validate(msg, sender)) {
             History.next(setOf(sender))
-//            TODO: update view.vPush
         }
     }
 

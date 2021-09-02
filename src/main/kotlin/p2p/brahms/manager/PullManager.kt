@@ -23,7 +23,6 @@ object PullManager : P2PMessageListener {
     override fun receive(msg: P2PMessage, sender : Peer) {
         if (msg is PullResponse && requests.containsKey(sender)) {
             History.next(msg.neighbourSample)
-//            TODO: update view.pullV
         } else if (msg is PullRequest) {
             P2PCommunicator.send(
                 PullResponse(
