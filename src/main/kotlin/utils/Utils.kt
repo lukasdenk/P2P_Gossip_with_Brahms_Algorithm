@@ -12,6 +12,13 @@ fun ByteBuffer.readRemaining(): ByteArray {
     return remaining
 }
 
+fun ByteBuffer.toByteArray(): ByteArray {
+    val result = ByteArray(this.capacity())
+    this.position(0)
+    this.get(result, 0, result.size)
+    return result
+}
+
 fun ipFromSocketAddress(socketAddress: SocketAddress): String {
     val address = socketAddress.toString().replace("/", "")
     return address.substring(0, address.indexOf(":"))

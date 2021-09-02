@@ -38,20 +38,21 @@ object ServicesManager {
         apiService.start()
     }
 
-    suspend fun startP2PService(address: String, port: Int) {
+    suspend fun startP2PService(p2pAddress: String, p2pPort: Int) {
         p2pService = Service(
-            address = address,
-            port = port,
+            address = p2pAddress,
+            port = p2pPort,
             read = { address: SocketAddress, data: ByteBuffer ->
+                val message = MessageParser().toPeerToPeerMessage(data)
                 P2PMessagesManager.receive(
-                    MessageParser().toPeerToPeerMessage(data),
+                    message,
                     Peer(
                         ipFromSocketAddress(address),
                         portFromSocketAddressAsString(address)
                     )
                 )
                 println(
-                    "Received message of type: ${MessageParser().toApiMessage(data).javaClass.name} from " +
+                    "Received message of type: ${message.javaClass.name} from " +
                             "${ipFromSocketAddress(socketAddress = address)}:" +
                             portFromSocketAddressAsString(socketAddress = address)
                 )

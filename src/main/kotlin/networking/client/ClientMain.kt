@@ -3,6 +3,7 @@ package networking.client
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.GossipAnnounce
+import messaging.p2p.ProbeRequest
 import utils.MessageParser
 import utils.ParametersReader
 import java.nio.ByteBuffer
@@ -23,5 +24,12 @@ fun main(args: Array<String>) {
                 data = byteArrayOf(1, 2, 3)
             ).toByteArray()
         )
+/*
+        ClientsManager.write(
+            parametersReader.gossipServiceAddress,
+            7002,
+            ProbeRequest().toByteArray()
+        )
+*/
     }
 }

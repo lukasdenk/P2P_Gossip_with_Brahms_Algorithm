@@ -6,6 +6,7 @@ import kotlinx.serialization.json.Json
 import messaging.api.*
 import messaging.p2p.*
 import messaging.p2p.P2PUnknownMessage
+import networking.P2PMessageType
 import java.nio.ByteBuffer
 
 @ExperimentalSerializationApi
@@ -13,29 +14,28 @@ class MessageParser {
 
     fun toPeerToPeerMessage(buffer: ByteBuffer): P2PMessage {
         val type = buffer.int
-        val body = ByteArray(buffer.capacity())
-        buffer.get(body, Int.SIZE_BYTES, body.size)
+        val body = buffer.readRemaining()
         return when(type) {
-            MessageType.SpreadMessage.value.toInt() -> {
+            P2PMessageType.SpreadMessage.value -> {
                 Json.decodeFromString<SpreadMsg>(String(body))
             }
-            MessageType.PullRequest.value.toInt() -> {
+            P2PMessageType.PullRequest.value -> {
                 Json.decodeFromString<PullRequest>(String(body))
             }
-            MessageType.PullResponse.value.toInt() -> {
+            P2PMessageType.PullResponse.value -> {
                 Json.decodeFromString<PullResponse>(String(body))
             }
-            MessageType.PushRequest.value.toInt() -> {
+            P2PMessageType.PushRequest.value -> {
                 Json.decodeFromString<PushMsg>(String(body))
             }
-            MessageType.ProbeRequest.value.toInt() -> {
+            P2PMessageType.ProbeRequest.value -> {
                 ProbeRequest()
             }
-            MessageType.ProbeResponse.value.toInt() -> {
+            P2PMessageType.ProbeResponse.value -> {
                 ProbeResponse()
             }
             else -> {
-                P2PUnknownMessage()
+                P2PUnknownMessage(data = body)
             }
         }
     }

@@ -28,6 +28,7 @@ class Service(
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
     private val clientChannelMap = ConcurrentHashMap<String, AsynchronousSocketChannel>()
+    private val channelToAddressMap = ConcurrentHashMap<AsynchronousSocketChannel, String>()
     private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
     private val hasSpaceForNewConnections
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
@@ -62,21 +63,26 @@ class Service(
                     successfulConnectionAttempt = { clientChannel ->
                         clientChannelList.add(clientChannel)
                         clientChannelMap[clientChannel.remoteAddress.toString()] = clientChannel
+                        channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
                         accept()
                     },
                     failedConnectionAttempt = { clientChannel ->
                         clientChannelList.remove(clientChannel)
                         clientChannelMap.remove(clientChannel.remoteAddress.toString())
+                        channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
                         accept()
                     },
-                    connectionClosed = this@Service::connectionClosed
+                    connectionClosed = {
+                        connectionClosed(it)
+                    }
                 )
             )
         }
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel) {
-        clientChannelMap.remove(channel.remoteAddress.toString())
+        clientChannelMap.remove(channelToAddressMap[channel])
+        channelToAddressMap.remove(channel)
         clientChannelList.remove(channel)
         if (!waitingForConnection.get()) {
             println("[${this::class.simpleName}] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
@@ -108,14 +114,6 @@ class Service(
             successfulConnectionAttempt.invoke(clientChannel)
         }
 
-        private fun write(bytes: ByteArray) {
-            socketChannel.write(
-                ByteBuffer.wrap(bytes),
-                bytes,
-                WriteHandler(writeCompleted = { readData() })
-            )
-        }
-
         private fun readData() {
             if (!socketChannel.isOpen) {
                 closeChannel()
@@ -126,7 +124,7 @@ class Service(
                 ReadHandler(
                     readCompleted = { bytes: ByteBuffer ->
                         read.invoke(socketChannel.remoteAddress, bytes)
-                        // TODO readData()
+                        readData()
                     },
                     closeChannel = { closeChannel() }
                 )
