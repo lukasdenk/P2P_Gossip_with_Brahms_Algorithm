@@ -3,6 +3,7 @@ package networking.service
 import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.net.SocketAddress
+import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
@@ -31,9 +32,11 @@ class Service(
     private val hasSpaceForNewConnections
         get() = clientChannelList.size < Constants.MaxConnectionsAmount
     private val waitingForConnection = AtomicBoolean(false)
+    private lateinit var serverChannel: AsynchronousServerSocketChannel
 
     suspend fun start() {
         println("[${this::class.simpleName}] Gossip-8 service has been started at $socketAddress")
+        createServerChannel()
         accept()
         while (true) {
             delay(Duration.seconds(10))
@@ -45,16 +48,20 @@ class Service(
             ?: throw IllegalStateException("Peer has not been connected")
     }
 
+    private fun createServerChannel() {
+        socketConnectionsScope.launch {
+            serverChannel = AsynchronousServerSocketChannel.open()
+            serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
+            serverChannel.bind(socketAddress)
+        }
+    }
+
     private fun accept() {
         waitingForConnection.set(hasSpaceForNewConnections)
         if (!hasSpaceForNewConnections) {
             return
         }
         socketConnectionsScope.launch {
-            val serverChannel = AsynchronousServerSocketChannel.open()
-//            serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-//            serverChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
-            serverChannel.bind(socketAddress)
             serverChannel.accept(
                 clientChannelList, ConnectionHandler(
                     read = read,
