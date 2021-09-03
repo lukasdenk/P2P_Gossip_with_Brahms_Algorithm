@@ -66,9 +66,11 @@ class Service(
                 clientChannelList, ConnectionHandler(
                     read = read,
                     successfulConnectionAttempt = { clientChannel ->
-                        clientChannelList.add(clientChannel)
-                        clientChannelMap[clientChannel.remoteAddress.toString()] = clientChannel
-                        channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
+                        if (clientChannel.isOpen) { // TODO check why this happens later
+                            clientChannelList.add(clientChannel)
+                            clientChannelMap[clientChannel.remoteAddress.toString()] = clientChannel
+                            channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
+                        }
                         accept()
                     },
                     failedConnectionAttempt = { clientChannel ->
