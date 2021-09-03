@@ -12,6 +12,7 @@ object Configs {
     val probeInterval = 5L
     val kickInterval = 5L
     val historySize = 50
+    val pullLimit = 20
 
     //    TODO: read from configs
     val seed: MutableSet<Peer> = mutableSetOf()

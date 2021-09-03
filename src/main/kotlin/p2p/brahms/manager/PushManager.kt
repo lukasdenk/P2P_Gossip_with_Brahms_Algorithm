@@ -13,7 +13,7 @@ import p2p.brahms.History
 import p2p.brahms.PoW
 
 object PushManager : P2PMessageListener {
-
+    val receivedPushs: MutableSet<Peer> = mutableSetOf()
 
     fun push(peers: Collection<Peer>) {
         peers.forEach {
@@ -25,9 +25,14 @@ object PushManager : P2PMessageListener {
         }
     }
 
+    fun reset() {
+        receivedPushs.clear()
+    }
+
     override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is PushMsg && validate(msg, sender)) {
             History.next(setOf(sender))
+            receivedPushs.add(sender)
         }
     }
 
