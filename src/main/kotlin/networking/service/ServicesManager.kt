@@ -34,7 +34,7 @@ object ServicesManager {
                 )
             },
             connectionClosed = { socketAddress ->
-                GossipNotifyManager.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
+                GossipManager.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
             }
         )
         apiService.start()
