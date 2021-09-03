@@ -21,7 +21,7 @@ object PushManager : P2PMessageListener {
 
     fun push(peers: Set<Peer>) {
         peers.forEach {
-            CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.Default).launch {
                 val nonce = PoW.work(it)
                 val msg = PushMsg(nonce)
                 P2PCommunicator.send(msg, it)

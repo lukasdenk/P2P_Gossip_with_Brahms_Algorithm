@@ -46,7 +46,7 @@ class Sampler() {
 
     @ExperimentalTime
     fun probe() {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             val peerInstance = peer.get()
             if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
                 initialize()
