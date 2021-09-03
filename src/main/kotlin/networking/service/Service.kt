@@ -3,12 +3,10 @@ package networking.service
 import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 import java.net.SocketAddress
-import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
-import java.nio.channels.NotYetConnectedException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
@@ -54,8 +52,8 @@ class Service(
         }
         socketConnectionsScope.launch {
             val serverChannel = AsynchronousServerSocketChannel.open()
-            serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-            serverChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
+//            serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
+//            serverChannel.setOption(StandardSocketOptions.SO_REUSEPORT, true)
             serverChannel.bind(socketAddress)
             serverChannel.accept(
                 clientChannelList, ConnectionHandler(

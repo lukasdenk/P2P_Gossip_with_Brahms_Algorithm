@@ -1,12 +1,11 @@
 package networking.client
 
+import json.JsonMapper
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.GossipAnnounce
 import messaging.p2p.ProbeRequest
-import utils.MessageParser
 import utils.ParametersReader
-import java.nio.ByteBuffer
 import kotlin.time.ExperimentalTime
 
 @ExperimentalSerializationApi
@@ -27,7 +26,7 @@ fun main(args: Array<String>) {
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
-            ProbeRequest().toByteArray()
+            JsonMapper.mapToJson(ProbeRequest())
         )
     }
 }
