@@ -1,5 +1,5 @@
 package messaging.api
 
 interface APIMessageListener {
-    fun receive(msg: APIMessage, sender: Port)
+    fun receive(msg: APIMessage, sender: Int)
 }

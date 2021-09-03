@@ -1,6 +1,12 @@
 package api.manager
 
-import messaging.api.*
+import messaging.api.APIMessage
+import messaging.api.APIMessageListener
+import messaging.api.DataType
+import messaging.api.MsgId
+import messaging.api.gossip.GossipNotification
+import messaging.api.gossip.GossipNotify
+import messaging.api.gossip.GossipValidation
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
@@ -10,12 +16,12 @@ import p2p.SpreadManager
 import kotlin.time.ExperimentalTime
 
 object APIMessagesManager : APIMessageListener, P2PMessageListener {
-    val subscribers: MutableMap<DataType, MutableSet<Port>> = HashMap()
+    val subscribers: MutableMap<DataType, MutableSet<Int>> = HashMap()
     val msgCache: MutableMap<MsgId, SpreadMsg> = HashMap()
 
 
     @ExperimentalTime
-    override fun receive(msg: APIMessage, sender: Port) {
+    override fun receive(msg: APIMessage, sender: Int) {
         if (msg is GossipNotify) {
             subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
         } else if (msg is GossipValidation) {
@@ -41,7 +47,7 @@ object APIMessagesManager : APIMessageListener, P2PMessageListener {
     }
 
     //    TODO: call when connection breaks
-    fun channelClosed(port: Port) {
+    fun channelClosed(port: Int) {
         subscribers.forEach { t, u ->
             u.remove(port)
         }

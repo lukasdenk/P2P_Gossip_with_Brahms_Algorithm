@@ -4,7 +4,6 @@ import api.manager.APIMessagesManager
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
-import messaging.api.Port
 import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
@@ -65,7 +64,7 @@ object ServicesManager {
         p2pService.start()
     }
 
-    fun sendApiMessage(msg: APIMessage, port: Port) {
+    fun sendApiMessage(msg: APIMessage, port: Int) {
         //        TODO: create addr from port
 //        apiService.write(, msg.toByteArray())
     }
