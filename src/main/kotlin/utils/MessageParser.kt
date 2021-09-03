@@ -4,11 +4,12 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
 import messaging.api.MsgType
 import messaging.api.gossip.*
+import messaging.api.nse.NseEstimate
+import messaging.api.nse.NseQuery
 import java.nio.ByteBuffer
 
 @ExperimentalSerializationApi
 class MessageParser {
-
 
     fun toApiMessage(buffer: ByteBuffer): APIMessage {
         if (buffer.remaining() < 8) {
@@ -28,6 +29,12 @@ class MessageParser {
             }
             MsgType.GossipValidation.value -> {
                 GossipValidation.fromByteBuffer(buffer)
+            }
+            MsgType.NseQuery.value -> {
+                NseQuery()
+            }
+            MsgType.NseEstimate.value -> {
+                NseEstimate.fromByteBuffer(buffer)
             }
             else -> {
                 GossipUnknownMessage.fromByteBuffer(buffer)

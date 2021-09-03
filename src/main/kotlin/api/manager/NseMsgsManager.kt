@@ -12,7 +12,7 @@ object NseMsgsManager : APIMessageListener {
     var estimation = Configs.seed.size
     override fun receive(msg: APIMessage, sender: Int) {
         if (msg is NseEstimate) {
-            estimation = msg.estimation
+            estimation = msg.estimatePeers
         }
     }
 
