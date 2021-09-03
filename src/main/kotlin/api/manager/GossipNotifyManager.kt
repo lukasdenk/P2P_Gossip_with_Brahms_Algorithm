@@ -57,7 +57,6 @@ object GossipNotifyManager : APIMessageListener, P2PMessageListener {
         }
     }
 
-    //    TODO: call when connection breaks
     fun channelClosed(port: Int) {
         subscribers.forEach { t, u ->
             u.remove(port)

@@ -36,6 +36,9 @@ object ServicesManager {
                             "${ipFromSocketAddress(socketAddress = address)}:" +
                             portFromSocketAddressAsString(socketAddress = address)
                 )
+            },
+            connectionClosed = { socketAddress ->
+                GossipNotifyManager.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
             }
         )
         apiService.start()
@@ -46,7 +49,6 @@ object ServicesManager {
             address = p2pAddress,
             port = p2pPort,
             read = { address: SocketAddress, data: ByteArray ->
-                // TODO when an API channel closes call GroupNotifyManager#channelClosed
                 val message = JsonMapper.mapFromJson(data) ?: return@Service
                 P2PCommunicator.receive(
                     message,
@@ -70,8 +72,7 @@ object ServicesManager {
     }
 
     fun sendApiMessage(msg: APIMessage, port: Int) {
-        //        TODO: create addr from port
-//        apiService.write(, msg.toByteArray())
+        apiService.write("127.0.0.1:${port}", msg.toByteArray())
     }
 
     fun sendP2PMessage(msg: P2PMessage, peer: Peer) {

@@ -36,3 +36,16 @@ fun portFromSocketAddressAsString(socketAddress: SocketAddress): String {
 fun portFromSocketAddressAsInt(socketAddress: SocketAddress): Int {
     return Integer.parseInt(portFromSocketAddressAsString(socketAddress = socketAddress))
 }
+
+fun portFromSocketAddressAsString(socketAddress: String): String {
+    val address = socketAddress.replace("\\", "")
+    return address.substring(address.indexOf(":") + 1)
+}
+
+fun portFromSocketAddressAsInt(socketAddress: String): Int {
+    return Integer.parseInt(portFromSocketAddressAsString(socketAddress = socketAddress))
+}
+
+fun socketAddressToString(socketAddress: SocketAddress): String {
+    return "${ipFromSocketAddress(socketAddress)}:${portFromSocketAddressAsString(socketAddress)}"
+}

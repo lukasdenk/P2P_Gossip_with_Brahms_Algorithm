@@ -1,6 +1,8 @@
 package networking.service
 
 import kotlinx.coroutines.*
+import utils.ipFromSocketAddress
+import utils.socketAddressToString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.net.StandardSocketOptions
@@ -21,7 +23,8 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (SocketAddress, ByteArray) -> Unit
+    private val read: (SocketAddress, ByteArray) -> Unit,
+    private val connectionClosed: (String) -> Unit = {},
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
@@ -70,16 +73,18 @@ class Service(
                 clientChannelList, ConnectionHandler(
                     read = read,
                     successfulConnectionAttempt = { clientChannel ->
-                        if (clientChannel.isOpen) { // TODO check why this happens later
+                        if (clientChannel.isOpen) { // TODO check why we get closed channels sometimes
+                            val address = socketAddressToString(clientChannel.remoteAddress)
                             clientChannelList.add(clientChannel)
-                            clientChannelMap[clientChannel.remoteAddress.toString()] = clientChannel
-                            channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
+                            clientChannelMap[address] = clientChannel
+                            channelToAddressMap[clientChannel] = address
                         }
                         accept()
                     },
                     failedConnectionAttempt = { clientChannel ->
+                        val address = socketAddressToString(clientChannel.remoteAddress)
                         clientChannelList.remove(clientChannel)
-                        clientChannelMap.remove(clientChannel.remoteAddress.toString())
+                        clientChannelMap.remove(address)
                         channelToAddressMap.remove(clientChannel)
                         accept()
                     },
@@ -93,8 +98,11 @@ class Service(
 
     private fun connectionClosed(channel: AsynchronousSocketChannel?) {
         // TODO investigate why sometimes we do not have channel in channelToAddressMap
-        if (channelToAddressMap.contains(channel)) {
+        if (channel != null && channelToAddressMap.contains(channel)) {
             clientChannelMap.remove(channelToAddressMap[channel])
+            connectionClosed.invoke(channelToAddressMap[channel]!!)
+        } else {
+            println("Channel is closed and we cannot react to it")
         }
         channelToAddressMap.remove(channel)
         clientChannelList.remove(channel)
