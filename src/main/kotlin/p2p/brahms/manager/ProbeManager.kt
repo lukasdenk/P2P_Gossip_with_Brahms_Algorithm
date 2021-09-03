@@ -15,12 +15,17 @@ object ProbeManager : P2PMessageListener {
         }
     }
 
-    fun probe(peer: Peer) {
+    fun probe(peer: Peer?): Boolean {
+        if (peer == null) {
+            return false
+        }
+//        TODO: wait for response
         P2PCommunicator.send(ProbeRequest(), peer)
         probes.put(peer, LocalDateTime.now())
+//        see TODO
+        return false
     }
 
-    //    TODO: call at beginning
     suspend fun kick() {
         while (true) {
             delay(Configs.kickInterval)

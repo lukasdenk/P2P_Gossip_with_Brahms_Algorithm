@@ -1,10 +1,13 @@
 package p2p.brahms
 
+import kotlinx.coroutines.delay
+import main.Configs
 import main.randomSubSet
 import messaging.p2p.Peer
+import p2p.brahms.manager.ProbeManager
 
 object History {
-    val n = 50
+    val n = Configs.historySize
     private val samplers = MutableList(n) { Sampler() }
 
     fun next(peers: Set<Peer>) {
@@ -17,5 +20,15 @@ object History {
 
     fun get(n: Int): Set<Peer> {
         return samplers.mapNotNull(Sampler::get).randomSubSet(n)
+    }
+
+    suspend fun probe() {
+        while (true) {
+            delay(Configs.probeInterval)
+            samplers.forEach {
+                val peerInstance = it.peer.get()
+                ProbeManager.probe(peerInstance)
+            }
+        }
     }
 }

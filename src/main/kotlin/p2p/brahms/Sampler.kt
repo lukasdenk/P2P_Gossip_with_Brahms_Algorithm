@@ -1,11 +1,8 @@
 package p2p.brahms
 
-import kotlinx.coroutines.delay
-import main.Configs
 import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
-import p2p.brahms.manager.ProbeManager
 import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
@@ -45,18 +42,6 @@ class Sampler {
         }
     }
 
-    //    TODO: call at beginning
-    suspend fun probe() {
-        while (true) {
-            delay(Configs.probeInterval)
-
-            val peerInstance = peer.get()
-            initializeIfOffline()
-            if (peerInstance != null) {
-                ProbeManager.probe(peerInstance)
-            }
-        }
-    }
 
 
 }
