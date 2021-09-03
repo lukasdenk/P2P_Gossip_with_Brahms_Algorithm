@@ -6,13 +6,13 @@ import messaging.p2p.*
 import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.View
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
 object PullManager : P2PMessageListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
-    var limit: Int = Configs.pullLimit
-    val receivedPulls: MutableSet<Peer> = mutableSetOf()
+    val receivedPulls: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
 
     fun reset() {
         receivedPulls.clear()
@@ -21,8 +21,8 @@ object PullManager : P2PMessageListener {
     @ExperimentalTime
     fun pull(peers: Collection<Peer>) {
         requests.clear()
-        peers.parallelStream().forEach {
-            val pullRequest = PullRequest(limit)
+        peers.forEach {
+            val pullRequest = PullRequest(Configs.pullLimit)
             requests[it] = pullRequest
             P2PCommunicator.send(pullRequest, it)
         }

@@ -23,5 +23,4 @@ object Configs {
     val gossipModule = APIModule(7001)
     val nseModule = APIModule(7201)
 
-
 }

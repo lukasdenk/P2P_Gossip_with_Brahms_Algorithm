@@ -5,7 +5,7 @@ import messaging.api.MsgType
 import java.nio.ByteBuffer
 
 class GossipAnnounce(
-    val timeToLive: Byte,
+    val ttl: Byte,
     val dataType: Short,
     val data: ByteArray
 ) : APIMessage {
@@ -24,7 +24,7 @@ class GossipAnnounce(
         val buffer = ByteBuffer.allocate(headerSize + data.size)
         buffer.putShort(headerSize)
         buffer.putShort(MsgType.GossipAnnounce.value)
-        buffer.put(timeToLive)
+        buffer.put(ttl)
         buffer.put(0) // reserved byte
         buffer.putShort(dataType)
         buffer.put(data)

@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
             parametersReader.gossipServiceAddress,
             parametersReader.gossipServicePort,
             GossipAnnounce(
-                timeToLive = 10,
+                ttl = 10,
                 dataType = 1,
                 data = byteArrayOf(1, 2, 3)
             ).toByteArray()

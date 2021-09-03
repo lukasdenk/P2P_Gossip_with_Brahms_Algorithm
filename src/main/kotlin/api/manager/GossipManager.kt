@@ -32,7 +32,7 @@ object GossipManager : APIMessageListener, P2PMessageListener {
                 spread(spreadMsg)
             }
         } else if (msg is GossipAnnounce) {
-            val spreadMsg = SpreadMsg(msg.dataType, msg.dataType.toInt(), msg.data)
+            val spreadMsg = SpreadMsg(msg.dataType, msg.ttl.toInt(), msg.data)
             spread(spreadMsg)
         }
     }
@@ -43,7 +43,6 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
-    //    not thread safe
     @ExperimentalTime
     @Synchronized
     override fun receive(msg: P2PMessage, sender: Peer) {

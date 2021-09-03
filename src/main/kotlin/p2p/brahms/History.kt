@@ -1,11 +1,11 @@
 package p2p.brahms
 
-import kotlinx.coroutines.delay
 import main.Configs
 import main.randomSubSet
 import messaging.p2p.Peer
 import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 object History {
     private var samplers = MutableList(Configs.initNse3rdRoot) { Sampler() }
 
@@ -17,16 +17,12 @@ object History {
         }
     }
 
-    fun get(n: Int): Set<Peer> {
-        return samplers.mapNotNull(Sampler::get).randomSubSet(n)
+    fun next(peer: Peer) {
+        next(setOf(peer))
     }
 
-    @ExperimentalTime
-    suspend fun probe() {
-        while (true) {
-            delay(Configs.probeInterval)
-            samplers.forEach(Sampler::probe)
-        }
+    fun get(n: Int): Set<Peer> {
+        return samplers.mapNotNull(Sampler::get).randomSubSet(n)
     }
 
     fun resize(n: Int) {

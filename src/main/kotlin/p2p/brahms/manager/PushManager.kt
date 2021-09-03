@@ -12,13 +12,14 @@ import messaging.p2p.PushMsg
 import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.PoW
+import java.util.*
 import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 object PushManager : P2PMessageListener {
-    val receivedPushs: MutableSet<Peer> = mutableSetOf()
+    val receivedPushs: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
 
-    @ExperimentalTime
-    fun push(peers: Collection<Peer>) {
+    fun push(peers: Set<Peer>) {
         peers.forEach {
             CoroutineScope(Dispatchers.Main).launch {
                 val nonce = PoW.work(it)

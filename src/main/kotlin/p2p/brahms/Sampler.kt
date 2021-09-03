@@ -1,5 +1,8 @@
 package p2p.brahms
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
@@ -9,11 +12,15 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 
-class Sampler {
+@ExperimentalTime
+class Sampler() {
     var peer: AtomicReference<Peer?> = AtomicReference(null)
     var rand = AtomicReference(Random.nextBytes(32))
     var peerHash: AtomicReference<ByteArray?> = AtomicReference(null)
 
+    init {
+        probe()
+    }
 
     fun initialize() {
 //        TODO: sophisticated value
@@ -23,7 +30,7 @@ class Sampler {
     }
 
     fun next(other: Peer) {
-        val otherHash = (other.ip + rand.get()).toByteArray(Charset.forName("utf-8")).sha256()
+        val otherHash = (other.ip + other.port + rand.get()).toByteArray(Charset.forName("utf-8")).sha256()
 
         synchronized(this) {
             if (otherHash < peerHash.get()) {
@@ -39,9 +46,11 @@ class Sampler {
 
     @ExperimentalTime
     fun probe() {
-        val peerInstance = peer.get()
-        if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
-            initialize()
+        CoroutineScope(Dispatchers.Main).launch {
+            val peerInstance = peer.get()
+            if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
+                initialize()
+            }
         }
     }
 

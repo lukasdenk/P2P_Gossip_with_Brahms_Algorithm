@@ -13,7 +13,7 @@ import kotlin.time.ExperimentalTime
 
 
 object View {
-    var view: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
+    var view: MutableSet<Peer> = Collections.synchronizedSet(Configs.seed)
 
     private const val alpha = 0.45
     private const val beta = 0.45
@@ -26,39 +26,37 @@ object View {
     @ExperimentalTime
     suspend fun update() {
         var i = 0
-        var pushSize = 45
-        var pullSize = 45
-        var historySize = 10
         while (true) {
             if (i % Configs.estimationUpdateInterval == 0) {
                 updateEstimation()
             }
 
-
             PushManager.reset()
             PullManager.reset()
-            PushManager.push(view.randomSubSet(pushSize))
-            PullManager.pull(view.randomSubSet(pullSize))
+            PushManager.push(view.randomSubSet(pushFraction))
+            PullManager.pull(view.randomSubSet(pullFraction))
 
             delay(Configs.updateInterval)
 
             if (PushManager.receivedPushs.size < Configs.pushLimit) {
-                val pushs = PushManager.receivedPushs.randomSubSet(pushSize)
-                val pulls = PullManager.receivedPulls.randomSubSet(pullSize)
+                val pushs = PushManager.receivedPushs.randomSubSet(pushFraction)
+                val pulls = PullManager.receivedPulls.randomSubSet(pullFraction)
                 val pushsAndPulls = pushs union pulls
-                val tooLess = pullSize + pushSize - pushsAndPulls.size
+                val compensate = pullFraction + pushFraction - pushsAndPulls.size
                 view = (pushsAndPulls union
-                        History.get(historySize + tooLess)).toMutableSet()
+                        History.get(historyFraction + compensate)).toMutableSet()
             }
+            i++
         }
     }
 
+    @ExperimentalTime
     private fun updateEstimation() {
         val estimation = NseMsgsManager.estimation
         val historyAndViewSize = estimation.toDouble().pow(1.0 / 3.0).toInt()
-        pushFraction = (alpha * estimation).toInt()
-        pullFraction = (beta * estimation).toInt()
-        historyFraction = estimation - pullFraction - pushFraction
+        pushFraction = (alpha * historyAndViewSize).toInt()
+        pullFraction = (beta * historyAndViewSize).toInt()
+        historyFraction = historyAndViewSize - pullFraction - pushFraction
         view = view.randomSubSet(historyAndViewSize)
         History.resize(historyAndViewSize)
     }

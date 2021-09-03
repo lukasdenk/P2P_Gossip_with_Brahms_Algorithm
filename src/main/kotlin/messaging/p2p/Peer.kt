@@ -7,8 +7,6 @@ class Peer(
     val ip: String,
     val port: Int
 ) {
-    //    TODO: remove
-    var online: Boolean = true
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
