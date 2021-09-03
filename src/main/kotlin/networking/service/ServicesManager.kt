@@ -21,9 +21,9 @@ object ServicesManager {
     private lateinit var apiService: Service
     private lateinit var p2pService: Service
 
-    suspend fun startApiService(address: String, port: Int) {
+    suspend fun startApiService(gossipAddress: String, port: Int) {
         apiService = Service(
-            address = address,
+            address = gossipAddress,
             port = port,
             read = { address: SocketAddress, data: ByteArray ->
                 val apiMessage = MessageParser().toApiMessage(ByteBuffer.wrap(data))
@@ -62,6 +62,10 @@ object ServicesManager {
             }
         )
         p2pService.start()
+    }
+
+    fun isP2PPeerOnline(peer: Peer): Boolean {
+        return p2pService.isOnline(peer.toSocketAddress())
     }
 
     fun sendApiMessage(msg: APIMessage, port: Int) {

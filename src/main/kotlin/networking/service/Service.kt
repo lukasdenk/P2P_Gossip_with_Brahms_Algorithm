@@ -48,6 +48,10 @@ class Service(
             ?: throw IllegalStateException("Peer has not been connected")
     }
 
+    fun isOnline(socketAddress: String): Boolean {
+        return clientChannelMap.contains(socketAddress)
+    }
+
     private suspend fun createServerChannel() {
         socketConnectionsScope.launch {
             serverChannel = AsynchronousServerSocketChannel.open()
