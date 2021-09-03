@@ -17,7 +17,7 @@ import p2p.P2PCommunicator
 import p2p.brahms.View
 import kotlin.time.ExperimentalTime
 
-object GossipNotifyManager : APIMessageListener, P2PMessageListener {
+object GossipManager : APIMessageListener, P2PMessageListener {
     val subscribers: MutableMap<DataType, MutableSet<Int>> = HashMap()
 
 
