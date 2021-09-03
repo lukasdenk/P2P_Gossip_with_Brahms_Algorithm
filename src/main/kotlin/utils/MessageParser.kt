@@ -2,7 +2,7 @@ package utils
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
-import messaging.api.MessageType
+import messaging.api.MsgType
 import messaging.api.gossip.*
 import java.nio.ByteBuffer
 
@@ -17,16 +17,16 @@ class MessageParser {
         val size = buffer.short
         val type = buffer.short
         return when(type) {
-            MessageType.GossipAnnounce.value -> {
+            MsgType.GossipAnnounce.value -> {
                 GossipAnnounce.fromByteBuffer(buffer)
             }
-            MessageType.GossipNotify.value -> {
+            MsgType.GossipNotify.value -> {
                 GossipNotify.fromByteBuffer(buffer)
             }
-            MessageType.GossipNotification.value -> {
+            MsgType.GossipNotification.value -> {
                 GossipNotification.fromByteBuffer(buffer)
             }
-            MessageType.GossipValidation.value -> {
+            MsgType.GossipValidation.value -> {
                 GossipValidation.fromByteBuffer(buffer)
             }
             else -> {

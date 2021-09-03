@@ -4,6 +4,7 @@ import messaging.api.APIMessage
 import messaging.api.APIMessageListener
 import messaging.api.DataType
 import messaging.api.MsgId
+import messaging.api.gossip.GossipAnnounce
 import messaging.api.gossip.GossipNotification
 import messaging.api.gossip.GossipNotify
 import messaging.api.gossip.GossipValidation
@@ -12,12 +13,12 @@ import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
 import networking.service.ServicesManager
-import p2p.SpreadManager
+import p2p.P2PCommunicator
+import p2p.brahms.View
 import kotlin.time.ExperimentalTime
 
-object APIMessagesManager : APIMessageListener, P2PMessageListener {
+object GossipNotifyManager : APIMessageListener, P2PMessageListener {
     val subscribers: MutableMap<DataType, MutableSet<Int>> = HashMap()
-    val msgCache: MutableMap<MsgId, SpreadMsg> = HashMap()
 
 
     @ExperimentalTime
@@ -28,9 +29,19 @@ object APIMessagesManager : APIMessageListener, P2PMessageListener {
             val spreadMsg = msgCache[msg.messageId]
             if (spreadMsg != null && spreadMsg.ttl != 1) {
                 spreadMsg.decrementTtl()
-                SpreadManager.spread(spreadMsg)
+                spread(spreadMsg)
             }
+        } else if (msg is GossipAnnounce) {
+            val spreadMsg = SpreadMsg(msg.dataType, msg.dataType.toInt(), msg.data)
+            spread(spreadMsg)
         }
+    }
+
+    val msgCache: MutableMap<MsgId, SpreadMsg> = HashMap()
+
+    @ExperimentalTime
+    fun spread(msg: SpreadMsg) {
+        View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
     //    not thread safe

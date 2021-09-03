@@ -1,7 +1,7 @@
 package messaging.api.gossip
 
 import messaging.api.APIMessage
-import messaging.api.MessageType
+import messaging.api.MsgType
 import java.nio.ByteBuffer
 import kotlin.experimental.and
 
@@ -25,7 +25,7 @@ class GossipValidation(
         val headerSize: Short = 8
         val buffer = ByteBuffer.allocate(headerSize.toInt())
         buffer.putShort(headerSize)
-        buffer.putShort(MessageType.GossipValidation.value)
+        buffer.putShort(MsgType.GossipValidation.value)
         buffer.putShort(messageId)
         buffer.putShort(if (isValid) 0 else 1)
         buffer.position(0)

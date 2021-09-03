@@ -6,8 +6,7 @@ import main.randomSubSet
 import messaging.p2p.Peer
 
 object History {
-    val n = Configs.historySize
-    private val samplers = MutableList(n) { Sampler() }
+    private var samplers = MutableList(Configs.initNse3rdRoot) { Sampler() }
 
     fun next(peers: Set<Peer>) {
         samplers.parallelStream().forEach { s ->
@@ -25,6 +24,13 @@ object History {
         while (true) {
             delay(Configs.probeInterval)
             samplers.forEach(Sampler::probe)
+        }
+    }
+
+    fun resize(n: Int) {
+        samplers = samplers.shuffled().subList(0, n).toMutableList()
+        for (i in samplers.size..n) {
+            samplers.add(Sampler())
         }
     }
 }
