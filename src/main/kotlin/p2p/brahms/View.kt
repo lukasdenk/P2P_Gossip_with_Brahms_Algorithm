@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import main.Configs
 import main.randomSubSet
-import messaging.p2p.Peer
+import messaging.Peer
 import p2p.brahms.manager.PullManager
 import p2p.brahms.manager.PushManager
 

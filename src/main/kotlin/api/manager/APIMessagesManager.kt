@@ -1,10 +1,10 @@
 package api.manager
 
 import api.APICommunicator
+import messaging.P2PMessageListener
+import messaging.Peer
 import messaging.api.*
 import messaging.p2p.P2PMessage
-import messaging.p2p.P2PMessageListener
-import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
 import p2p.SpreadManager
 

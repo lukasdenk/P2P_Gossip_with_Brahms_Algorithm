@@ -1,6 +1,6 @@
-package messaging.p2p
+package json
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class P2PMessage
+sealed class Super

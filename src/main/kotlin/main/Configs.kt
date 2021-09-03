@@ -1,6 +1,6 @@
 package main
 
-import messaging.p2p.Peer
+import messaging.Peer
 
 object Configs {
 

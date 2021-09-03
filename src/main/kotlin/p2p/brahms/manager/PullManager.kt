@@ -1,7 +1,11 @@
 package p2p.brahms.manager
 
 import main.randomSubSet
-import messaging.p2p.*
+import messaging.P2PMessageListener
+import messaging.Peer
+import messaging.p2p.P2PMessage
+import messaging.p2p.PullRequest
+import messaging.p2p.PullResponse
 import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.View
