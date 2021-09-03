@@ -1,7 +1,6 @@
 package networking.service
 
 import kotlinx.coroutines.*
-import utils.ipFromSocketAddress
 import utils.socketAddressToString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -31,9 +30,8 @@ class Service(
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
     private val clientChannelMap = ConcurrentHashMap<String, AsynchronousSocketChannel>()
     private val channelToAddressMap = ConcurrentHashMap<AsynchronousSocketChannel, String>()
-    private val clientChannelList = ConcurrentLinkedQueue<AsynchronousSocketChannel>()
     private val hasSpaceForNewConnections
-        get() = clientChannelList.size < Constants.MaxConnectionsAmount
+        get() = clientChannelMap.size < Constants.MaxConnectionsAmount
     private val waitingForConnection = AtomicBoolean(false)
     private lateinit var serverChannel: AsynchronousServerSocketChannel
 
@@ -69,23 +67,15 @@ class Service(
             return
         }
         socketConnectionsScope.launch {
-            serverChannel.accept(
-                clientChannelList, ConnectionHandler(
+            serverChannel.accept(null, ConnectionHandler(
                     read = read,
                     successfulConnectionAttempt = { clientChannel ->
-                        if (clientChannel.isOpen) { // TODO check why we get closed channels sometimes
-                            val address = socketAddressToString(clientChannel.remoteAddress)
-                            clientChannelList.add(clientChannel)
-                            clientChannelMap[address] = clientChannel
-                            channelToAddressMap[clientChannel] = address
-                        }
+                        indexChannel(clientChannel)
                         accept()
                     },
                     failedConnectionAttempt = { clientChannel ->
-                        val address = socketAddressToString(clientChannel.remoteAddress)
-                        clientChannelList.remove(clientChannel)
-                        clientChannelMap.remove(address)
-                        channelToAddressMap.remove(clientChannel)
+                        val address = channelToAddressMap[clientChannel]!!
+                        println("[${this::class.simpleName}] Channel ($address) failed to connect.")
                         accept()
                     },
                     connectionClosed = {
@@ -96,24 +86,26 @@ class Service(
         }
     }
 
-    private fun connectionClosed(channel: AsynchronousSocketChannel?) {
-        // TODO investigate why sometimes we do not have channel in channelToAddressMap
-        if (channel != null && channelToAddressMap.contains(channel)) {
-            clientChannelMap.remove(channelToAddressMap[channel])
-            connectionClosed.invoke(channelToAddressMap[channel]!!)
-        } else {
-            println("Channel is closed and we cannot react to it")
-        }
-        channelToAddressMap.remove(channel)
-        clientChannelList.remove(channel)
+    private fun connectionClosed(channel: AsynchronousSocketChannel) {
+        val address = channelToAddressMap[channel]!!
+        connectionClosed.invoke(address)
+        unindexChannel(channel)
         if (!waitingForConnection.get()) {
-            println("[${this::class.simpleName}] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
+            println("[${this::class.simpleName}] Channel ($address) has been closed. ${Constants.MaxConnectionsAmount - clientChannelMap.size} connections left")
             accept()
         }
     }
 
-    fun cancel() {
-        socketConnectionsScope.cancel()
+    private fun indexChannel(channel: AsynchronousSocketChannel) {
+        val address = socketAddressToString(channel.remoteAddress)
+        clientChannelMap[address] = channel
+        channelToAddressMap[channel] = address
+    }
+
+    private fun unindexChannel(channel: AsynchronousSocketChannel) {
+        val address = channelToAddressMap[channel]!!
+        clientChannelMap.remove(address)
+        channelToAddressMap.remove(channel)
     }
 
     private class ConnectionHandler(
@@ -130,10 +122,10 @@ class Service(
             clientChannel: AsynchronousSocketChannel,
             attachement: Any?
         ) {
+            successfulConnectionAttempt.invoke(clientChannel)
             this.socketChannel = clientChannel
             println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
             readData()
-            successfulConnectionAttempt.invoke(clientChannel)
         }
 
         private fun readData() {
