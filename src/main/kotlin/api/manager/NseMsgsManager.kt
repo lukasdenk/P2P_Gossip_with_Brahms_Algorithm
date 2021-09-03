@@ -7,7 +7,9 @@ import messaging.api.APIMessage
 import messaging.api.APIMessageListener
 import messaging.api.nse.NseEstimate
 import messaging.api.nse.NseQuery
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 object NseMsgsManager : APIMessageListener {
     var estimation = Configs.seed.size
     override fun receive(msg: APIMessage, sender: Int) {
