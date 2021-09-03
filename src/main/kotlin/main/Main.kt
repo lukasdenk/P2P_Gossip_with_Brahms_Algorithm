@@ -3,8 +3,8 @@ package main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import p2p.brahms.Bootstrapper
+import p2p.brahms.History
 import p2p.brahms.View
-import p2p.brahms.manager.ProbeManager
 
 
 fun main() {
@@ -13,7 +13,7 @@ fun main() {
     runBlocking {
         Bootstrapper.bootstrap()
         launch {
-            ProbeManager.kick()
+            History.probe()
         }
         launch {
             View.update()

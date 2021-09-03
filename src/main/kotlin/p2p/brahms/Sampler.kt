@@ -32,16 +32,12 @@ class Sampler {
     }
 
     fun get(): Peer? {
-        initializeIfOffline()
         return peer.get()
     }
 
-    private fun initializeIfOffline() {
-        if (peer.get()?.online == false) {
-            initialize()
-        }
+    fun probe() {
+//        TODO: test if peer is online
     }
-
 
 
 }

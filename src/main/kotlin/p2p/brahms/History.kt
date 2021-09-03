@@ -4,7 +4,6 @@ import kotlinx.coroutines.delay
 import main.Configs
 import main.randomSubSet
 import messaging.p2p.Peer
-import p2p.brahms.manager.ProbeManager
 
 object History {
     val n = Configs.historySize
@@ -25,10 +24,7 @@ object History {
     suspend fun probe() {
         while (true) {
             delay(Configs.probeInterval)
-            samplers.forEach {
-                val peerInstance = it.peer.get()
-                ProbeManager.probe(peerInstance)
-            }
+            samplers.forEach(Sampler::probe)
         }
     }
 }
