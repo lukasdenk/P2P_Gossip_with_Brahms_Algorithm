@@ -29,5 +29,9 @@ class Peer(
         return result
     }
 
+    fun toSocketAddress(): String {
+        return "$ip:$port"
+    }
+
 
 }

@@ -1,7 +1,11 @@
 package networking.service
 
 import api.manager.APIMessagesManager
+import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
+import messaging.api.APIMessage
+import messaging.api.Port
+import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
 import p2p.brahms.P2PMessagesManager
 import utils.MessageParser
@@ -48,7 +52,7 @@ object ServicesManager {
                     message,
                     Peer(
                         ipFromSocketAddress(address),
-                        portFromSocketAddressAsString(address)
+                        portFromSocketAddressAsInt(address)
                     )
                 )
                 println(
@@ -61,11 +65,12 @@ object ServicesManager {
         p2pService.start()
     }
 
-    fun sendApiMessage(socketAddress: String, message: ByteArray) {
-        apiService.write(socketAddress, message)
+    fun sendApiMessage(msg: APIMessage, peer: Peer) {
+        apiService.write(peer.toSocketAddress(), msg.toByteArray())
     }
 
-    fun sendP2PMessage(socketAddress: String, message: ByteArray) {
-        p2pService.write(socketAddress, message)
+    fun sendP2PMessage(msg: P2PMessage, port: Port) {
+//        TODO: create addr from port
+        p2pService.write(, JsonMapper.mapToJson(msg))
     }
 }

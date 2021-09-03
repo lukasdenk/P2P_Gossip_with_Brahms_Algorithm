@@ -1,11 +1,11 @@
 package api.manager
 
-import api.APICommunicator
 import messaging.api.*
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
+import networking.service.ServicesManager
 import p2p.SpreadManager
 
 object APIMessagesManager : APIMessageListener, P2PMessageListener {
@@ -31,10 +31,11 @@ object APIMessagesManager : APIMessageListener, P2PMessageListener {
             val msgId = MsgIdCounter.increment()
             msgCache.put(msgId, msg)
             val notification = GossipNotification(msg.dataType, msgId, msg.data)
-            subscribers[notification.dataType]?.forEach { APICommunicator.send(notification, it) }
+            subscribers[notification.dataType]?.forEach { ServicesManager.sendApiMessage(notification, it) }
         }
     }
 
+    //    TODO: call when connection breaks
     fun channelClosed(port: Port) {
         subscribers.forEach { t, u ->
             u.remove(port)

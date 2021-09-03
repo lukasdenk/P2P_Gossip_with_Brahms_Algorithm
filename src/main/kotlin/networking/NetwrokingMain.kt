@@ -2,11 +2,8 @@ package networking
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
-import messaging.api.GossipAnnounce
-import networking.client.ClientsManager
 import networking.service.PreferencesReader
 import networking.service.ServicesManager
-import utils.ParametersReader
 import kotlin.time.ExperimentalTime
 
 @DelicateCoroutinesApi
