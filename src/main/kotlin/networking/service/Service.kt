@@ -86,11 +86,12 @@ class Service(
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel?) {
-        if (channel != null) {
+        // TODO investigate why sometimes we do not have channel in channelToAddressMap
+        if (channelToAddressMap.contains(channel)) {
             clientChannelMap.remove(channelToAddressMap[channel])
-            channelToAddressMap.remove(channel)
-            clientChannelList.remove(channel)
         }
+        channelToAddressMap.remove(channel)
+        clientChannelList.remove(channel)
         if (!waitingForConnection.get()) {
             println("[${this::class.simpleName}] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
             accept()
