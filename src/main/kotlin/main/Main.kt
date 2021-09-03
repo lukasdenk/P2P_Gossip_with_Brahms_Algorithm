@@ -1,12 +1,15 @@
 package main
 
 import kotlinx.coroutines.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import networking.service.PreferencesReader
 import networking.service.ServicesManager
 import utils.ParametersReader
 import kotlin.time.ExperimentalTime
 
 
+@DelicateCoroutinesApi
+@ExperimentalSerializationApi
 @ExperimentalTime
 fun main(args: Array<String>) {
 //    val msg: messaging.p2p.P2PMessage = messaging.p2p.PullResponse(mutableSetOf(Peer("a", 1), Peer("b", 2)))

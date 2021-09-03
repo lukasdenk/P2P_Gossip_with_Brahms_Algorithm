@@ -48,12 +48,12 @@ class Service(
             ?: throw IllegalStateException("Peer has not been connected")
     }
 
-    private fun createServerChannel() {
+    private suspend fun createServerChannel() {
         socketConnectionsScope.launch {
             serverChannel = AsynchronousServerSocketChannel.open()
             serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
             serverChannel.bind(socketAddress)
-        }
+        }.join()
     }
 
     private fun accept() {
