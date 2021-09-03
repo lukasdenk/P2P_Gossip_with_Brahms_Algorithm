@@ -7,10 +7,7 @@ import messaging.api.APIMessage
 import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
-import utils.MessageParser
-import utils.ipFromSocketAddress
-import utils.portFromSocketAddressAsInt
-import utils.portFromSocketAddressAsString
+import utils.*
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import kotlin.time.ExperimentalTime
@@ -33,8 +30,7 @@ object ServicesManager {
                 )
                 println(
                     "Received message of type: ${apiMessage.javaClass.name} from " +
-                            "${ipFromSocketAddress(socketAddress = address)}:" +
-                            portFromSocketAddressAsString(socketAddress = address)
+                            socketAddressToString(socketAddress = address)
                 )
             },
             connectionClosed = { socketAddress ->
@@ -59,8 +55,7 @@ object ServicesManager {
                 )
                 println(
                     "Received message of type: ${message.javaClass.name} from " +
-                            "${ipFromSocketAddress(socketAddress = address)}:" +
-                            portFromSocketAddressAsString(socketAddress = address)
+                            socketAddressToString(socketAddress = address)
                 )
             }
         )
