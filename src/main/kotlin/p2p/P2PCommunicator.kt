@@ -1,8 +1,8 @@
 package p2p
 
-import messaging.P2PMessageListener
-import messaging.Peer
 import messaging.p2p.P2PMessage
+import messaging.p2p.P2PMessageListener
+import messaging.p2p.Peer
 
 //TODO To be done by kyrylo
 

@@ -3,7 +3,7 @@ package p2p.brahms
 import main.Configs
 import main.sha256
 import main.startsWithXLeadingZeroes
-import messaging.Peer
+import messaging.p2p.Peer
 import java.nio.charset.Charset
 
 object PoW {

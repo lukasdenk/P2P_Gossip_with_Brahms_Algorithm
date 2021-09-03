@@ -1,4 +1,4 @@
-package messaging
+package messaging.p2p
 
 import kotlinx.serialization.Serializable
 import messaging.api.Port

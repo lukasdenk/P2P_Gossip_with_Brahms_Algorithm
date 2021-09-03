@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 import main.Configs
 import main.compareTo
 import main.sha256
-import messaging.Peer
+import messaging.p2p.Peer
 import p2p.brahms.manager.ProbeManager
 import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
