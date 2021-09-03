@@ -13,6 +13,7 @@ object Configs {
     val kickInterval = 5L
     val historySize = 50
     val pullLimit = 20
+    val updateInterval = 20000L
 
     //    TODO: read from configs
     val seed: MutableSet<Peer> = mutableSetOf()

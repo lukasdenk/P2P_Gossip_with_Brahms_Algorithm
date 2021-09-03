@@ -9,18 +9,21 @@ import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
 import messaging.p2p.PushMsg
+import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.PoW
+import kotlin.time.ExperimentalTime
 
 object PushManager : P2PMessageListener {
     val receivedPushs: MutableSet<Peer> = mutableSetOf()
 
+    @ExperimentalTime
     fun push(peers: Collection<Peer>) {
         peers.forEach {
             CoroutineScope(Dispatchers.Main).launch {
                 val nonce = PoW.work(it)
                 val msg = PushMsg(nonce)
-//                TODO: send
+                P2PCommunicator.send(msg, it)
             }
         }
     }

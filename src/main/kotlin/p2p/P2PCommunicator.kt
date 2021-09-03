@@ -12,10 +12,11 @@ object P2PCommunicator {
     //    TODO: call listener's receive()-fun for incoming messages
     val LISTENER: List<P2PMessageListener> = listOf()
 
-    @ExperimentalTime
-    fun send(msg: P2PMessage, receiver: Peer) {
-        ServicesManager.sendP2PMessage(msg, receiver)
-    }
+//    TODO: send in launch (best would be in networking module)
+@ExperimentalTime
+fun send(msg: P2PMessage, receiver: Peer) {
+    ServicesManager.sendP2PMessage(msg, receiver)
+}
 
 
 

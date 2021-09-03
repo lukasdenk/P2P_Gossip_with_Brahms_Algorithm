@@ -21,5 +21,5 @@ object PoW {
     }
 
     fun buildPoW(timestamp: Long, peer: Peer, i: Long): ByteArray =
-        ((timestamp / 60000L).toString() + peer.ip + i).toByteArray(Charset.forName("utf-8")).sha256()
+        ((timestamp / 60000L).toString() + peer.ip + Configs.self.ip + i).toByteArray(Charset.forName("utf-8")).sha256()
 }
