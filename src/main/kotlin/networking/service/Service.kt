@@ -74,7 +74,7 @@ class Service(
                     failedConnectionAttempt = { clientChannel ->
                         clientChannelList.remove(clientChannel)
                         clientChannelMap.remove(clientChannel.remoteAddress.toString())
-                        channelToAddressMap[clientChannel] = clientChannel.remoteAddress.toString()
+                        channelToAddressMap.remove(clientChannel)
                         accept()
                     },
                     connectionClosed = {
@@ -85,10 +85,12 @@ class Service(
         }
     }
 
-    private fun connectionClosed(channel: AsynchronousSocketChannel) {
-        clientChannelMap.remove(channelToAddressMap[channel])
-        channelToAddressMap.remove(channel)
-        clientChannelList.remove(channel)
+    private fun connectionClosed(channel: AsynchronousSocketChannel?) {
+        if (channel != null) {
+            clientChannelMap.remove(channelToAddressMap[channel])
+            channelToAddressMap.remove(channel)
+            clientChannelList.remove(channel)
+        }
         if (!waitingForConnection.get()) {
             println("[${this::class.simpleName}] Channel is closed. ${Constants.MaxConnectionsAmount - clientChannelList.size} connections left")
             accept()

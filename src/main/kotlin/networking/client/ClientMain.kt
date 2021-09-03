@@ -7,6 +7,7 @@ import messaging.api.GossipAnnounce
 import messaging.api.GossipValidation
 import messaging.p2p.ProbeRequest
 import messaging.p2p.ProbeResponse
+import messaging.p2p.PushMsg
 import utils.ParametersReader
 import kotlin.time.ExperimentalTime
 
@@ -34,6 +35,11 @@ fun main(args: Array<String>) {
             parametersReader.gossipServiceAddress,
             7002,
             JsonMapper.mapToJson(ProbeResponse())
+        )
+        ClientsManager.write(
+            parametersReader.gossipServiceAddress,
+            7002,
+            JsonMapper.mapToJson(PushMsg(nonce = 10000L))
         )
     }
 }
