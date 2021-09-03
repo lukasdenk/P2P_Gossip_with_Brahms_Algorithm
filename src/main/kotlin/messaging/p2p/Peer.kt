@@ -1,12 +1,11 @@
 package messaging.p2p
 
 import kotlinx.serialization.Serializable
-import messaging.api.Port
 
 @Serializable
 class Peer(
     val ip: String,
-    val port: Port
+    val port: Int
 ) {
     //    TODO: remove
     var online: Boolean = true
