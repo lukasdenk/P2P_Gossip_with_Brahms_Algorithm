@@ -1,5 +1,7 @@
 package p2p.brahms.manager
 
+import json.P2PMessage
+import json.PushMsg
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -7,8 +9,6 @@ import main.Configs
 import main.startsWithXLeadingZeroes
 import messaging.P2PMessageListener
 import messaging.Peer
-import messaging.p2p.P2PMessage
-import messaging.p2p.PushMsg
 import p2p.brahms.History
 import p2p.brahms.PoW
 

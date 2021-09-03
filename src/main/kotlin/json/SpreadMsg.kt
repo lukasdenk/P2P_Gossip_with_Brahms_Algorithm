@@ -6,7 +6,7 @@ import kotlin.math.max
 
 @Serializable
 class SpreadMsg(val dataType: DataType, var ttl: Int, val data: ByteArray) :
-    Super() {
+    P2PMessage() {
     fun decrementTtl() {
         ttl = max(0, ttl - 1)
     }

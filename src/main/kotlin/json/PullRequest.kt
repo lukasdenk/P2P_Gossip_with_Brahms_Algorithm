@@ -1,4 +1,4 @@
 package json
 
-class PullRequest(val limit: Int) : Super() {
+class PullRequest(val limit: Int) : P2PMessage() {
 }

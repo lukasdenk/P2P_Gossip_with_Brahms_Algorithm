@@ -1,6 +1,6 @@
 package p2p
 
-import messaging.p2p.SpreadMsg
+import json.SpreadMsg
 import p2p.brahms.View
 
 object SpreadManager {
