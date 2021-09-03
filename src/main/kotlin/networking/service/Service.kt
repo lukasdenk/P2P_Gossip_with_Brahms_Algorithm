@@ -20,7 +20,7 @@ import kotlin.time.ExperimentalTime
 class Service(
     address: String,
     port: Int,
-    private val read: (SocketAddress, ByteBuffer) -> Unit
+    private val read: (SocketAddress, ByteArray) -> Unit
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
@@ -93,7 +93,7 @@ class Service(
     }
 
     private class ConnectionHandler(
-        private val read: (SocketAddress, ByteBuffer) -> Unit,
+        private val read: (SocketAddress, ByteArray) -> Unit,
         private val successfulConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val failedConnectionAttempt: (AsynchronousSocketChannel) -> Unit,
         private val connectionClosed: (clientChannel: AsynchronousSocketChannel) -> Unit
@@ -120,7 +120,7 @@ class Service(
             buffer.clear()
             socketChannel.read(buffer, Constants.MessageTimeoutInSec, TimeUnit.SECONDS, buffer,
                 ReadHandler(
-                    readCompleted = { bytes: ByteBuffer ->
+                    readCompleted = { bytes: ByteArray ->
                         read.invoke(socketChannel.remoteAddress, bytes)
                         readData()
                     },
@@ -166,7 +166,7 @@ class Service(
     }
 
     private class ReadHandler(
-        private val readCompleted: (ByteBuffer) -> Unit = {},
+        private val readCompleted: (ByteArray) -> Unit = {},
         private val closeChannel: () -> Unit
     ) : CompletionHandler<Int, ByteBuffer> {
 
@@ -175,9 +175,9 @@ class Service(
                 closeChannel.invoke()
                 return
             }
-            log(readToArray(buffer))
-            buffer.position(0)
-            readCompleted.invoke(buffer)
+            val byteArray = readToArray(buffer)
+            log(byteArray)
+            readCompleted.invoke(byteArray)
         }
 
         private fun log(arr: ByteArray) {

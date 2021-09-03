@@ -23,8 +23,8 @@ object ServicesManager {
         apiService = Service(
             address = address,
             port = port,
-            read = { address: SocketAddress, data: ByteBuffer ->
-                val apiMessage = MessageParser().toApiMessage(data)
+            read = { address: SocketAddress, data: ByteArray ->
+                val apiMessage = MessageParser().toApiMessage(ByteBuffer.wrap(data))
                 APIMessagesManager.receive(
                     apiMessage,
                     portFromSocketAddressAsInt(address)
@@ -43,8 +43,8 @@ object ServicesManager {
         p2pService = Service(
             address = p2pAddress,
             port = p2pPort,
-            read = { address: SocketAddress, data: ByteBuffer ->
-                val message = JsonMapper.mapFromJson(data.readRemaining())
+            read = { address: SocketAddress, data: ByteArray ->
+                val message = JsonMapper.mapFromJson(data)
                 P2PMessagesManager.receive(
                     message,
                     Peer(
