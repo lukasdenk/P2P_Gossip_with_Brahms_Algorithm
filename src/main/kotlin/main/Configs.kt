@@ -16,14 +16,12 @@ object Configs {
     const val initNse3rdRoot = 100
     const val estimationInterval = 10L * 60L * 1000L
 
-    //    hardcoded
-    val nseModule = APIModule(7201)
-
-
     //    TODO: read from configs
     val seed: MutableSet<Peer> = mutableSetOf()
     val self = Peer("127.0.0.1", 1234)
     val cacheSize: Int = 10
+    val gossipModule = APIModule(7001)
+    val nseModule = APIModule(7201)
 
 
 }

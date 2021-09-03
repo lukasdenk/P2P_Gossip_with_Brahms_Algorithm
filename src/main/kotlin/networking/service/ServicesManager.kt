@@ -1,6 +1,6 @@
 package networking.service
 
-import api.manager.GossipNotifyManager
+import api.manager.GossipManager
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
@@ -24,7 +24,7 @@ object ServicesManager {
             port = port,
             read = { address: SocketAddress, data: ByteArray ->
                 val apiMessage = MessageParser().toApiMessage(ByteBuffer.wrap(data))
-                GossipNotifyManager.receive(
+                GossipManager.receive(
                     apiMessage,
                     portFromSocketAddressAsInt(address)
                 )

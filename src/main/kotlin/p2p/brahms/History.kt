@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import main.Configs
 import main.randomSubSet
 import messaging.p2p.Peer
+import kotlin.time.ExperimentalTime
 
 object History {
     private var samplers = MutableList(Configs.initNse3rdRoot) { Sampler() }
@@ -20,6 +21,7 @@ object History {
         return samplers.mapNotNull(Sampler::get).randomSubSet(n)
     }
 
+    @ExperimentalTime
     suspend fun probe() {
         while (true) {
             delay(Configs.probeInterval)

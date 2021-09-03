@@ -1,11 +1,11 @@
 package api
 
-import api.manager.GossipNotifyManager
+import api.manager.GossipManager
 import messaging.api.APIMessage
 import messaging.api.APIMessageListener
 
 object APICommunicator : APIMessageListener {
-    val listeners: List<APIMessageListener> = listOf(GossipNotifyManager)
+    val listeners: List<APIMessageListener> = listOf(GossipManager)
 
     fun send(msg: APIMessage, receiver: APIModule) {
 

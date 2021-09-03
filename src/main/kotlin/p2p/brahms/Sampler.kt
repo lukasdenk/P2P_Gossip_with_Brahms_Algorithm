@@ -3,9 +3,11 @@ package p2p.brahms
 import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
+import networking.service.ServicesManager
 import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
+import kotlin.time.ExperimentalTime
 
 class Sampler {
     var peer: AtomicReference<Peer?> = AtomicReference(null)
@@ -35,8 +37,12 @@ class Sampler {
         return peer.get()
     }
 
+    @ExperimentalTime
     fun probe() {
-//        TODO: test if peer is online
+        val peerInstance = peer.get()
+        if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
+            initialize()
+        }
     }
 
 
