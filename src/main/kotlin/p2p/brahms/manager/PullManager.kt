@@ -7,6 +7,7 @@ import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.ExperimentalTime
 
 object PullManager : P2PMessageListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
@@ -17,6 +18,7 @@ object PullManager : P2PMessageListener {
         receivedPulls.clear()
     }
 
+    @ExperimentalTime
     fun pull(peers: Collection<Peer>) {
         requests.clear()
         peers.parallelStream().forEach {
@@ -26,6 +28,7 @@ object PullManager : P2PMessageListener {
         }
     }
 
+    @ExperimentalTime
     override fun receive(msg: P2PMessage, sender : Peer) {
         if (msg is PullResponse && requests.containsKey(sender)) {
             History.next(msg.neighbourSample)

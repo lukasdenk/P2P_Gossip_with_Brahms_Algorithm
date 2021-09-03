@@ -7,6 +7,7 @@ import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
 import networking.service.ServicesManager
 import p2p.SpreadManager
+import kotlin.time.ExperimentalTime
 
 object APIMessagesManager : APIMessageListener, P2PMessageListener {
     val subscribers: MutableMap<DataType, MutableSet<Port>> = HashMap()
@@ -26,12 +27,15 @@ object APIMessagesManager : APIMessageListener, P2PMessageListener {
     }
 
     //    not thread safe
+    @ExperimentalTime
     override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is SpreadMsg) {
             val msgId = MsgIdCounter.increment()
             msgCache.put(msgId, msg)
             val notification = GossipNotification(msg.dataType, msgId, msg.data)
-            subscribers[notification.dataType]?.forEach { ServicesManager.sendApiMessage(notification, it) }
+            subscribers[notification.dataType]?.forEach {
+                ServicesManager.sendApiMessage(notification, it)
+            }
         }
     }
 

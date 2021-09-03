@@ -65,12 +65,12 @@ object ServicesManager {
         p2pService.start()
     }
 
-    fun sendApiMessage(msg: APIMessage, peer: Peer) {
-        apiService.write(peer.toSocketAddress(), msg.toByteArray())
+    fun sendApiMessage(msg: APIMessage, port: Port) {
+        //        TODO: create addr from port
+//        apiService.write(, msg.toByteArray())
     }
 
-    fun sendP2PMessage(msg: P2PMessage, port: Port) {
-//        TODO: create addr from port
-        p2pService.write(, JsonMapper.mapToJson(msg))
+    fun sendP2PMessage(msg: P2PMessage, peer: Peer) {
+        p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJson(msg))
     }
 }
