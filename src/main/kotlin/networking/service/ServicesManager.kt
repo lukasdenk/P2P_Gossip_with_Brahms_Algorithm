@@ -7,7 +7,7 @@ import messaging.api.APIMessage
 import messaging.api.Port
 import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
-import p2p.brahms.P2PMessagesManager
+import p2p.P2PCommunicator
 import utils.*
 import java.net.SocketAddress
 import java.nio.ByteBuffer
@@ -45,7 +45,7 @@ object ServicesManager {
             port = p2pPort,
             read = { address: SocketAddress, data: ByteBuffer ->
                 val message = JsonMapper.mapFromJson(data.readRemaining())
-                P2PMessagesManager.receive(
+                P2PCommunicator.receive(
                     message,
                     Peer(
                         ipFromSocketAddress(address),
