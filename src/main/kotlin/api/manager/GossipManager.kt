@@ -3,7 +3,6 @@ package api.manager
 import messaging.api.APIMessage
 import messaging.api.APIMessageListener
 import messaging.api.DataType
-import messaging.api.MsgId
 import messaging.api.gossip.GossipAnnounce
 import messaging.api.gossip.GossipNotification
 import messaging.api.gossip.GossipNotify
@@ -15,10 +14,11 @@ import messaging.p2p.SpreadMsg
 import networking.service.ServicesManager
 import p2p.P2PCommunicator
 import p2p.brahms.View
+import java.util.*
 import kotlin.time.ExperimentalTime
 
 object GossipManager : APIMessageListener, P2PMessageListener {
-    val subscribers: MutableMap<DataType, MutableSet<Int>> = HashMap()
+    val subscribers: MutableMap<DataType, MutableSet<Int>> = Collections.synchronizedMap(mutableMapOf())
 
 
     @ExperimentalTime
@@ -26,7 +26,7 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         if (msg is GossipNotify) {
             subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
         } else if (msg is GossipValidation) {
-            val spreadMsg = msgCache[msg.messageId]
+            val spreadMsg = MsgCache.remove(msg.messageId)
             if (spreadMsg != null && spreadMsg.ttl != 1) {
                 spreadMsg.decrementTtl()
                 spread(spreadMsg)
@@ -37,7 +37,6 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         }
     }
 
-    val msgCache: MutableMap<MsgId, SpreadMsg> = HashMap()
 
     @ExperimentalTime
     fun spread(msg: SpreadMsg) {
@@ -46,10 +45,11 @@ object GossipManager : APIMessageListener, P2PMessageListener {
 
     //    not thread safe
     @ExperimentalTime
+    @Synchronized
     override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is SpreadMsg) {
             val msgId = MsgIdCounter.increment()
-            msgCache.put(msgId, msg)
+            MsgCache.put(msgId, msg)
             val notification = GossipNotification(msg.dataType, msgId, msg.data)
             subscribers[notification.dataType]?.forEach {
                 ServicesManager.sendApiMessage(notification, it)
