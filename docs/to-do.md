@@ -7,6 +7,7 @@
 - set def charset
 - make P2PMessage an Interface
 - thread safe
+- https?
 
 # Kyrylo
 
