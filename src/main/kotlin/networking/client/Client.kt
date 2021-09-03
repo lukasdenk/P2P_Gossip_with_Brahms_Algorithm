@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import networking.service.Constants
+import utils.toReadableString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.nio.ByteBuffer
@@ -178,7 +179,7 @@ class Client(
         private fun log(arr: ByteArray) {
             println(
                 "[${this::class.simpleName}] incoming msg (${arr.size}): " +
-                    arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
+                    arr.toReadableString()
             )
         }
 

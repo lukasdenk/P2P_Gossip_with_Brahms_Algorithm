@@ -19,6 +19,10 @@ fun ByteBuffer.toByteArray(): ByteArray {
     return result
 }
 
+fun ByteArray.toReadableString(): String {
+    return this.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
+}
+
 fun ipFromSocketAddress(socketAddress: SocketAddress): String {
     val address = socketAddress.toString().replace("/", "")
     return address.substring(0, address.indexOf(":"))

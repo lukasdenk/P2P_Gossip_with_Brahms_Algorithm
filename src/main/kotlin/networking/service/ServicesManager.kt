@@ -46,7 +46,8 @@ object ServicesManager {
             address = p2pAddress,
             port = p2pPort,
             read = { address: SocketAddress, data: ByteArray ->
-                val message = JsonMapper.mapFromJson(data)
+                // TODO when an API channel closes call GroupNotifyManager#channelClosed
+                val message = JsonMapper.mapFromJson(data) ?: return@Service
                 P2PCommunicator.receive(
                     message,
                     Peer(
