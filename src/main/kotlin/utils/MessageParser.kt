@@ -1,7 +1,9 @@
 package utils
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import messaging.api.*
+import messaging.api.APIMessage
+import messaging.api.MessageType
+import messaging.api.gossip.*
 import java.nio.ByteBuffer
 
 @ExperimentalSerializationApi

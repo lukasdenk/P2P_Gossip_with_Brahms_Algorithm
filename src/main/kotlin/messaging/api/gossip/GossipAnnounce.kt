@@ -1,5 +1,7 @@
-package messaging.api
+package messaging.api.gossip
 
+import messaging.api.APIMessage
+import messaging.api.MessageType
 import java.nio.ByteBuffer
 
 class GossipAnnounce(

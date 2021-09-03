@@ -12,13 +12,10 @@ import kotlin.time.ExperimentalTime
 object View {
     var view: MutableSet<Peer> = HashSet()
 
-    val alpha = 0.3
-    val beta = 0.5
-    val gamma = 0.2
     private val cacheSize = Configs.cacheSize
 
-    val pushSize = (alpha * cacheSize).toInt()
-    val pullSize = (beta * cacheSize).toInt()
+    val pushSize = (Configs.alpha * cacheSize).toInt()
+    val pullSize = (Configs.beta * cacheSize).toInt()
     val historySize = cacheSize - pullSize - pushSize
 
     //    TODO: sophisticated value

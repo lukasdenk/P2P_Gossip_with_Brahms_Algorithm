@@ -1,5 +1,6 @@
-package messaging.api
+package messaging.api.gossip
 
+import messaging.api.APIMessage
 import utils.readRemaining
 import java.nio.ByteBuffer
 
