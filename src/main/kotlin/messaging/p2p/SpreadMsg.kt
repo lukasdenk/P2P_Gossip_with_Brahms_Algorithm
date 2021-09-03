@@ -1,4 +1,4 @@
-package json
+package messaging.p2p
 
 import kotlinx.serialization.Serializable
 import messaging.api.DataType

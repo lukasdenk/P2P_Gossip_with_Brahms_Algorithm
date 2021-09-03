@@ -1,8 +1,8 @@
 package p2p.brahms
 
-import json.P2PMessage
 import messaging.P2PMessageListener
 import messaging.Peer
+import messaging.p2p.P2PMessage
 import p2p.brahms.manager.ProbeManager
 import p2p.brahms.manager.PullManager
 import p2p.brahms.manager.PushManager
