@@ -28,17 +28,17 @@ fun main(args: Array<String>) {
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
-            JsonMapper.mapToJson(ProbeRequest())
+            JsonMapper.mapToJsonByteArray(ProbeRequest())
         )
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
-            JsonMapper.mapToJson(ProbeResponse())
+            JsonMapper.mapToJsonByteArray(ProbeResponse())
         )
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
-            JsonMapper.mapToJson(PushMsg(nonce = 10000L))
+            JsonMapper.mapToJsonByteArray(PushMsg(nonce = 10000L))
         )
     }
 }

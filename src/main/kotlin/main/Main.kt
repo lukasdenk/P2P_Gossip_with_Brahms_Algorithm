@@ -16,12 +16,12 @@ fun main(args: Array<String>) {
 //    val msg: messaging.p2p.P2PMessage = messaging.p2p.PullResponse(mutableSetOf(Peer("a", 1), Peer("b", 2)))
 //    println(Json.encodeToString(msg)) // Serializing data of compile-time type OwnedProject
     runBlocking {
-        launch {
-            View.update()
-        }
         val parametersReader = ParametersReader()
         parametersReader.read(args)
         val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
+        launch {
+            View.update()
+        }
         mutableListOf(
             CoroutineScope(Dispatchers.IO).launch {
                 ServicesManager.startApiService(
