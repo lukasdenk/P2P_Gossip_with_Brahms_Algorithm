@@ -64,28 +64,31 @@ class P2PService(
     }
 
     private fun accept() {
+        if (waitingForConnection.getAndSet(true)) {
+            return
+        }
         socketConnectionsScope.launch {
             serverChannel.accept(null, ConnectionHandler(
                 read = read,
                 successfulConnectionAttempt = { clientChannel ->
+                    waitingForConnection.set(false)
                     accept()
                 },
                 failedConnectionAttempt = { clientChannel ->
+                    waitingForConnection.set(false)
                     accept()
                 },
                 connectionClosed = {
-                    connectionClosed(it)
+                    connectionClosed()
                 }
             )
             )
         }
     }
 
-    private fun connectionClosed(channel: AsynchronousSocketChannel) {
-        if (!waitingForConnection.get()) {
-            println("[${this::class.simpleName}] Channel has been closed.")
-            accept()
-        }
+    private fun connectionClosed() {
+        println("[${this::class.simpleName}] Channel has been closed.")
+        accept()
     }
 
     private class ConnectionHandler(
