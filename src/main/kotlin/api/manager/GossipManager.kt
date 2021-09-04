@@ -1,22 +1,23 @@
 package api.manager
 
+import api.APICommunicator
+import api.APIModule
 import messaging.api.*
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
-import networking.service.ServicesManager
 import p2p.P2PCommunicator
 import p2p.brahms.View
-import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
 object GossipManager : APIMessageListener, P2PMessageListener {
-    val subscribers: MutableMap<DataType, MutableSet<Int>> = Collections.synchronizedMap(mutableMapOf())
+    val subscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
 
     @ExperimentalTime
-    override fun receive(msg: APIMessage, sender: Int) {
+    override fun receive(msg: APIMessage, sender: APIModule) {
         if (msg is GossipNotify) {
             subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
         } else if (msg is GossipValidation) {
@@ -45,14 +46,14 @@ object GossipManager : APIMessageListener, P2PMessageListener {
             MsgCache.put(msgId, msg)
             val notification = GossipNotification(msg.dataType, msgId, msg.data)
             subscribers[notification.dataType]?.forEach {
-                ServicesManager.sendApiMessage(notification, it)
+                APICommunicator.send(notification, it)
             }
         }
     }
 
-    fun channelClosed(port: Int) {
+    override fun channelClosed(module: APIModule) {
         subscribers.forEach { t, u ->
-            u.remove(port)
+            u.remove(module)
         }
         subscribers.entries.removeIf { it.value.isEmpty() }
 //        TODO: remove after testing

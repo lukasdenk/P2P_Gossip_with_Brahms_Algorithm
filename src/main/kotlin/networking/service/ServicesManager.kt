@@ -1,13 +1,16 @@
 package networking.service
 
-import api.manager.GossipManager
+import api.APICommunicator
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
 import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
-import utils.*
+import utils.MessageParser
+import utils.ipFromSocketAddress
+import utils.portFromSocketAddressAsInt
+import utils.socketAddressToString
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import kotlin.time.ExperimentalTime
@@ -24,7 +27,7 @@ object ServicesManager {
             port = port,
             read = { address: SocketAddress, data: ByteArray ->
                 val apiMessage = MessageParser().toApiMessage(ByteBuffer.wrap(data))
-                GossipManager.receive(
+                APICommunicator.receive(
                     apiMessage,
                     portFromSocketAddressAsInt(address)
                 )
@@ -34,7 +37,7 @@ object ServicesManager {
                 )
             },
             connectionClosed = { socketAddress ->
-                GossipManager.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
+                APICommunicator.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
             }
         )
         apiService.start()
@@ -75,6 +78,6 @@ object ServicesManager {
     }
 
     fun sendP2PMessage(msg: P2PMessage, peer: Peer) {
-        p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJson(msg))
+        p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJsonByteArray(msg))
     }
 }

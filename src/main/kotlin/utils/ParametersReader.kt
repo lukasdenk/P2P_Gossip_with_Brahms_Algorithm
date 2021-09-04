@@ -19,6 +19,7 @@ class ParametersReader {
                 "-c" -> {
                     iniConfigPath = args.getOrElse(i + 1) { "" }
                 }
+//                TODO: remove client related code
                 "-a" -> {
                     clientMode = ClientMode.Announce
                 }

@@ -7,16 +7,22 @@ import networking.service.ServicesManager
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-object APICommunicator : APIMessageListener {
+object APICommunicator {
     val listeners: List<APIMessageListener> = listOf(GossipManager)
 
     fun send(msg: APIMessage, receiver: APIModule) {
         ServicesManager.sendApiMessage(msg, receiver.port)
     }
 
-    override fun receive(msg: APIMessage, sender: Int) {
+    fun receive(msg: APIMessage, senderPort: Int) {
         listeners.forEach {
-            it.receive(msg, sender)
+            it.receive(msg, APIModule(senderPort))
+        }
+    }
+
+    fun channelClosed(port: Int) {
+        listeners.forEach {
+            it.channelClosed(APIModule(port))
         }
     }
 }

@@ -14,9 +14,6 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 fun main(args: Array<String>) {
     runBlocking {
-        launch {
-            View.update()
-        }
         val parametersReader = ParametersReader()
         parametersReader.read(args)
         val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
@@ -29,6 +26,9 @@ fun main(args: Array<String>) {
             degree = propertiesReader.degree,
             peersList = propertiesReader.peersList
         )
+        launch {
+            View.update()
+        }
         mutableListOf(
             CoroutineScope(Dispatchers.IO).launch {
                 ServicesManager.startApiService(

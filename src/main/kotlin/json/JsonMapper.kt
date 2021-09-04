@@ -10,17 +10,22 @@ import java.nio.charset.Charset
 
 @ExperimentalSerializationApi
 object JsonMapper {
-    fun mapToJson(msg: P2PMessage): ByteArray {
+    fun mapToJsonByteArray(msg: P2PMessage): ByteArray {
+        return mapToJsonString(msg).toByteArray(Charset.forName("utf-8"))
+    }
+
+    fun mapToJsonString(msg: P2PMessage): String {
         val string = Json.encodeToString(msg)
-        return string.toByteArray(Charset.forName("utf-8"))
+        return string
     }
 
     fun mapFromJson(raw: ByteArray): P2PMessage? {
         return try {
             Json.decodeFromString(raw.toString(Charset.forName("utf-8")))
         } catch (exception: Throwable) {
-            println("[${this::class.simpleName}] message with following content cannot be decoded: " +
-                    raw.toReadableString()
+            println(
+                "[${this::class.simpleName}] message with following content cannot be decoded: " +
+                        raw.toReadableString()
             )
             null
         }
