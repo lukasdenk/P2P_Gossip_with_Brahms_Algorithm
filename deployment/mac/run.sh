@@ -1,0 +1,1 @@
+java -jar deployment/mac/Gossip.jar -c deployment/mac/service.ini
