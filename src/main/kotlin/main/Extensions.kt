@@ -6,19 +6,22 @@ import kotlin.math.min
 
 fun ByteArray.sha256(): ByteArray {
     val sha256Instance = MessageDigest.getInstance("SHA256")
-    return sha256Instance.digest(this)
+    val digest = sha256Instance.digest(this)
+    if (digest.size != 32) {
+        throw IllegalStateException("digest size not 32. $this")
+    }
+    return digest
 }
 
 operator fun ByteArray.compareTo(other: ByteArray?): Int {
     if (other == null) {
         return 1
     }
-
-    val leadingZeroesComparison = other.leadingZeroes().compareTo(this.leadingZeroes())
-    if (leadingZeroesComparison != 0) {
-        return leadingZeroesComparison
+    if (this.size != other.size) {
+        throw UnsupportedOperationException("Can only compare ByteArrays with identical length")
     }
-    for (i in 0..this.size) {
+
+    for (i in 0 until this.size) {
         val comp = this[i].compareTo(other[i])
         if (comp != 0) {
             return comp

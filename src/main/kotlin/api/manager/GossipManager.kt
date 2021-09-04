@@ -37,12 +37,13 @@ object GossipManager : APIMsgListener, P2PMsgListener {
     }
 
     fun spread(msg: SpreadMsg) {
+        println("[P2P-SP] ${View.view}")
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
     @Synchronized
     override fun receive(msg: P2PMsg) {
-        if (msg is SpreadMsg) {
+        if (msg is SpreadMsg && msg.sender in View.view) {
             sendNotification(msg)
         }
     }

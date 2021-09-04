@@ -25,9 +25,9 @@ fun main(args: Array<String>) {
             "[gossip]\n" +
                     "degree = 30\n" +
                     "cache_size = 50\n" +
-                    "api_address = localhost:${7003 + id * 2}\n" +
-                    "p2p_address = localhost:${7004 + 2 * id}\n" +
-                    "bootstrapper = localhost:7001"
+                    "api_address = localhost:${7050 + id}\n" +
+                    "p2p_address = localhost:${7000 + id}\n" +
+                    "bootstrapper = localhost:7000"
         )
         args[0] = "-c"
         args[1] = ini.absolutePath

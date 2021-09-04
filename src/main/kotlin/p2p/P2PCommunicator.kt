@@ -1,5 +1,6 @@
 package p2p
 
+import api.manager.GossipManager
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.p2p.P2PMsg
@@ -14,16 +15,16 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 object P2PCommunicator : P2PMsgListener {
-    val listeners: List<P2PMsgListener> = listOf(PullManager, PushManager)
+    val listeners: List<P2PMsgListener> = listOf(PullManager, PushManager, GossipManager)
 
     fun send(msg: P2PMsg, receiver: Peer) {
-        println("send ${JsonMapper.mapToJsonString(msg)} to ${receiver.port}")
+        println("[P2P] send ${JsonMapper.mapToJsonString(msg)} to ${receiver.port}")
         ClientsManager.write(receiver.ip, receiver.port, JsonMapper.mapToJsonByteArray(msg))
     }
 
     override fun receive(msg: P2PMsg) {
+        println("[P2P] received ${JsonMapper.mapToJsonString(msg)} from ${msg.sender.port}")
         listeners.forEach {
-            println("received ${JsonMapper.mapToJsonString(msg)} from ${msg.sender.port}")
             it.receive(msg)
         }
     }
