@@ -1,7 +1,7 @@
 package p2p.brahms
 
 import kotlinx.coroutines.delay
-import main.Configs
+import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
 import p2p.brahms.manager.PullManager
@@ -11,14 +11,14 @@ import kotlin.time.ExperimentalTime
 
 
 object View {
-    var view: MutableSet<Peer> = Collections.synchronizedSet(Configs.seed)
+    var view: MutableSet<Peer> = Collections.synchronizedSet(HashSet(Preferences.bootstrappingPeers))
 
     private const val alpha = 0.45
     private const val beta = 0.45
 
-    private val pushFraction = (Configs.degree * alpha).toInt()
-    private val pullFraction = (Configs.degree * beta).toInt()
-    private val historyFraction = Configs.degree - pushFraction - pullFraction
+    private val pushFraction = (Preferences.degree * alpha).toInt()
+    private val pullFraction = (Preferences.degree * beta).toInt()
+    private val historyFraction = Preferences.degree - pushFraction - pullFraction
 
 
     @ExperimentalTime
@@ -30,9 +30,9 @@ object View {
             PushManager.push(view.randomSubSet(pushFraction))
             PullManager.pull(view.randomSubSet(pullFraction))
 
-            delay(Configs.updateInterval)
+            delay(Preferences.updateInterval)
 
-            if (PushManager.receivedPushs.size < Configs.pushLimit) {
+            if (PushManager.receivedPushs.size < Preferences.pushLimit) {
                 val pushs = PushManager.receivedPushs.randomSubSet(pushFraction)
                 val pulls = PullManager.receivedPulls.randomSubSet(pullFraction)
                 val pushsAndPulls = pushs union pulls

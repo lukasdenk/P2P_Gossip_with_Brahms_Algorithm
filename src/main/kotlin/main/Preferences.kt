@@ -3,6 +3,14 @@ package main
 import messaging.p2p.Peer
 
 object Preferences {
+    //    TODO: find good value
+    val difficulty: Int = 4
+
+    val probeInterval = 5000L
+    val updateInterval = 10000L
+    val pullLimit = (updateInterval / 1000L).toInt()
+    const val pushLimit: Int = 1000
+
     var gossipServiceAddress: String = "localhost"
         private set
     var gossipServicePort: Int = 7001
@@ -15,9 +23,11 @@ object Preferences {
         private set
     var degree: Int = 30
         private set
-    val peers: List<Peer>
+    val bootstrappingPeers: List<Peer>
         get() = peersList.toList()
     private val peersList: MutableList<Peer> = mutableListOf()
+
+    val self = Peer(p2pServiceAddress, p2pServicePort)
 
     fun initialize(
         gossipServiceAddress: String,

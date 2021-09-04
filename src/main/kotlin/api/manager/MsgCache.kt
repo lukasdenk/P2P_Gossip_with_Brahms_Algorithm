@@ -1,6 +1,6 @@
 package api.manager
 
-import main.Configs
+import main.Preferences
 import messaging.api.MsgId
 import messaging.p2p.SpreadMsg
 import java.util.*
@@ -15,7 +15,7 @@ object MsgCache {
         val timeMillis = System.currentTimeMillis()
         msgCache[id] = Pair(msg, timeMillis)
         msgTimeMillis[timeMillis] = id
-        if (msgCache.size > Configs.cacheSize) {
+        if (msgCache.size > Preferences.cacheSize) {
             val minTimesMillis = msgTimeMillis.firstKey()
             if (minTimesMillis != null) {
                 val minId = msgTimeMillis.remove(minTimesMillis)

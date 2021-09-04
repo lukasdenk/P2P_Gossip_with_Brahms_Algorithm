@@ -1,6 +1,6 @@
 package p2p.brahms.manager
 
-import main.Configs
+import main.Preferences
 import main.randomSubSet
 import messaging.p2p.*
 import p2p.P2PCommunicator
@@ -22,7 +22,7 @@ object PullManager : P2PMessageListener {
     fun pull(peers: Collection<Peer>) {
         requests.clear()
         peers.forEach {
-            val pullRequest = PullRequest(Configs.pullLimit)
+            val pullRequest = PullRequest(Preferences.pullLimit)
             requests[it] = pullRequest
             P2PCommunicator.send(pullRequest, it)
         }
