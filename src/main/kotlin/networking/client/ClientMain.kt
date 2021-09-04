@@ -24,21 +24,21 @@ fun main(args: Array<String>) {
                 dataType = 1,
                 data = byteArrayOf(1, 2, 3)
             ).toByteArray()
-        )
+        ).join()
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
             JsonMapper.mapToJsonByteArray(ProbeRequest())
-        )
+        ).join()
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
             JsonMapper.mapToJsonByteArray(ProbeResponse())
-        )
+        ).join()
         ClientsManager.write(
             parametersReader.gossipServiceAddress,
             7002,
             JsonMapper.mapToJsonByteArray(PushMsg(nonce = 10000L))
-        )
+        ).join()
     }
 }
