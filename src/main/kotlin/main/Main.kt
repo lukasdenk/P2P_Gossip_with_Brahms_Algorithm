@@ -5,7 +5,9 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import networking.service.PreferencesReader
 import networking.service.ServicesManager
 import p2p.brahms.View
+import test.Test
 import utils.ParametersReader
+import java.io.File
 import kotlin.time.ExperimentalTime
 
 
@@ -13,6 +15,24 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 fun main(args: Array<String>) {
+//        TODO: remove
+    if (args[0] != "-c") {
+        val id = args[0].toInt()
+        val ini = File("resources/$id.ini")
+        ini.writeText(
+            "[gossip]\n" +
+                    "degree = 30\n" +
+                    "cache_size = 50\n" +
+                    "api_address = localhost:${7002 + id * 2}\n" +
+                    "p2p_address = localhost:${7003 + 2 * id}\n" +
+                    "bootstrapper = localhost:7000"
+        )
+        args[0] = "-c"
+        args[1] = ini.absolutePath
+        Test.id = id
+    }
+
+
     runBlocking {
         val parametersReader = ParametersReader()
         parametersReader.read(args)
