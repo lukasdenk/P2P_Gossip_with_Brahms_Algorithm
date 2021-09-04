@@ -73,7 +73,7 @@ object ServicesManager {
         try {
             apiService.write("127.0.0.1:${port}", msg.toByteArray())
         } catch (cannotConnectEx: IllegalStateException) {
-            GossipManager.channelClosed(port)
+            APICommunicator.channelClosed(port)
         }
     }
 
