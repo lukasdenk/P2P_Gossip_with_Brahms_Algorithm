@@ -15,8 +15,8 @@ object P2PCommunicator : P2PMessageListener {
     val listeners: List<P2PMessageListener> = listOf(PullManager, PushManager)
 
     fun send(msg: P2PMessage, receiver: Peer) {
-        ServicesManager.sendP2PMessage(msg, receiver)
         println("send ${JsonMapper.mapToJsonString(msg)} to ${receiver.port}")
+        ServicesManager.sendP2PMessage(msg, receiver)
     }
 
     override fun receive(msg: P2PMessage, sender: Peer) {
