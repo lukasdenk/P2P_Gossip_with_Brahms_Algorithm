@@ -29,8 +29,8 @@ object PullManager : P2PMessageListener {
     }
 
     @ExperimentalTime
-    override fun receive(msg: P2PMessage, sender : Peer) {
-        if (msg is PullResponse && requests.containsKey(sender)) {
+    override fun receive(msg: P2PMessage) {
+        if (msg is PullResponse && requests.containsKey(msg.sender)) {
             History.next(msg.neighbourSample)
             receivedPulls.addAll(msg.neighbourSample.filter { it != Preferences.self })
         } else if (msg is PullRequest) {
@@ -38,7 +38,7 @@ object PullManager : P2PMessageListener {
                 PullResponse(
                     View.view.randomSubSet(msg.limit)
                 ),
-                sender
+                msg.sender
             )
         }
     }

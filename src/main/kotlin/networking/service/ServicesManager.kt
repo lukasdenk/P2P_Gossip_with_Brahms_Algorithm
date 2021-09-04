@@ -8,7 +8,6 @@ import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
 import utils.MessageParser
-import utils.ipFromSocketAddress
 import utils.portFromSocketAddressAsInt
 import utils.socketAddressToString
 import java.net.SocketAddress
@@ -50,11 +49,7 @@ object ServicesManager {
             read = { address: SocketAddress, data: ByteArray ->
                 val message = JsonMapper.mapFromJson(data) ?: return@Service
                 P2PCommunicator.receive(
-                    message,
-                    Peer(
-                        ipFromSocketAddress(address),
-                        portFromSocketAddressAsInt(address)
-                    )
+                    message
                 )
                 println(
                     "Received message of type: ${message.javaClass.name} from " +

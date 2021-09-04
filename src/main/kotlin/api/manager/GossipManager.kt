@@ -5,7 +5,6 @@ import api.APIModule
 import messaging.api.*
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
-import messaging.p2p.Peer
 import messaging.p2p.SpreadMsg
 import p2p.P2PCommunicator
 import p2p.brahms.View
@@ -40,7 +39,7 @@ object GossipManager : APIMessageListener, P2PMessageListener {
     }
 
     @Synchronized
-    override fun receive(msg: P2PMessage, sender: Peer) {
+    override fun receive(msg: P2PMessage) {
         if (msg is SpreadMsg) {
             sendNotification(msg)
         }

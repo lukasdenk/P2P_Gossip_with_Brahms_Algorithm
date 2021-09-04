@@ -19,10 +19,10 @@ object P2PCommunicator : P2PMessageListener {
         ClientsManager.write(receiver.ip, receiver.port, JsonMapper.mapToJsonByteArray(msg))
     }
 
-    override fun receive(msg: P2PMessage, sender: Peer) {
+    override fun receive(msg: P2PMessage) {
         listeners.forEach {
-            println("received ${JsonMapper.mapToJsonString(msg)} from ${sender.port}")
-            it.receive(msg, sender)
+            println("received ${JsonMapper.mapToJsonString(msg)} from ${msg.sender.port}")
+            it.receive(msg)
         }
     }
 

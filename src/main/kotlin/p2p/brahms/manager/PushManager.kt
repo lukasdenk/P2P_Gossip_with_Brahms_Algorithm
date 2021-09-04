@@ -33,17 +33,17 @@ object PushManager : P2PMessageListener {
         receivedPushs.clear()
     }
 
-    override fun receive(msg: P2PMessage, sender: Peer) {
+    override fun receive(msg: P2PMessage) {
 //        Ignore if sender is equals to ourselves. In this case, the push must be from an erroneous or attacker peer.
-        if (msg is PushMsg && validate(msg, sender) && sender != Preferences.self) {
-            History.next(sender)
-            receivedPushs.add(sender)
+        if (msg is PushMsg && validate(msg) && msg.sender != Preferences.self) {
+            History.next(msg.sender)
+            receivedPushs.add(msg.sender)
         }
     }
 
-    private fun validate(msg: PushMsg, sender: Peer): Boolean {
+    private fun validate(msg: PushMsg): Boolean {
         for (i in 0..4) {
-            val work = PoW.buildPoW(System.currentTimeMillis() - 60000L * i, sender, Preferences.self, msg.nonce)
+            val work = PoW.buildPoW(System.currentTimeMillis() - 60000L * i, msg.sender, Preferences.self, msg.nonce)
             if (work
                     .startsWithXLeadingZeroes(Preferences.difficulty)
             ) {
