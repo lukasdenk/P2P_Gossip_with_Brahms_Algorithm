@@ -1,6 +1,5 @@
 package main
 
-import api.APIModule
 import messaging.p2p.Peer
 
 object Configs {
@@ -17,8 +16,6 @@ object Configs {
     val seed: MutableSet<Peer> = mutableSetOf()
     val self = Peer("127.0.0.1", 1234)
     val cacheSize: Int = 10
-    val gossipModule = APIModule(7001)
-    val nseModule = APIModule(7201)
     val degree = 10
 
 }
