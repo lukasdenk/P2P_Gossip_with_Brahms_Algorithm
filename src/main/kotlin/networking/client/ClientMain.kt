@@ -4,8 +4,6 @@ import json.JsonMapper
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.GossipAnnounce
-import messaging.p2p.ProbeRequest
-import messaging.p2p.ProbeResponse
 import messaging.p2p.PushMsg
 import utils.ParametersReader
 import kotlin.time.ExperimentalTime
@@ -24,16 +22,6 @@ fun main(args: Array<String>) {
                 dataType = 1,
                 data = byteArrayOf(1, 2, 3)
             ).toByteArray()
-        ).join()
-        ClientsManager.write(
-            parametersReader.gossipServiceAddress,
-            7002,
-            JsonMapper.mapToJsonByteArray(ProbeRequest())
-        ).join()
-        ClientsManager.write(
-            parametersReader.gossipServiceAddress,
-            7002,
-            JsonMapper.mapToJsonByteArray(ProbeResponse())
         ).join()
         ClientsManager.write(
             parametersReader.gossipServiceAddress,

@@ -40,6 +40,7 @@ object View {
                 view = (pushsAndPulls union
                         History.get(historyFraction + compensate)).toMutableSet()
             }
+            println("View: $view")
             i++
         }
     }

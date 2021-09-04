@@ -7,7 +7,16 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 object History {
-    private var samplers = MutableList(Preferences.degree) { Sampler() }
+    private val samplers: List<Sampler>
+
+    init {
+        val initList = mutableListOf<Sampler>()
+        for (i in 0..Preferences.bootstrappingPeers.size) {
+            val peer = Preferences.bootstrappingPeers.getOrNull(i)
+            initList.add(Sampler(peer))
+        }
+        samplers = initList
+    }
 
     fun next(peers: Set<Peer>) {
         samplers.parallelStream().forEach { s ->

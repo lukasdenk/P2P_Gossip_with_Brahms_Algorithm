@@ -3,12 +3,11 @@ package networking.service
 import api.APICommunicator
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
-import messaging.api.APIMessage
-import messaging.p2p.P2PMessage
+import messaging.api.APIMsg
+import messaging.p2p.P2PMsg
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
 import utils.MessageParser
-import utils.ipFromSocketAddress
 import utils.portFromSocketAddressAsInt
 import utils.socketAddressToString
 import java.net.SocketAddress
@@ -50,11 +49,7 @@ object ServicesManager {
             read = { address: SocketAddress, data: ByteArray ->
                 val message = JsonMapper.mapFromJson(data) ?: return@Service
                 P2PCommunicator.receive(
-                    message,
-                    Peer(
-                        ipFromSocketAddress(address),
-                        portFromSocketAddressAsInt(address)
-                    )
+                    message
                 )
                 println(
                     "Received message of type: ${message.javaClass.name} from " +
@@ -69,7 +64,7 @@ object ServicesManager {
         return p2pService.isOnline(peer.toSocketAddress())
     }
 
-    fun sendApiMessage(msg: APIMessage, port: Int) {
+    fun sendApiMessage(msg: APIMsg, port: Int) {
         try {
             apiService.write("127.0.0.1:${port}", msg.toByteArray())
         } catch (cannotConnectEx: IllegalStateException) {
@@ -77,7 +72,7 @@ object ServicesManager {
         }
     }
 
-    fun sendP2PMessage(msg: P2PMessage, peer: Peer) {
+    fun sendP2PMessage(msg: P2PMsg, peer: Peer) {
         p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJsonByteArray(msg))
     }
 }

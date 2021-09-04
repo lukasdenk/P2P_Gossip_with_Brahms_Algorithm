@@ -3,5 +3,6 @@ package messaging.p2p
 import kotlinx.serialization.Serializable
 
 @Serializable
-class ProbeResponse : P2PMessage() {
+sealed class P2PMsg {
+    abstract val sender: Peer
 }

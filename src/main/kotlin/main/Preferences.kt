@@ -27,7 +27,8 @@ object Preferences {
         get() = peersList.toList()
     private val peersList: MutableList<Peer> = mutableListOf()
 
-    val self = Peer(p2pServiceAddress, p2pServicePort)
+    var self = Peer(p2pServiceAddress, p2pServicePort)
+
 
     fun initialize(
         gossipServiceAddress: String,
@@ -45,5 +46,6 @@ object Preferences {
         this.cacheSize = cacheSize
         this.degree = degree
         this.peersList.addAll(peersList)
+        this.self = Peer(p2pServiceAddress, p2pServicePort)
     }
 }
