@@ -62,6 +62,7 @@ class Sampler(peer: Peer? = null) {
                 delay(Preferences.probeInterval)
                 val peerInstance = atomicPeer.get()
                 if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
+                    println("peer ${peerInstance.port} went offline")
                     initialize()
                 }
             }

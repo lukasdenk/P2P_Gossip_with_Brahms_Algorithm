@@ -42,8 +42,9 @@ object PushManager : P2PMessageListener {
     }
 
     private fun validate(msg: PushMsg, sender: Peer): Boolean {
-        for (i in 0..1) {
-            if (PoW.buildPoW(System.currentTimeMillis() - 60000L * i, sender, Preferences.self, msg.nonce)
+        for (i in 0..4) {
+            val work = PoW.buildPoW(System.currentTimeMillis() - 60000L * i, sender, Preferences.self, msg.nonce)
+            if (work
                     .startsWithXLeadingZeroes(Preferences.difficulty)
             ) {
                 return true

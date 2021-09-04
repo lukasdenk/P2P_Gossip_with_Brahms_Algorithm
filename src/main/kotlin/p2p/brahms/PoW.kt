@@ -18,7 +18,7 @@ object PoW {
         return nonce
     }
 
-    fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, i: Long): ByteArray =
-        ((timestamp / 60000L).toString() + sender.ip + receiver.ip + i).toByteArray(Charset.forName("utf-8"))
+    fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, nonce: Long): ByteArray =
+        ((timestamp / 60000L).toString() + sender.ip + receiver.ip + nonce).toByteArray(Charset.forName("utf-8"))
             .sha256()
 }
