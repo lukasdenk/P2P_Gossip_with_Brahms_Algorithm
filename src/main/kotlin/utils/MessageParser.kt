@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 @ExperimentalSerializationApi
 class MessageParser {
 
-    fun toApiMessage(buffer: ByteBuffer): APIMessage {
+    fun toApiMessage(buffer: ByteBuffer): APIMsg {
         if (buffer.remaining() < 8) {
             return GossipUnknownMessage.fromByteBuffer(buffer)
         }

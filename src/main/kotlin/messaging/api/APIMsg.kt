@@ -1,6 +1,6 @@
 package messaging.api
 
 
-interface APIMessage {
+interface APIMsg {
     fun toByteArray(): ByteArray
 }

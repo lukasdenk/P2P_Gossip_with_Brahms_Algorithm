@@ -10,15 +10,18 @@ object PoW {
     fun work(receiver: Peer): Long {
         val timestamp = System.currentTimeMillis()
         var hash: ByteArray
-        var nonce = 0L
+        var nonce = -1L
         do {
-            hash = buildPoW(timestamp, Preferences.self, receiver, nonce)
             nonce++
+            hash = buildPoW(timestamp, Preferences.self, receiver, nonce)
         } while (!hash.startsWithXLeadingZeroes(Preferences.difficulty))
         return nonce
     }
 
-    fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, i: Long): ByteArray =
-        ((timestamp / 60000L).toString() + sender.ip + receiver.ip + i).toByteArray(Charset.forName("utf-8"))
+    fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, nonce: Long): ByteArray {
+        val l = timestamp / 60000L
+//        println("[${Preferences.self.port}] $l $sender.ip $receiver.ip $nonce")
+        return (l.toString() + sender.ip + receiver.ip + nonce).toByteArray(Charset.forName("utf-8"))
             .sha256()
+    }
 }

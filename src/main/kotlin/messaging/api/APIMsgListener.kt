@@ -2,8 +2,8 @@ package messaging.api
 
 import api.APIModule
 
-interface APIMessageListener {
-    fun receive(msg: APIMessage, sender: APIModule)
+interface APIMsgListener {
+    fun receive(msg: APIMsg, sender: APIModule)
 
     fun channelClosed(module: APIModule)
 }

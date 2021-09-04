@@ -7,7 +7,7 @@ class GossipNotification(
     val messageId: Short,
     val dataType: DataType,
     val data: ByteArray
-) : APIMessage {
+) : APIMsg {
 
     companion object {
         fun fromByteBuffer(buffer: ByteBuffer): GossipNotification {

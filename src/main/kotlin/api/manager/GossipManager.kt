@@ -3,23 +3,24 @@ package api.manager
 import api.APICommunicator
 import api.APIModule
 import messaging.api.*
-import messaging.p2p.P2PMessage
-import messaging.p2p.P2PMessageListener
-import messaging.p2p.Peer
+import messaging.p2p.P2PMsg
+import messaging.p2p.P2PMsgListener
 import messaging.p2p.SpreadMsg
 import p2p.P2PCommunicator
 import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
-object GossipManager : APIMessageListener, P2PMessageListener {
-    val subscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
+@ExperimentalTime
+object GossipManager : APIMsgListener, P2PMsgListener {
+    val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
-
-    @ExperimentalTime
-    override fun receive(msg: APIMessage, sender: APIModule) {
+    @Synchronized
+    override fun receive(msg: APIMsg, sender: APIModule) {
         if (msg is GossipNotify) {
-            subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
+            val subscribers = dataTypeToSubscribers.getOrDefault(msg.dataType, HashSet())
+            subscribers.add(sender)
+            dataTypeToSubscribers[msg.dataType] = subscribers
         } else if (msg is GossipValidation) {
             val spreadMsg = MsgCache.remove(msg.messageId)
             if (spreadMsg != null && spreadMsg.ttl != 1 && msg.isValid) {
@@ -29,35 +30,37 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         } else if (msg is GossipAnnounce) {
             val spreadMsg = SpreadMsg(msg.dataType, msg.ttl.toInt(), msg.data)
             spread(spreadMsg)
+            sendNotification(spreadMsg)
         }
     }
 
-
-    @ExperimentalTime
     fun spread(msg: SpreadMsg) {
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
-    @ExperimentalTime
     @Synchronized
-    override fun receive(msg: P2PMessage, sender: Peer) {
+    override fun receive(msg: P2PMsg) {
         if (msg is SpreadMsg) {
-            val msgId = MsgIdCounter.increment()
-            MsgCache.put(msgId, msg)
-            val notification = GossipNotification(msg.dataType, msgId, msg.data)
-            subscribers[notification.dataType]?.forEach {
-                APICommunicator.send(notification, it)
-            }
+            sendNotification(msg)
+        }
+    }
+
+    private fun sendNotification(msg: SpreadMsg) {
+        val msgId = MsgIdCounter.increment()
+        MsgCache.put(msgId, msg)
+        val notification = GossipNotification(msg.dataType, msgId, msg.data)
+        dataTypeToSubscribers[notification.dataType]?.forEach {
+            APICommunicator.send(notification, it)
         }
     }
 
     override fun channelClosed(module: APIModule) {
-        subscribers.forEach { t, u ->
+        dataTypeToSubscribers.forEach { t, u ->
             u.remove(module)
         }
-        subscribers.entries.removeIf { it.value.isEmpty() }
+        dataTypeToSubscribers.entries.removeIf { it.value.isEmpty() }
 //        TODO: remove after testing
-        if (!subscribers.filterValues { it.isEmpty() }.isEmpty()) {
+        if (!dataTypeToSubscribers.filterValues { it.isEmpty() }.isEmpty()) {
             throw IllegalStateException("check stmt above")
         }
     }
