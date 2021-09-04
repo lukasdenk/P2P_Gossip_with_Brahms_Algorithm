@@ -1,0 +1,1 @@
+java -jar deployment/windows/Gossip.jar -c deployment/windows/service.ini
