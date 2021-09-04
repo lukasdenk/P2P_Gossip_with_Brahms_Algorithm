@@ -12,11 +12,10 @@ import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 object GossipManager : APIMessageListener, P2PMessageListener {
     val subscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
-
-    @ExperimentalTime
     override fun receive(msg: APIMessage, sender: APIModule) {
         if (msg is GossipNotify) {
             subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
@@ -29,25 +28,27 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         } else if (msg is GossipAnnounce) {
             val spreadMsg = SpreadMsg(msg.dataType, msg.ttl.toInt(), msg.data)
             spread(spreadMsg)
+            sendNotification(spreadMsg)
         }
     }
 
-
-    @ExperimentalTime
     fun spread(msg: SpreadMsg) {
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
-    @ExperimentalTime
     @Synchronized
     override fun receive(msg: P2PMessage, sender: Peer) {
         if (msg is SpreadMsg) {
-            val msgId = MsgIdCounter.increment()
-            MsgCache.put(msgId, msg)
-            val notification = GossipNotification(msg.dataType, msgId, msg.data)
-            subscribers[notification.dataType]?.forEach {
-                APICommunicator.send(notification, it)
-            }
+            sendNotification(msg)
+        }
+    }
+
+    private fun sendNotification(msg: SpreadMsg) {
+        val msgId = MsgIdCounter.increment()
+        MsgCache.put(msgId, msg)
+        val notification = GossipNotification(msg.dataType, msgId, msg.data)
+        subscribers[notification.dataType]?.forEach {
+            APICommunicator.send(notification, it)
         }
     }
 
