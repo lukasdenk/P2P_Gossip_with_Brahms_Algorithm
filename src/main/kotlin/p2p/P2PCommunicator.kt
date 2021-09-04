@@ -4,7 +4,7 @@ import json.JsonMapper
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
-import networking.service.ServicesManager
+import networking.client.ClientsManager
 import p2p.brahms.manager.PullManager
 import p2p.brahms.manager.PushManager
 import kotlin.time.ExperimentalTime
@@ -16,7 +16,7 @@ object P2PCommunicator : P2PMessageListener {
 
     fun send(msg: P2PMessage, receiver: Peer) {
         println("send ${JsonMapper.mapToJsonString(msg)} to ${receiver.port}")
-        ServicesManager.sendP2PMessage(msg, receiver)
+        ClientsManager.write(receiver.ip, receiver.port, JsonMapper.mapToJsonByteArray(msg))
     }
 
     override fun receive(msg: P2PMessage, sender: Peer) {
