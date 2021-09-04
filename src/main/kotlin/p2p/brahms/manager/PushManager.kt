@@ -3,7 +3,7 @@ package p2p.brahms.manager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import main.Configs
+import main.Preferences
 import main.startsWithXLeadingZeroes
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
@@ -43,7 +43,7 @@ object PushManager : P2PMessageListener {
     private fun validate(msg: PushMsg, peer: Peer): Boolean {
         for (i in 0..1) {
             if (PoW.buildPoW(System.currentTimeMillis() - 60000L * i, peer, msg.nonce)
-                    .startsWithXLeadingZeroes(Configs.difficulty)
+                    .startsWithXLeadingZeroes(Preferences.difficulty)
             ) {
                 return true
             }

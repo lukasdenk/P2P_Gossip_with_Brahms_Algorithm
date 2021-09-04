@@ -1,13 +1,13 @@
 package p2p.brahms
 
-import main.Configs
+import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 object History {
-    private var samplers = MutableList(Configs.degree) { Sampler() }
+    private var samplers = MutableList(Preferences.degree) { Sampler() }
 
     fun next(peers: Set<Peer>) {
         samplers.parallelStream().forEach { s ->

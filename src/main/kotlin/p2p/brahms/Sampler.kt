@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import main.Configs
+import main.Preferences
 import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
@@ -50,7 +50,7 @@ class Sampler() {
     fun probe() {
         CoroutineScope(Dispatchers.Default).launch {
             while (true) {
-                delay(Configs.probeInterval)
+                delay(Preferences.probeInterval)
                 val peerInstance = peer.get()
                 if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
                     initialize()
