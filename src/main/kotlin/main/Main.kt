@@ -18,14 +18,16 @@ fun main(args: Array<String>) {
 //        TODO: remove
     if (args[0] != "-c") {
         val id = args[0].toInt()
-        val ini = File("resources/$id.ini")
+        val ini = File("src/main/resources/test_inis/$id.ini")
+        println(ini.absolutePath)
+        ini.createNewFile()
         ini.writeText(
             "[gossip]\n" +
                     "degree = 30\n" +
                     "cache_size = 50\n" +
-                    "api_address = localhost:${7002 + id * 2}\n" +
-                    "p2p_address = localhost:${7003 + 2 * id}\n" +
-                    "bootstrapper = localhost:7000"
+                    "api_address = localhost:${7003 + id * 2}\n" +
+                    "p2p_address = localhost:${7004 + 2 * id}\n" +
+                    "bootstrapper = localhost:7001"
         )
         args[0] = "-c"
         args[1] = ini.absolutePath

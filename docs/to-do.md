@@ -14,6 +14,8 @@
 - break API connection
 - PoW invalid
 - invalid
+- peer goes offline -> does it disappear from view?
+-
 
 ## Kyrylo
 

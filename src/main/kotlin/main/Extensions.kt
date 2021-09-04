@@ -45,7 +45,7 @@ fun ByteArray.leadingZeroes(): Int {
     return leadingZeroes
 }
 
-fun <T> Collection<T>.randomSubSet(n: Int): MutableSet<T> {
+fun <T> Set<T>.randomSubSet(n: Int): MutableSet<T> {
     val ceiling = min(n, this.size)
     return this.toList().shuffled().subList(0, ceiling).toMutableSet()
 }

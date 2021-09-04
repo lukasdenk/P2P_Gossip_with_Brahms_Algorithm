@@ -9,7 +9,7 @@ object Preferences {
     val probeInterval = 5000L
     val updateInterval = 10000L
     val pullLimit = (updateInterval / 1000L).toInt()
-    const val pushLimit: Int = 1000
+    const val pushLimit: Int = 10
 
     var gossipServiceAddress: String = "localhost"
         private set

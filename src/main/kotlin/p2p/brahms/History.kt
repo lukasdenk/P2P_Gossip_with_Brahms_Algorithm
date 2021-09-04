@@ -31,6 +31,6 @@ object History {
     }
 
     fun get(n: Int): Set<Peer> {
-        return samplers.mapNotNull(Sampler::get).randomSubSet(n)
+        return samplers.mapNotNull(Sampler::get).toSet().randomSubSet(n)
     }
 }
