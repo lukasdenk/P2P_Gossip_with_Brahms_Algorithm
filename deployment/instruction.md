@@ -16,8 +16,12 @@ To build and run the jar in IntelIJ do the following:
        1. Run `.\deployment\windows\update_jar_and_ini.ps1` from root project folder.
     2. For Windows CMD
        1. Run `.\deployment\windows\update_jar_and_ini.cmd` from root project folder.
+    3. For MacOS Terminal
+       1. Run `sh deployment/mac/update_artifact_and_ini.sh` from root project folder.
 14. Run the jar file
     1. For Windows PowerShell
        1. Run `.\deployment\windows\run.ps1` from root project folder.
     2. For Windows CMD
        1. Run `.\deployment\windows\run.cmd` from root project folder.
+    3. For MacOS Terminal
+       1. Run `sh deployment/mac/run.sh` from root project folder.
