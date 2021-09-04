@@ -15,7 +15,8 @@ object JsonMapper {
     }
 
     fun mapToJsonString(msg: P2PMsg): String {
-        val string = Json.encodeToString(msg)
+        val json = Json { encodeDefaults = true }
+        val string = json.encodeToString(msg)
         return string
     }
 
