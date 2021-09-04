@@ -4,35 +4,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import utils.socketAddressToString
-import java.net.InetSocketAddress
-import java.net.SocketAddress
-import java.net.StandardSocketOptions
+import networking.client.ClientsManager
+import java.net.*
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+
 
 @ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
 class P2PService(
     address: String,
     port: Int,
-    private val read: (SocketAddress, ByteArray) -> Unit,
-    private val connectionClosed: (String) -> Unit = {},
+    private val read: (SocketAddress, ByteArray) -> Unit
 ) {
 
     private val socketConnectionsScope = CoroutineScope(Dispatchers.IO)
     private val socketAddress: SocketAddress = InetSocketAddress(address, port)
-    private val clientChannelMap = ConcurrentHashMap<String, AsynchronousSocketChannel>()
-    private val channelToAddressMap = ConcurrentHashMap<AsynchronousSocketChannel, String>()
-    private val hasSpaceForNewConnections
-        get() = clientChannelMap.size < Constants.MaxConnectionsAmount
     private val waitingForConnection = AtomicBoolean(false)
     private lateinit var serverChannel: AsynchronousServerSocketChannel
 
@@ -45,13 +38,21 @@ class P2PService(
         }
     }
 
-    fun write(socketAddress: String, message: ByteArray) {
-        clientChannelMap[socketAddress]?.write(ByteBuffer.wrap(message))
-            ?: throw IllegalStateException("Peer $socketAddress has not been connected")
+    fun isOnline(hostName: String, port: Int): Boolean {
+        return isSocketAlive(hostName, port)
     }
 
-    fun isOnline(socketAddress: String): Boolean {
-        return clientChannelMap.contains(socketAddress)
+    private fun isSocketAlive(hostName: String, port: Int): Boolean {
+        val socketAddress: SocketAddress = InetSocketAddress(hostName, port)
+        val socket = Socket()
+        val timeoutInSec = 2
+        return try {
+            socket.connect(socketAddress, timeoutInSec * 1000)
+            socket.close()
+            true
+        } catch (exception: Throwable) {
+            false
+        }
     }
 
     private suspend fun createServerChannel() {
@@ -63,20 +64,13 @@ class P2PService(
     }
 
     private fun accept() {
-        waitingForConnection.set(hasSpaceForNewConnections)
-        if (!hasSpaceForNewConnections) {
-            return
-        }
         socketConnectionsScope.launch {
             serverChannel.accept(null, ConnectionHandler(
                 read = read,
                 successfulConnectionAttempt = { clientChannel ->
-                    indexChannel(clientChannel)
                     accept()
                 },
                 failedConnectionAttempt = { clientChannel ->
-                    val address = channelToAddressMap[clientChannel]!!
-                    println("[${this::class.simpleName}] Channel ($address) failed to connect.")
                     accept()
                 },
                 connectionClosed = {
@@ -88,25 +82,10 @@ class P2PService(
     }
 
     private fun connectionClosed(channel: AsynchronousSocketChannel) {
-        val address = channelToAddressMap[channel]!!
-        connectionClosed.invoke(address)
-        unindexChannel(channel)
         if (!waitingForConnection.get()) {
-            println("[${this::class.simpleName}] Channel ($address) has been closed. ${Constants.MaxConnectionsAmount - clientChannelMap.size} connections left")
+            println("[${this::class.simpleName}] Channel has been closed.")
             accept()
         }
-    }
-
-    private fun indexChannel(channel: AsynchronousSocketChannel) {
-        val address = socketAddressToString(channel.remoteAddress)
-        clientChannelMap[address] = channel
-        channelToAddressMap[channel] = address
-    }
-
-    private fun unindexChannel(channel: AsynchronousSocketChannel) {
-        val address = channelToAddressMap[channel]!!
-        clientChannelMap.remove(address)
-        channelToAddressMap.remove(channel)
     }
 
     private class ConnectionHandler(

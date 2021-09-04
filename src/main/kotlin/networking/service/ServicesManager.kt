@@ -6,6 +6,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMessage
 import messaging.p2p.P2PMessage
 import messaging.p2p.Peer
+import networking.client.ClientsManager
 import p2p.P2PCommunicator
 import utils.MessageParser
 import utils.ipFromSocketAddress
@@ -66,7 +67,7 @@ object ServicesManager {
     }
 
     fun isP2PPeerOnline(peer: Peer): Boolean {
-        return p2pService.isOnline(peer.toSocketAddress())
+        return p2pService.isOnline(peer.ip, peer.port)
     }
 
     fun sendApiMessage(msg: APIMessage, port: Int) {
@@ -78,6 +79,6 @@ object ServicesManager {
     }
 
     fun sendP2PMessage(msg: P2PMessage, peer: Peer) {
-        p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJsonByteArray(msg))
+        ClientsManager.write(peer.ip, peer.port, JsonMapper.mapToJsonByteArray(msg))
     }
 }
