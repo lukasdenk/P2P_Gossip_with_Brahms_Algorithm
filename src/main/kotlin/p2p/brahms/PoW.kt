@@ -7,18 +7,18 @@ import messaging.p2p.Peer
 import java.nio.charset.Charset
 
 object PoW {
-    fun work(peer: Peer): Long {
+    fun work(receiver: Peer): Long {
         val timestamp = System.currentTimeMillis()
         var hash: ByteArray
         var nonce = 0L
         do {
-            hash = buildPoW(timestamp, peer, nonce)
+            hash = buildPoW(timestamp, Preferences.self, receiver, nonce)
             nonce++
         } while (!hash.startsWithXLeadingZeroes(Preferences.difficulty))
         return nonce
     }
 
-    fun buildPoW(timestamp: Long, peer: Peer, i: Long): ByteArray =
-        ((timestamp / 60000L).toString() + peer.ip + Preferences.self.ip + i).toByteArray(Charset.forName("utf-8"))
+    fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, i: Long): ByteArray =
+        ((timestamp / 60000L).toString() + sender.ip + receiver.ip + i).toByteArray(Charset.forName("utf-8"))
             .sha256()
 }

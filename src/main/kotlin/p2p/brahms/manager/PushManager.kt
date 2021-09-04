@@ -40,9 +40,9 @@ object PushManager : P2PMessageListener {
         }
     }
 
-    private fun validate(msg: PushMsg, peer: Peer): Boolean {
+    private fun validate(msg: PushMsg, sender: Peer): Boolean {
         for (i in 0..1) {
-            if (PoW.buildPoW(System.currentTimeMillis() - 60000L * i, peer, msg.nonce)
+            if (PoW.buildPoW(System.currentTimeMillis() - 60000L * i, sender, Preferences.self, msg.nonce)
                     .startsWithXLeadingZeroes(Preferences.difficulty)
             ) {
                 return true
