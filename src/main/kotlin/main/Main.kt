@@ -1,6 +1,5 @@
 package main
 
-import api.manager.NseMsgsManager
 import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import networking.service.PreferencesReader
@@ -19,9 +18,6 @@ fun main(args: Array<String>) {
     runBlocking {
         launch {
             View.update()
-        }
-        launch {
-            NseMsgsManager.estimate()
         }
         val parametersReader = ParametersReader()
         parametersReader.read(args)
