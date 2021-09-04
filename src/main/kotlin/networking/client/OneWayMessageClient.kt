@@ -120,7 +120,7 @@ class OneWayMessageClient(
     ) : CompletionHandler<Int, ByteArray> {
 
         override fun completed(result: Int, attachment: ByteArray) {
-            log(attachment)
+            log(attachment) // TODO remove later
             writeCompleted.invoke()
         }
 

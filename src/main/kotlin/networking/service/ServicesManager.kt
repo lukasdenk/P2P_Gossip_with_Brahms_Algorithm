@@ -67,7 +67,11 @@ object ServicesManager {
     }
 
     fun sendApiMessage(msg: APIMessage, port: Int) {
-        apiService.write("127.0.0.1:${port}", msg.toByteArray())
+        try {
+            apiService.write("127.0.0.1:${port}", msg.toByteArray())
+        } catch (cannotConnectEx: IllegalStateException) {
+            GossipManager.channelClosed(port)
+        }
     }
 
     fun sendP2PMessage(msg: P2PMessage, peer: Peer) {

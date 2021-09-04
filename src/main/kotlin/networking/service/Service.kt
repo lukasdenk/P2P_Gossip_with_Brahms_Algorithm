@@ -46,7 +46,7 @@ class Service(
 
     fun write(socketAddress: String, message: ByteArray) {
         clientChannelMap[socketAddress]?.write(ByteBuffer.wrap(message))
-            ?: throw IllegalStateException("Peer has not been connected")
+            ?: throw IllegalStateException("Peer $socketAddress has not been connected")
     }
 
     fun isOnline(socketAddress: String): Boolean {
