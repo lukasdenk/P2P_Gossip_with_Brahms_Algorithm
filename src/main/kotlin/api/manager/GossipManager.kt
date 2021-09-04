@@ -14,11 +14,14 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 object GossipManager : APIMessageListener, P2PMessageListener {
-    val subscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
+    val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
+    @Synchronized
     override fun receive(msg: APIMessage, sender: APIModule) {
         if (msg is GossipNotify) {
-            subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
+            val subscribers = dataTypeToSubscribers.getOrDefault(msg.dataType, HashSet())
+            subscribers.add(sender)
+            dataTypeToSubscribers[msg.dataType] = subscribers
         } else if (msg is GossipValidation) {
             val spreadMsg = MsgCache.remove(msg.messageId)
             if (spreadMsg != null && spreadMsg.ttl != 1 && msg.isValid) {
@@ -47,18 +50,18 @@ object GossipManager : APIMessageListener, P2PMessageListener {
         val msgId = MsgIdCounter.increment()
         MsgCache.put(msgId, msg)
         val notification = GossipNotification(msg.dataType, msgId, msg.data)
-        subscribers[notification.dataType]?.forEach {
+        dataTypeToSubscribers[notification.dataType]?.forEach {
             APICommunicator.send(notification, it)
         }
     }
 
     override fun channelClosed(module: APIModule) {
-        subscribers.forEach { t, u ->
+        dataTypeToSubscribers.forEach { t, u ->
             u.remove(module)
         }
-        subscribers.entries.removeIf { it.value.isEmpty() }
+        dataTypeToSubscribers.entries.removeIf { it.value.isEmpty() }
 //        TODO: remove after testing
-        if (!subscribers.filterValues { it.isEmpty() }.isEmpty()) {
+        if (!dataTypeToSubscribers.filterValues { it.isEmpty() }.isEmpty()) {
             throw IllegalStateException("check stmt above")
         }
     }
