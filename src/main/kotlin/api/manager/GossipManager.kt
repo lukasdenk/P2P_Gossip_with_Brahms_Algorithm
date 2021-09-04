@@ -3,8 +3,8 @@ package api.manager
 import api.APICommunicator
 import api.APIModule
 import messaging.api.*
-import messaging.p2p.P2PMessage
-import messaging.p2p.P2PMessageListener
+import messaging.p2p.P2PMsg
+import messaging.p2p.P2PMsgListener
 import messaging.p2p.SpreadMsg
 import p2p.P2PCommunicator
 import p2p.brahms.View
@@ -12,11 +12,11 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-object GossipManager : APIMessageListener, P2PMessageListener {
+object GossipManager : APIMsgListener, P2PMsgListener {
     val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
     @Synchronized
-    override fun receive(msg: APIMessage, sender: APIModule) {
+    override fun receive(msg: APIMsg, sender: APIModule) {
         if (msg is GossipNotify) {
             val subscribers = dataTypeToSubscribers.getOrDefault(msg.dataType, HashSet())
             subscribers.add(sender)
@@ -39,7 +39,7 @@ object GossipManager : APIMessageListener, P2PMessageListener {
     }
 
     @Synchronized
-    override fun receive(msg: P2PMessage) {
+    override fun receive(msg: P2PMsg) {
         if (msg is SpreadMsg) {
             sendNotification(msg)
         }

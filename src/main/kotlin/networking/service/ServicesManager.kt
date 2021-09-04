@@ -3,8 +3,8 @@ package networking.service
 import api.APICommunicator
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
-import messaging.api.APIMessage
-import messaging.p2p.P2PMessage
+import messaging.api.APIMsg
+import messaging.p2p.P2PMsg
 import messaging.p2p.Peer
 import p2p.P2PCommunicator
 import utils.MessageParser
@@ -64,7 +64,7 @@ object ServicesManager {
         return p2pService.isOnline(peer.toSocketAddress())
     }
 
-    fun sendApiMessage(msg: APIMessage, port: Int) {
+    fun sendApiMessage(msg: APIMsg, port: Int) {
         try {
             apiService.write("127.0.0.1:${port}", msg.toByteArray())
         } catch (cannotConnectEx: IllegalStateException) {
@@ -72,7 +72,7 @@ object ServicesManager {
         }
     }
 
-    fun sendP2PMessage(msg: P2PMessage, peer: Peer) {
+    fun sendP2PMessage(msg: P2PMsg, peer: Peer) {
         p2pService.write(peer.toSocketAddress(), JsonMapper.mapToJsonByteArray(msg))
     }
 }

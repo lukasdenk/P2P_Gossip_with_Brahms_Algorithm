@@ -12,7 +12,7 @@ class SpreadMsg(
     val data: ByteArray,
     override val sender: Peer = Preferences.self
 ) :
-    P2PMessage() {
+    P2PMsg() {
     fun decrementTtl() {
         if (ttl != 0) {
             ttl = max(1, ttl - 1)

@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import main.Preferences
 import main.startsWithXLeadingZeroes
-import messaging.p2p.P2PMessage
-import messaging.p2p.P2PMessageListener
+import messaging.p2p.P2PMsg
+import messaging.p2p.P2PMsgListener
 import messaging.p2p.Peer
 import messaging.p2p.PushMsg
 import p2p.P2PCommunicator
@@ -16,7 +16,7 @@ import java.util.*
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-object PushManager : P2PMessageListener {
+object PushManager : P2PMsgListener {
     val receivedPushs: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
 
     fun push(peers: Set<Peer>) {
@@ -33,7 +33,7 @@ object PushManager : P2PMessageListener {
         receivedPushs.clear()
     }
 
-    override fun receive(msg: P2PMessage) {
+    override fun receive(msg: P2PMsg) {
 //        Ignore if sender is equals to ourselves. In this case, the push must be from an erroneous or attacker peer.
         if (msg is PushMsg && validate(msg) && msg.sender != Preferences.self) {
             History.next(msg.sender)

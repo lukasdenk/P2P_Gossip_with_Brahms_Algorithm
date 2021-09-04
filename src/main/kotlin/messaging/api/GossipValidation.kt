@@ -6,10 +6,10 @@ import kotlin.experimental.and
 class GossipValidation(
     val messageId: Short,
     val isValid: Boolean
-) : APIMessage {
+) : APIMsg {
 
     companion object {
-        fun fromByteBuffer(buffer: ByteBuffer): APIMessage {
+        fun fromByteBuffer(buffer: ByteBuffer): APIMsg {
             val messageId = buffer.short
             val isValid: Boolean = buffer.short.and(1) == 1.toShort()
             return GossipValidation(
