@@ -12,9 +12,6 @@ object Configs {
     val updateInterval = 10000L
     val pullLimit = (updateInterval / 1000L).toInt()
     const val pushLimit: Int = 1000
-    val estimationUpdateInterval = 50
-    const val initNse3rdRoot = 100
-    const val estimationInterval = 10L * 60L * 1000L
 
     //    TODO: read from configs
     val seed: MutableSet<Peer> = mutableSetOf()
@@ -22,5 +19,6 @@ object Configs {
     val cacheSize: Int = 10
     val gossipModule = APIModule(7001)
     val nseModule = APIModule(7201)
+    val degree = 10
 
 }

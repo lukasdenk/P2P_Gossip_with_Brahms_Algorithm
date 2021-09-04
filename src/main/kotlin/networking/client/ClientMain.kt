@@ -3,7 +3,7 @@ package networking.client
 import json.JsonMapper
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
-import messaging.api.gossip.GossipAnnounce
+import messaging.api.GossipAnnounce
 import messaging.p2p.ProbeRequest
 import messaging.p2p.ProbeResponse
 import messaging.p2p.PushMsg

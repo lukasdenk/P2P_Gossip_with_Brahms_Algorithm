@@ -7,7 +7,7 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 object History {
-    private var samplers = MutableList(Configs.initNse3rdRoot) { Sampler() }
+    private var samplers = MutableList(Configs.degree) { Sampler() }
 
     fun next(peers: Set<Peer>) {
         samplers.parallelStream().forEach { s ->
@@ -23,12 +23,5 @@ object History {
 
     fun get(n: Int): Set<Peer> {
         return samplers.mapNotNull(Sampler::get).randomSubSet(n)
-    }
-
-    fun resize(n: Int) {
-        samplers = samplers.shuffled().subList(0, n).toMutableList()
-        for (i in samplers.size..n) {
-            samplers.add(Sampler())
-        }
     }
 }

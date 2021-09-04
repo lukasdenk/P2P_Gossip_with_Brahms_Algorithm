@@ -1,7 +1,5 @@
-package messaging.api.gossip
+package messaging.api
 
-import messaging.api.APIMessage
-import messaging.api.MsgType
 import java.nio.ByteBuffer
 import kotlin.experimental.and
 

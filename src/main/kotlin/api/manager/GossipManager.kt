@@ -1,12 +1,6 @@
 package api.manager
 
-import messaging.api.APIMessage
-import messaging.api.APIMessageListener
-import messaging.api.DataType
-import messaging.api.gossip.GossipAnnounce
-import messaging.api.gossip.GossipNotification
-import messaging.api.gossip.GossipNotify
-import messaging.api.gossip.GossipValidation
+import messaging.api.*
 import messaging.p2p.P2PMessage
 import messaging.p2p.P2PMessageListener
 import messaging.p2p.Peer
