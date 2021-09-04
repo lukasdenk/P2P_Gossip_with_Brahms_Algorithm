@@ -8,6 +8,8 @@ import kotlin.math.max
 class SpreadMsg(val dataType: DataType, var ttl: Int, val data: ByteArray) :
     P2PMessage() {
     fun decrementTtl() {
-        ttl = max(0, ttl - 1)
+        if (ttl != 0) {
+            ttl = max(1, ttl - 1)
+        }
     }
 }
