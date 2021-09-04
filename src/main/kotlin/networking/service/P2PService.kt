@@ -1,6 +1,9 @@
 package networking.service
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import utils.socketAddressToString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -10,16 +13,14 @@ import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-
 @ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
-class Service(
+class P2PService(
     address: String,
     port: Int,
     private val read: (SocketAddress, ByteArray) -> Unit,
@@ -36,7 +37,7 @@ class Service(
     private lateinit var serverChannel: AsynchronousServerSocketChannel
 
     suspend fun start() {
-        println("[${this::class.simpleName}] Gossip-8 service has been started at $socketAddress")
+        println("[${this::class.simpleName}] has been started at $socketAddress")
         createServerChannel()
         accept()
         while (true) {
@@ -68,20 +69,20 @@ class Service(
         }
         socketConnectionsScope.launch {
             serverChannel.accept(null, ConnectionHandler(
-                    read = read,
-                    successfulConnectionAttempt = { clientChannel ->
-                        indexChannel(clientChannel)
-                        accept()
-                    },
-                    failedConnectionAttempt = { clientChannel ->
-                        val address = channelToAddressMap[clientChannel]!!
-                        println("[${this::class.simpleName}] Channel ($address) failed to connect.")
-                        accept()
-                    },
-                    connectionClosed = {
-                        connectionClosed(it)
-                    }
-                )
+                read = read,
+                successfulConnectionAttempt = { clientChannel ->
+                    indexChannel(clientChannel)
+                    accept()
+                },
+                failedConnectionAttempt = { clientChannel ->
+                    val address = channelToAddressMap[clientChannel]!!
+                    println("[${this::class.simpleName}] Channel ($address) failed to connect.")
+                    accept()
+                },
+                connectionClosed = {
+                    connectionClosed(it)
+                }
+            )
             )
         }
     }

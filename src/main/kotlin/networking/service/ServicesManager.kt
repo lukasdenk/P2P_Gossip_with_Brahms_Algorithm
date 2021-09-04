@@ -18,11 +18,11 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 object ServicesManager {
-    private lateinit var apiService: Service
-    private lateinit var p2pService: Service
+    private lateinit var apiService: APIService
+    private lateinit var p2pService: P2PService
 
     suspend fun startApiService(gossipAddress: String, port: Int) {
-        apiService = Service(
+        apiService = APIService(
             address = gossipAddress,
             port = port,
             read = { address: SocketAddress, data: ByteArray ->
@@ -44,11 +44,11 @@ object ServicesManager {
     }
 
     suspend fun startP2PService(p2pAddress: String, p2pPort: Int) {
-        p2pService = Service(
+        p2pService = P2PService(
             address = p2pAddress,
             port = p2pPort,
             read = { address: SocketAddress, data: ByteArray ->
-                val message = JsonMapper.mapFromJson(data) ?: return@Service
+                val message = JsonMapper.mapFromJson(data) ?: return@P2PService
                 P2PCommunicator.receive(
                     message,
                     Peer(
