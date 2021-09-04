@@ -38,6 +38,9 @@ class Sampler(peer: Peer? = null) {
     }
 
     fun next(other: Peer) {
+        if (other == Preferences.self) {
+            return
+        }
         val otherHash = hashPeer(other)
 
         synchronized(this) {
