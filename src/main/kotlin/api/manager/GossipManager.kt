@@ -21,7 +21,7 @@ object GossipManager : APIMessageListener, P2PMessageListener {
             subscribers.getOrDefault(msg.dataType, HashSet()).add(sender)
         } else if (msg is GossipValidation) {
             val spreadMsg = MsgCache.remove(msg.messageId)
-            if (spreadMsg != null && spreadMsg.ttl != 1) {
+            if (spreadMsg != null && spreadMsg.ttl != 1 && msg.isValid) {
                 spreadMsg.decrementTtl()
                 spread(spreadMsg)
             }
