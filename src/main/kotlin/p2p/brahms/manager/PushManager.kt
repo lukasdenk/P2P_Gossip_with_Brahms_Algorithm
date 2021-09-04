@@ -34,8 +34,9 @@ object PushManager : P2PMessageListener {
     }
 
     override fun receive(msg: P2PMessage, sender: Peer) {
-        if (msg is PushMsg && validate(msg, sender)) {
-            History.next(setOf(sender))
+//        Ignore if sender is equals to ourselves. In this case, the push must be from an erroneous or attacker peer.
+        if (msg is PushMsg && validate(msg, sender) && sender != Preferences.self) {
+            History.next(sender)
             receivedPushs.add(sender)
         }
     }
