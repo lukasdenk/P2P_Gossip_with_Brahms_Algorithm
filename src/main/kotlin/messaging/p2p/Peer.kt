@@ -30,5 +30,9 @@ class Peer(
         return "$ip:$port"
     }
 
+    override fun toString(): String {
+        return "Peer(ip='$ip', port=$port)"
+    }
+
 
 }
