@@ -10,7 +10,6 @@ import networking.client.ClientsManager
 import p2p.P2PCommunicator
 import utils.MessageParser
 import utils.portFromSocketAddressAsInt
-import utils.socketAddressToString
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import kotlin.time.ExperimentalTime
@@ -31,10 +30,10 @@ object ServicesManager {
                     apiMessage,
                     portFromSocketAddressAsInt(address)
                 )
-                println(
-                    "Received message of type: ${apiMessage.javaClass.name} from " +
-                            socketAddressToString(socketAddress = address)
-                )
+//                println(
+//                    "Received message of type: ${apiMessage.javaClass.name} from " +
+//                            socketAddressToString(socketAddress = address)
+//                )
             },
             connectionClosed = { socketAddress ->
                 APICommunicator.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))
@@ -52,10 +51,10 @@ object ServicesManager {
                 P2PCommunicator.receive(
                     message
                 )
-                println(
-                    "Received message of type: ${message.javaClass.name} from " +
-                            socketAddressToString(socketAddress = address)
-                )
+//                println(
+//                    "Received message of type: ${message.javaClass.name} from " +
+//                            socketAddressToString(socketAddress = address)
+//                )
             }
         )
         p2pService.start()

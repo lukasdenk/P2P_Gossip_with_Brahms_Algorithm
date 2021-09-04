@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import networking.service.Constants
-import utils.toReadableString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.nio.ByteBuffer
@@ -47,7 +46,7 @@ class Client(
             socketChannel.connect(gossipAddress, socketChannel, ConnectionHandler(
                 firstWrite,
                 read,
-                connectionClosed = { println("closed the connection") },
+//                connectionClosed = { println("closed the connection") },
                 connectionFailed = { reconnect() }
             ))
         }
@@ -78,7 +77,7 @@ class Client(
 
         override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
-            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
+//            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
             sendFirstMessage()
         }
 
@@ -147,10 +146,10 @@ class Client(
         }
 
         private fun log(bytes: ByteArray) {
-            println(
-                "[${this::class.simpleName}] sent " +
-                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
-            )
+//            println(
+//                "[${this::class.simpleName}] sent " +
+//                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
+//            )
         }
 
         override fun failed(exc: Throwable, attachment: ByteArray) {
@@ -177,10 +176,10 @@ class Client(
         }
 
         private fun log(arr: ByteArray) {
-            println(
-                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
-                    arr.toReadableString()
-            )
+//            println(
+//                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
+//                    arr.toReadableString()
+//            )
         }
 
         private fun readToArray(buffer: ByteBuffer): ByteArray {

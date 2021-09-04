@@ -46,7 +46,7 @@ class OneWayMessageClient(
                 write,
                 connectionClosed = {
                     isUp.set(false)
-                    println("closed the connection")
+//                    println("closed the connection")
                 },
                 connectionFailed = { reconnect() }
             ))
@@ -76,7 +76,7 @@ class OneWayMessageClient(
 
         override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
-            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
+//            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
             sendFirstMessage()
         }
 
@@ -125,10 +125,10 @@ class OneWayMessageClient(
         }
 
         private fun log(bytes: ByteArray) {
-            println(
-                "[${this::class.simpleName}] sent " +
-                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
-            )
+//            println(
+//                "[${this::class.simpleName}] sent " +
+//                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
+//            )
         }
 
         override fun failed(exc: Throwable, attachment: ByteArray) {

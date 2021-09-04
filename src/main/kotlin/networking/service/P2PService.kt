@@ -4,8 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import networking.client.ClientsManager
-import java.net.*
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.SocketAddress
+import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
@@ -87,7 +89,7 @@ class P2PService(
     }
 
     private fun connectionClosed() {
-        println("[${this::class.simpleName}] Channel has been closed.")
+//        println("[${this::class.simpleName}] Channel has been closed.")
         accept()
     }
 
@@ -107,7 +109,7 @@ class P2PService(
         ) {
             successfulConnectionAttempt.invoke(clientChannel)
             this.socketChannel = clientChannel
-            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
+//            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
             readData()
         }
 
@@ -156,10 +158,10 @@ class P2PService(
         }
 
         private fun log(arr: ByteArray) {
-            println(
-                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
-                        arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
-            )
+//            println(
+//                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
+//                        arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
+//            )
         }
 
         private fun readToArray(buffer: ByteBuffer): ByteArray {

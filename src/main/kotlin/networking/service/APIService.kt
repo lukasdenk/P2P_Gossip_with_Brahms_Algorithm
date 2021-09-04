@@ -1,6 +1,9 @@
 package networking.service
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import utils.socketAddressToString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -10,7 +13,6 @@ import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
@@ -120,7 +122,7 @@ class APIService(
         ) {
             successfulConnectionAttempt.invoke(clientChannel)
             this.socketChannel = clientChannel
-            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
+//            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
             readData()
         }
 
@@ -164,10 +166,10 @@ class APIService(
         }
 
         private fun log(bytes: ByteArray) {
-            println(
-                "[${this::class.simpleName}] sent " +
-                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
-            )
+//            println(
+//                "[${this::class.simpleName}] sent " +
+//                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
+//            )
         }
 
         override fun failed(exc: Throwable, attachment: ByteArray) {
@@ -193,10 +195,10 @@ class APIService(
         }
 
         private fun log(arr: ByteArray) {
-            println(
-                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
-                        arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
-            )
+//            println(
+//                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
+//                        arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
+//            )
         }
 
         private fun readToArray(buffer: ByteBuffer): ByteArray {
