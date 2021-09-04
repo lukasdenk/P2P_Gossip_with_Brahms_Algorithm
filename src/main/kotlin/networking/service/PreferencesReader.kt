@@ -1,6 +1,9 @@
 package networking.service
 
+import messaging.p2p.Peer
 import org.ini4j.Ini
+import utils.ipFromSocketAddress
+import utils.portFromSocketAddressAsInt
 import java.io.File
 import java.io.FileInputStream
 
@@ -9,6 +12,7 @@ class PreferencesReader(
 ) {
 
     companion object {
+        private const val Bootstrapper = "bootstrapper"
         private const val Gossip = "gossip"
         private const val Degree = "degree"
         private const val CacheSize = "cache_size"
@@ -38,6 +42,7 @@ class PreferencesReader(
         private set
     var degree: Int = 30
         private set
+    val peersList: MutableList<Peer> = mutableListOf()
     private val preferencesFilePath
         get() = System.getProperty("user.dir") +
                 "${File.separator}$SrcFolder" +
@@ -82,6 +87,12 @@ class PreferencesReader(
         }
         if (preferences[Gossip, CacheSize] != null) {
             cacheSize = Integer.parseInt(preferences[Gossip, CacheSize])
+        }
+        if (preferences[Gossip, Bootstrapper] != null) {
+            val peers: String = preferences[Gossip, Bootstrapper]
+            peersList.addAll(
+                peers.split(",").map { Peer(ipFromSocketAddress(it), portFromSocketAddressAsInt(it)) }
+            )
         }
     }
 

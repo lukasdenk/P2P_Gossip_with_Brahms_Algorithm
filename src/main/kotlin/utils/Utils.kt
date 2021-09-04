@@ -23,9 +23,12 @@ fun ByteArray.toReadableString(): String {
     return this.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
 }
 
-fun ipFromSocketAddress(socketAddress: SocketAddress): String {
-    val address = socketAddress.toString().replace("/", "")
+fun ipFromSocketAddress(address: String): String {
     return address.substring(0, address.indexOf(":"))
+}
+
+fun ipFromSocketAddress(socketAddress: SocketAddress): String {
+    return ipFromSocketAddress(socketAddress.toString().replace("/", ""))
 }
 
 fun portFromSocketAddressAsString(socketAddress: SocketAddress): String {

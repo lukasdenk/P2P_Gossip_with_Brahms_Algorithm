@@ -13,8 +13,6 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 fun main(args: Array<String>) {
-//    val msg: messaging.p2p.P2PMessage = messaging.p2p.PullResponse(mutableSetOf(Peer("a", 1), Peer("b", 2)))
-//    println(Json.encodeToString(msg)) // Serializing data of compile-time type OwnedProject
     runBlocking {
         launch {
             View.update()
@@ -22,17 +20,26 @@ fun main(args: Array<String>) {
         val parametersReader = ParametersReader()
         parametersReader.read(args)
         val propertiesReader = PreferencesReader.create(parametersReader.iniConfigPath)
+        Preferences.initialize(
+            gossipServiceAddress = propertiesReader.gossipServiceAddress,
+            gossipServicePort = propertiesReader.gossipServicePort,
+            p2pServiceAddress = propertiesReader.p2pServiceAddress,
+            p2pServicePort = propertiesReader.p2pServicePort,
+            cacheSize = propertiesReader.cacheSize,
+            degree = propertiesReader.degree,
+            peersList = propertiesReader.peersList
+        )
         mutableListOf(
             CoroutineScope(Dispatchers.IO).launch {
                 ServicesManager.startApiService(
-                    propertiesReader.gossipServiceAddress,
-                    propertiesReader.gossipServicePort
+                    Preferences.gossipServiceAddress,
+                    Preferences.gossipServicePort
                 )
             },
             CoroutineScope(Dispatchers.IO).launch {
                 ServicesManager.startP2PService(
-                    propertiesReader.p2pServiceAddress,
-                    propertiesReader.p2pServicePort
+                    Preferences.p2pServiceAddress,
+                    Preferences.p2pServicePort
                 )
             }
         ).joinAll()
