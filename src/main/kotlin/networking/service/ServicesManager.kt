@@ -72,8 +72,4 @@ object ServicesManager {
             APICommunicator.channelClosed(port)
         }
     }
-
-    fun sendP2PMessage(msg: P2PMsg, peer: Peer) {
-        ClientsManager.write(peer.ip, peer.port, JsonMapper.mapToJsonByteArray(msg))
-    }
 }
