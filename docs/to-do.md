@@ -26,6 +26,12 @@
   reasons) (+)
 - call channel broken
 
+### final report:
+
+- state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg
+- explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
+  fct or JsonMapper))
+
 ### For testing:
 
 - make it possible to use only client to listen to incoming p2p msgs
