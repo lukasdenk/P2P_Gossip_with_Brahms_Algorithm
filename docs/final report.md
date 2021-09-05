@@ -62,6 +62,7 @@ java library. We take care of the most important part - writing, reading, reacti
 
 Every time networking module receives a valid message, it converts it into Kotlin object: `messaging.p2p.P2PMgs` or `messaging.api.APIMsg`.
 The api or p2p message then passed to the APICommunicator or P2PCommunicator respectively. Invalid messages are ignored.
+If API channel is closed `api.manager.GossipManager` gets notified about it with `channelClosed` function.
 
 ##### Messages mapping from byte array to objects and to byte array from objects
 
