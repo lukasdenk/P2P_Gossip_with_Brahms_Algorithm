@@ -1,11 +1,13 @@
 package messaging.p2p
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import main.Preferences
 import messaging.api.DataType
 import kotlin.math.max
 
 @Serializable
+@SerialName("SpreadMsg")
 class SpreadMsg(
     val dataType: DataType,
     var ttl: Int,
