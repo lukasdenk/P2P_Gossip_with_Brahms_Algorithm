@@ -307,6 +307,10 @@ modules.
   - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
   - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
 
+After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes 
+and jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 
+3 hours were invested into documenting everything for internal use.
+
 ### Lukas Denk
 
 Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
