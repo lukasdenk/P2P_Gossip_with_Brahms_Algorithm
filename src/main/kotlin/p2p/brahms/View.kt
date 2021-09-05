@@ -36,9 +36,9 @@ object View {
 
             val oldView = setOf(view)
 
-            if (PushManager.receivedPushs.size < Preferences.pushLimit) {
-                val pushs = PushManager.receivedPushs.randomSubSet(pushFraction)
-                val pulls = PullManager.receivedPulls.randomSubSet(pullFraction)
+            if (PushManager.pushs.size < Preferences.pushLimit) {
+                val pushs = PushManager.pushs.randomSubSet(pushFraction)
+                val pulls = PullManager.pulls.randomSubSet(pullFraction)
                 val pushsAndPulls = pushs union pulls
                 view.clear()
                 view.addAll(

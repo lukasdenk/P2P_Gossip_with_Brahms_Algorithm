@@ -19,7 +19,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 object PushManager : P2PMsgListener {
-    val receivedPushs: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
+    val pushs: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
 
     fun push(peers: Set<Peer>) {
         peers.forEach {
@@ -32,14 +32,14 @@ object PushManager : P2PMsgListener {
     }
 
     fun reset() {
-        receivedPushs.clear()
+        pushs.clear()
     }
 
     override fun receive(msg: P2PMsg) {
 //        Ignore if sender is equals to ourselves. In this case, the push must be from an erroneous or attacker peer.
         if (msg is PushMsg && validate(msg) && msg.sender != Preferences.self) {
             History.next(msg.sender)
-            receivedPushs.add(msg.sender)
+            pushs.add(msg.sender)
         }
     }
 

@@ -11,13 +11,18 @@
 - read parameters from config
 - useful difficulty
 
+### final report
+
+- process architecture
+- security
+- reread
+
 ### For testing:
 
 - break API connection
 - PoW invalid
 - invalid
 - peer goes offline -> does it disappear from view?
--
 
 ## Kyrylo
 
@@ -28,9 +33,11 @@
 
 ### final report:
 
-- state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg
+- state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg (
+  check with my explanation to avoid explaining the same twice)
 - explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
   fct or JsonMapper))
+- include the libraries u used in library table
 
 ### For testing:
 

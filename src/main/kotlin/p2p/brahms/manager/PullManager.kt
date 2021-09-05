@@ -15,10 +15,10 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 object PullManager : P2PMsgListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
-    val receivedPulls: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
+    val pulls: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
 
     fun reset() {
-        receivedPulls.clear()
+        pulls.clear()
     }
 
     fun pull(peers: Collection<Peer>) {
@@ -33,7 +33,7 @@ object PullManager : P2PMsgListener {
     override fun receive(msg: P2PMsg) {
         if (msg is PullResponse && requests.containsKey(msg.sender)) {
             History.next(msg.neighbourSample)
-            receivedPulls.addAll(msg.neighbourSample.filter { it != Preferences.self })
+            pulls.addAll(msg.neighbourSample.filter { it != Preferences.self })
         } else if (msg is PullRequest) {
             P2PCommunicator.send(
                 PullResponse(
