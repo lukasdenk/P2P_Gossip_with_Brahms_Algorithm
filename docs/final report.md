@@ -1,12 +1,5 @@
 # Final report
 
-## Changelog
-
-### Defined libraries in use
-
-We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
-for networking connections management, and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
-
 ## Architecture
 
 ### Overview
@@ -67,16 +60,18 @@ java library. We take care of the most important part - writing, reading, reacti
 
 ### The API Package
 
-The main logic of the `api` package is in the `APIMessagesManager`. It implements the API communication as specified in
-the *specification* paper.  
-To receive messaging coming from other modules, the manager implements the `APIMessageListener` interface.  
+The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *
+specification* paper.  
+To receive messaging coming from other modules, the manager implements the `APIMsgListener` interface.  
 The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
-Therefore, it also implements the `P2PMessageListener` interface. The `networking` package is also liable for calling
-the `APIMessagesManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
-the `APIMessagesManager` then unsubscribes the corresponding module.  
-To send messages to other modules, the manager uses the `networking`
-package. Furthermore, it forwards validated knowledge of *Gossip Notification*s via the `SpreadManager` with a so
-called *spread message* (see section `p2p` package).
+Therefore, it also implements the `P2PMsgListener` interface. The `networking` package is also liable for calling
+the `GossipManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
+the `GossipManager` then unsubscribes the corresponding module.  
+To send messages to other modules, the manager uses the `APICommunicator`, which forwards the message to
+the `networking` package. Furthermore, it forwards validated knowledge of *Gossip Notification*s with a so called *
+spread message* (see section `p2p` package). The `APICommunicator` serves as an abstraction layer between the `api`
+and `networking` package. The `networking` package also uses it to forward incoming API messages to the `APIMsgListener`
+s.
 
 ### The Messaging Package
 
@@ -85,11 +80,11 @@ and `p2p` *main* packages). They each contain:
 
 - Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
   API protocol, we refer to the *specification* paper of this class. For the message types of the P2P protocol, we refer
-  to the *`p2p`
-  package* section.
-- The superclass `APIMessage` or `P2PMessage` from which the API or P2P message classes, respectively, inherit.
-- The interface `APIMessageListener` or `P2PMessageListener`, providing a method `receive` to receive API or P2P
-  messages, respectively. The `networking` package calls this method to pass incoming API or P2P messages, respectively.
+  to the *`p2p` package* section.
+- The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
+- The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
+  respectively. The `APICommunicator` or `P2PCommunicator's` calls this function to pass an incoming API or P2P
+  messages, whenever it receives one from the `networking` package.
 
 The reason for separating the messages into an own package is that our module uses them across multiple packages.
 
@@ -98,11 +93,13 @@ class contains the peer's address as well as whether the peer is online or not.
 
 ### The P2P Package
 
-The `p2p` package consists of the `SpreadManager` class, as well as the `brahms` package. The `SpreadManager` class is
-responsible for sending and receiving *spread message*s of the P2P protocol to or from other peers. Our module uses them
-to spread knowledge in the network. The `brahms` subpackage maintains the peer's neighbourhood by implementing a
-simplified version of the Brahms algorithm specified in [*Brahms: byzantine resilient random membership
-sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772)
+The `p2p` package consists of the `P2PCommunicator` class, as well as the `brahms` package. Similar to
+the `APICommunicator`, the `P2PCommunicator` assists as an abstraction layer between the `P2PMsgListener`s and
+the `networking` package. To send a P2P message, the `P2PMsgListener`s call the `P2PCommunicator`'s `send` function. The
+communicator then uses the `networking` package to send them. Vice versa, the `networking` package forwards incoming P2P
+messages to the communicator, which then calls each `P2PMsgListener`s `receive` function.   
+The `brahms` subpackage maintains the peer's neighbourhood by implementing a simplified version of the Brahms algorithm
+specified in [*Brahms: byzantine resilient random membership sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772)
 by Edward Bortnikov et al..
 
 #### The Brahms Algorithm
@@ -130,10 +127,11 @@ Architecture* section, we always talk about the instance of a message class. The
 - `SpreadMsg`
 - `PullRequest` and `PullResponse`
 - `PushRequest`
-- `ProbeRequest` and `ProbeResponse`
 
 As already mentioned, our module uses the `SpreadMsg` to spread knowledge across the network. A peer needs the other
-messages to maintain its view with the Brahms algorithm (see section *The Brahms algorithm*).
+messages to maintain its view with the Brahms algorithm (see section *The Brahms algorithm*). Our P2P protocol does not
+contain a *probe request* or *probe response* message. Instead, we check the availability of a peer directly on the
+network level by trying to connect to the peer's socket.
 
 #### Implementation of the Brahms Algorithm
 
@@ -155,7 +153,7 @@ the `ProbeManager` to do so.
 
 The remaining classes in the `brahms` package are the `Probe`-, `Pull`- and `PushManager`. They are responsible for
 handling the sending and/or receiving of probe, pull or push messages, respectively. They all implement
-the `P2PMessageListener` interface.  
+the `P2PMsgListener` interface.  
 Whenever the `ProbeManager` sends a probe request and does not receive a corresponding answer before a timeout, it sets
 the appropriate peer as offline and removes it from the current view.  
 The `PullManager` frequently sends pull requests to the peer's neighbours. If it does not receive an answer after a
@@ -172,9 +170,9 @@ Only then it updates the `View.vPush` set.
 
 In this section, we provide a precise definition of the message formats on the network layer. The peers transport them
 as Json objects. The `networking` package maps an incoming Json message to an instance of the message class it is
-associated with. It then forwards the instance to each `APIMessageListener`. On the other hand, when another class
-instructs the `networking` package to send a message instance, the mapping proceeds in the other direction. In this
-case, it maps the instance to a Json object before sending it to the message's destination.
+associated with. It then forwards the instance to each `APIMsgListener`. On the other hand, when another class instructs
+the `networking` package to send a message instance, the mapping proceeds in the other direction. In this case, it maps
+the instance to a Json object before sending it to the message's destination.
 
 ### Core Message
 
@@ -275,13 +273,19 @@ python gossip client and gossip mockup. And up to 5 hours were put into command 
 modules.
 
 - Resources that were studied about Async IO in Java and Coroutines approach in Kotlin.
-    - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
-    - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
-    - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
-    - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
+  - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
+  - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
+  - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
+  - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
 
 ### Lukas Denk
 
 Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
 midterm report.
-    
+
+## Changelog
+
+### Defined libraries in use
+
+We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+for networking connections management, and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
