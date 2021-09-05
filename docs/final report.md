@@ -64,6 +64,15 @@ Every time networking module receives a valid message, it converts it into Kotli
 The api or p2p message then passed to the APICommunicator or P2PCommunicator respectively. Invalid messages are ignored.
 If API channel is closed `api.manager.GossipManager` gets notified about it with `channelClosed` function.
 
+#### Process architecture
+
+We have two processes running: P2PService and APIService. Their addresses are defined as api_address and
+p2p_address accordingly. They are started as two different coroutines.
+
+In addition, if we need to send a P2P message, we create a process `OneWayMessageClient` to do so.
+It opens a socket connection with stated peer, sends message to it then closes the connection and stops the process.
+`OneWayMessageClient` is also starts as coroutine.
+
 ##### Messages mapping from byte array to objects and to byte array from objects
 
 ##### API messages
