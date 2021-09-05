@@ -11,7 +11,7 @@ class MessageParser {
         if (buffer.remaining() < 8) {
             return GossipUnknownMessage.fromByteBuffer(buffer)
         }
-        val size = buffer.short
+        buffer.short // skip size
         val type = buffer.short
         return when(type) {
             MsgType.GossipAnnounce.value -> {

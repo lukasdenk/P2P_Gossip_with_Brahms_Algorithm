@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.compareTo
 import main.sha256
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 
+@ExperimentalSerializationApi
 @ExperimentalTime
 class Sampler(peer: Peer? = null) {
     var atomicPeer: AtomicReference<Peer?>

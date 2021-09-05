@@ -1,6 +1,7 @@
 package p2p.brahms
 
 import kotlinx.coroutines.delay
+import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
@@ -10,6 +11,7 @@ import java.util.*
 import kotlin.time.ExperimentalTime
 
 
+@ExperimentalSerializationApi
 object View {
     var view: MutableSet<Peer> = Collections.synchronizedSet(HashSet(Preferences.bootstrappingPeers))
 

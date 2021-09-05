@@ -1,11 +1,13 @@
 package api
 
 import api.manager.GossipManager
+import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMsg
 import messaging.api.APIMsgListener
 import networking.service.ServicesManager
 import kotlin.time.ExperimentalTime
 
+@ExperimentalSerializationApi
 @ExperimentalTime
 object APICommunicator {
     val listeners: List<APIMsgListener> = listOf(GossipManager)

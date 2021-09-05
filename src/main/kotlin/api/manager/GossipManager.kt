@@ -2,6 +2,7 @@ package api.manager
 
 import api.APICommunicator
 import api.APIModule
+import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.*
 import messaging.p2p.P2PMsg
 import messaging.p2p.P2PMsgListener
@@ -11,6 +12,7 @@ import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
+@ExperimentalSerializationApi
 @ExperimentalTime
 object GossipManager : APIMsgListener, P2PMsgListener {
     val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
@@ -55,7 +57,7 @@ object GossipManager : APIMsgListener, P2PMsgListener {
     }
 
     override fun channelClosed(module: APIModule) {
-        dataTypeToSubscribers.forEach { t, u ->
+        dataTypeToSubscribers.forEach { (_, u) ->
             u.remove(module)
         }
         dataTypeToSubscribers.entries.removeIf { it.value.isEmpty() }

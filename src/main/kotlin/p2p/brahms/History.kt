@@ -1,10 +1,12 @@
 package p2p.brahms
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
 import kotlin.time.ExperimentalTime
 
+@ExperimentalSerializationApi
 @ExperimentalTime
 object History {
     private val samplers: List<Sampler>

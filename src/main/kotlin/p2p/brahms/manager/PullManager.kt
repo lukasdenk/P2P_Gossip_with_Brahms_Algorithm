@@ -1,5 +1,6 @@
 package p2p.brahms.manager
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
 import messaging.p2p.*
@@ -10,6 +11,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
 
+@ExperimentalSerializationApi
+@ExperimentalTime
 object PullManager : P2PMsgListener {
     private val requests: ConcurrentHashMap<Peer, PullRequest> = ConcurrentHashMap()
     val receivedPulls: MutableSet<Peer> = Collections.synchronizedSet(mutableSetOf())
@@ -18,7 +21,6 @@ object PullManager : P2PMsgListener {
         receivedPulls.clear()
     }
 
-    @ExperimentalTime
     fun pull(peers: Collection<Peer>) {
         requests.clear()
         peers.forEach {
@@ -28,7 +30,6 @@ object PullManager : P2PMsgListener {
         }
     }
 
-    @ExperimentalTime
     override fun receive(msg: P2PMsg) {
         if (msg is PullResponse && requests.containsKey(msg.sender)) {
             History.next(msg.neighbourSample)

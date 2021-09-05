@@ -70,11 +70,11 @@ class P2PService(
         socketConnectionsScope.launch {
             serverChannel.accept(null, ConnectionHandler(
                 read = read,
-                successfulConnectionAttempt = { clientChannel ->
+                successfulConnectionAttempt = {
                     waitingForConnection.set(false)
                     accept()
                 },
-                failedConnectionAttempt = { clientChannel ->
+                failedConnectionAttempt = {
                     waitingForConnection.set(false)
                     accept()
                 },

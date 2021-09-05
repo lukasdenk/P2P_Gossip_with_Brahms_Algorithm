@@ -1,6 +1,7 @@
 package p2p
 
 import json.JsonMapper
+import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.p2p.P2PMsg
 import messaging.p2p.P2PMsgListener
 import messaging.p2p.Peer
@@ -10,6 +11,7 @@ import p2p.brahms.manager.PushManager
 import kotlin.time.ExperimentalTime
 
 
+@ExperimentalSerializationApi
 @ExperimentalTime
 object P2PCommunicator : P2PMsgListener {
     val listeners: List<P2PMsgListener> = listOf(PullManager, PushManager)
