@@ -58,6 +58,30 @@ that will start their work as soon as action
 (Message receiving, connection establishment) happens. In this way, we delegate message receiving and sending to the
 java library. We take care of the most important part - writing, reading, reacting to failure events.
 
+#### Communication with API and P2P packages
+
+Every time networking module receives a valid message, it converts it into Kotlin object: `messaging.p2p.P2PMgs` or `messaging.api.APIMsg`.
+The api or p2p message then passed to the APICommunicator or P2PCommunicator respectively. Invalid messages are ignored.
+
+##### Messages mapping from byte array to objects and to byte array from objects
+
+##### API messages
+
+To map API messages into objects we manually parse ByteBuffer's content into APIMsg object with `fromByteBuffer` static
+function that implemented in every APIMsg class.
+
+To map API messages to byte array, we manually create byte array from objects according to the protocol specification 
+with `toByteArray()` function that implemented in every APIMsg object.
+
+##### P2P messages
+
+To map P2P messages into objects we use `json.JsonMapper` that makes use of `kotlinx.serialization` library.
+We convert our objects into json, which is string format, then it is converted into byte array and sent over 
+the network.
+
+To map P2P messages to byte array, we use `json.JsonMapper` that makes use of `kotlinx.serialization` library.
+We convert our byte arrays to string, then we convert resulting json into P2PMsg with `Json.mapFromJson` function. 
+
 ### The API Package
 
 The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *
