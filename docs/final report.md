@@ -88,8 +88,8 @@ and `p2p` *main* packages). They each contain:
 
 The reason for separating the messages into an own package is that our module uses them across multiple packages.
 
-The `p2p` package additionally contains the `Peer` class, representing a peer in the network. Beside other members, this
-class contains the peer's address as well as whether the peer is online or not.
+The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
+contains the address of the socket the peer is listening on.
 
 ### The P2P Package
 
@@ -135,55 +135,67 @@ network level by trying to connect to the peer's socket.
 
 #### Implementation of the Brahms Algorithm
 
-In our implementation, the `View` class maintains the peer's current view. At the startup of our module,
-the `Bootstrapper` class initializes the view by asking for pull responses from hardcoded peers. Afterwards, the `View`
-class frequently updates its view from three sources:
+In our implementation, the `View` singleton maintains the peer's current view. At the startup of our module, we
+initialize the view with the bootstrapping peers provided in the INI file. Afterwards, the `View`
+singleton frequently updates its view from three sources:
 
-- `vPush`. This is a set containing the peers from all the received push requests since the last update round.
-- `vPull`. A set consisting of the peers from all the pull responses since the last update round.
-- The current random subset of the history, provided by the `History` class.
+- `PushManager.push`. This is a set containing the peers from all the received push requests since the last update
+  round.
+- `PullManager.pull`. A set consisting of the peers from all the pull responses since the last update round.
+- The current random subset of the history, provided by the `History` singleton.
 
-The `History` class holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of the
-elements in the current random subset. It is implemented similar to the pseudocode in the aforementioned paper. However,
-we validate the online status of a `Sampler`'s peer differently:
-Whenever the `History` asks a `Sampler` for the peer the `Sampler` currently holds, the `Sampler` only returns the peer
-if its `online` variable is `true`. To update this variable, our `Sampler` instance is furthermore responsible for
-regularly sending probe requests to this peer. However, it does not send them directly but rather instructs
-the `ProbeManager` to do so.
+The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of
+the elements in the current random subset. The `Sampler` class is implemented similar to the pseudocode in the
+aforementioned paper. It holds the peer it is currently selecting as well as a random number.   
+For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'
+s `next(<peer>)` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
+selecting a peer, the received peer becomes the selected peer. Otherwise, the function hashes the peer's address as well
+as the random number with the SHA256 algorithm. If this hash is smaller than the hash of the currently selected peer,
+the received peer becomes the new selected peer. With this strategy, a `Sampler` always holds a peer selected uniformly
+at random from all the peers it has received so far. The random number ensures that the different `Sampler`s choose
+different peers.  
+Additionally, a `Sampler` must check the availability status of the peer it holds. This is done with a coroutine which
+periodically tries to connect to the peer. The `Sampler`'s construction phase launches the coroutine. Whenever the
+associated peer is offline, the `Sampler` resets itself. It removes the peer and creates a new random number.
 
-The remaining classes in the `brahms` package are the `Probe`-, `Pull`- and `PushManager`. They are responsible for
-handling the sending and/or receiving of probe, pull or push messages, respectively. They all implement
-the `P2PMsgListener` interface.  
-Whenever the `ProbeManager` sends a probe request and does not receive a corresponding answer before a timeout, it sets
-the appropriate peer as offline and removes it from the current view.  
-The `PullManager` frequently sends pull requests to the peer's neighbours. If it does not receive an answer after a
-timeout, it sends the peer as offline and removes it from the current view. Otherwise, it adds the peers contained in
-the pull responseto the `View.vPull` set.  
+The remaining classes in the `brahms` package are the aforementioned `Pull`- and `PushManager`. They are responsible for
+handling the sending and/or receiving of pull or push messages, respectively. They both implement the `P2PMsgListener`
+interface. The `PullManager` frequently sends pull requests to the peer's neighbours. If it does not receive an answer
+after a timeout, it sends the peer as offline and removes it from the current view. Otherwise, it adds the peers
+contained in the pull response to the `View.vPull` set.  
 The `PushManager` regularly sends push requests to the peer's neighbourhood. To send a push request, the sender must
 always proof some work. This prevents a malicious peer from flooding the network with push responses. Therefore, before
-sending such a request, the manager must first hash the sender and receiver address, the current date and hour, and a
-nonce. The nonce must be chosen so that the resulting hash starts with a certain number of leading 0 bits. Every time
-the `PushManager` receives a push request, it validates whether hashing the mentioned values results in a correct hash.
-Only then it updates the `View.vPush` set.
+sending such a request, the manager must first hash the sender and receiver address, the current time, in meticulous
+precision, as well as a nonce. The nonce must be chosen so that the resulting hash starts with a certain number of
+leading 0 bits. Every time the `PushManager` receives a push request, it validates whether hashing the mentioned values
+results in a correct hash. It tries the last few minutes as a time parameter. Only then it updates the `View.vPush` set.
 
 ## P2P Protocol
 
 In this section, we provide a precise definition of the message formats on the network layer. The peers transport them
-as Json objects. The `networking` package maps an incoming Json message to an instance of the message class it is
-associated with. It then forwards the instance to each `APIMsgListener`. On the other hand, when another class instructs
+as Json objects. The `networking` package maps an incoming Json message to an instance of the message class the Json
+message is associated with. It then forwards the instance to each `APIMsgListener`. When an entity instructs
 the `networking` package to send a message instance, the mapping proceeds in the other direction. In this case, it maps
 the instance to a Json object before sending it to the message's destination.
 
 ### Core Message
 
 When the `networking` package receives a Json message, it needs to know to which message class it should map the message
-to. Therefore, each Json message starts with the message type. The *body* field then contains the actual data of the
-message. Hence, each message is in the following format:
+to. Therefore, each Json message starts with the message type. Furthermore, it contains the address on which the sender
+listens to incoming messages. Hence, each message is in the following format:
 
-| Field name   | data type   | meaning                                            |
+| Field Name   | Data Type   | Meaning                                            |
 |--------------|-------------|----------------------------------------------------|
-| message type | integer     | integer, indicating the type of the message        |
-| body         | Json object | described in the next subsection |
+| type | string     | Integer, indicating the type of the message.        |
+|sender|Peer|As descibed in section *The Messaging Package*.
+| remaining fields         | | Described in the next subsections. |
+
+A peer has the following format:
+
+| Field Name | Data Type | Meaning                    |
+|------------|-----------|----------------------------|
+| ip address | string    | The IP address of the peer. |
+| port       | integer   | The port number of the peer.    |
 
 ### Body Types of the Core Message
 
@@ -191,56 +203,38 @@ In this section, we outline the different body formats, representing the differe
 
 #### Spread Message
 
-Message type integer: 0
+Message type string: *SpreadMsg*
 
-| Field name | data type  | meaning                                             |
+| Field Name | Data Type  | Meaning                                             |
 |------------|------------|-----------------------------------------------------|
-| dataType   | integer    | the data type field, as specified in *GOSSIP ANNOUNCE* |
-| ttl        | integer    | the TTL field, as specified in *GOSSIP ANNOUNCE*                 |
-| data       | byte array | the data field, as specified in *GOSSIP ANNOUNCE*                |
+| dataType   | integer    | The data type field, as specified in *GOSSIP ANNOUNCE*. |
+| ttl        | integer    | The TTL field, as specified in *GOSSIP ANNOUNCE*.                 |
+| data       | byte array | The data field, as specified in *GOSSIP ANNOUNCE*.                |
 
 #### Pull Request
 
-Message type integer: 1
+Message type string: *PullRequest*
 
-| Field name | data type     | meaning                                                                    |
+| Field Name | Data Type     | Meaning                                                                    |
 |------------|---------------|----------------------------------------------------------------------------|
-| limit       | integer | the maximum number of peers to send with the corresponding *pull response* |
+| limit       | integer | The maximum number of peers to send with the corresponding *pull response*. |
 
 #### Pull Response
 
-Message type integer: 2
+Message type string: *PullResponse*
 
-| Field name | data type     | meaning                                                                    |
+| Field Name | Data Type     | Meaning                                                                    |
 |------------|---------------|----------------------------------------------------------------------------|
-| view       | list of peers | the peer's view, with a maximum size of the limit of the corresponding *pull request*|
+| view       | list of peers | The peer's view, with a maximum size of the limit of the corresponding *pull request*.|
 
-A peer has the following format:
+#### Push Message
 
-| Field name | data type | meaning                    |
-|------------|-----------|----------------------------|
-| ip address | string    | the IP address of the peer |
-| port       | integer   | port number of the peer    |
+Message type string: *PushMsg*
 
-#### Push Request
-
-Message type integer: 3
-
-| Field name | data type  | meaning                             |
+| Field Name | Data Type  | Meaning                             |
 |------------|------------|-------------------------------------|
-| nonce      | byte array | the nonce proofing the sender's work |
+| nonce      | byte array | The nonce proofing the sender's work. |
 
-#### Probe Request
-
-Message type integer: 4
-
-Empty body
-
-#### Probe Response
-
-Message type integer: 5
-
-Empty body
 
 ### Changelog
 
@@ -248,14 +242,7 @@ Empty body
 
 ## Future Work. Features We Could Not Finish So Far.
 
-- We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
-  message, close the socket, and finish the coroutine in our communication module.
-- After that, we combine communication and peer-to-peer protocol modules.
-- Furthermore, we will use thread-safe libraries and synchronization to protect data which is used in different threads.
-- We will further write tests to
-  - eliminate crashes of our module
-  - find good parameters for timeouts, needed proof of work and similar
-    - protect our peer from attacks
+
 
 ## Workload Distribution
 
@@ -284,12 +271,22 @@ modules.
 
 ### Lukas Denk
 
-Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
-midterm report.
+Lukas Denk spent about 3 hours for research and design, about 30 hours for the implementation, about 12 hours for
+documentation and about 5 hours for testing and debugging.
 
-### Defined libraries in use
+## Used libraries
 
-We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
-for networking connections management, and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
+| Library                                                                                                                                     | Usage                                                        |
+|---------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [org.jetbrains.kotlin.jvm](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)                                                      | Compiles Kotlin code to the JVM.                             |
+| [org.jetbrains.kotlin.plugin.serialization' version  '1.5.30](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.serialization) | Maps P2P messages to kotlin objects  and vice versa.         |
+| [org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2](https://github.com/Kotlin/kotlinx.serialization)                                   | See above.                                                   |
+| [org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt](https://github.com/Kotlin/kotlinx.coroutines)                               | Provides coroutines, as described in section *
+architecture*. |
 
-# Build, Deploy and Run
+## Testing
+
+**TO BE DONE**
+
+## Build, Deploy and Run
+
