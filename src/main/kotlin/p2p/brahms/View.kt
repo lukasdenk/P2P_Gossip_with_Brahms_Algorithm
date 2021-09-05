@@ -34,15 +34,21 @@ object View {
 
             delay(Preferences.updateInterval)
 
+            val oldView = setOf(view)
+
             if (PushManager.receivedPushs.size < Preferences.pushLimit) {
                 val pushs = PushManager.receivedPushs.randomSubSet(pushFraction)
                 val pulls = PullManager.receivedPulls.randomSubSet(pullFraction)
                 val pushsAndPulls = pushs union pulls
-                val compensate = pullFraction + pushFraction - pushsAndPulls.size
-                view = (pushsAndPulls union
-                        History.get(historyFraction + compensate)).toMutableSet()
+                view.clear()
+                view.addAll(
+                    (pushsAndPulls union
+                            History.get(Preferences.degree - pushsAndPulls.size)).toMutableSet()
+                )
             }
-            println("View: $view")
+            if ((view intersect oldView).size != (view union oldView).size || i % 10 == 0) {
+                println("View: $view")
+            }
             i++
         }
     }

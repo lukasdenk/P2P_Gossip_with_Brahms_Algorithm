@@ -4,6 +4,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
+import java.lang.Integer.max
 import kotlin.time.ExperimentalTime
 
 @ExperimentalSerializationApi
@@ -13,7 +14,7 @@ object History {
 
     init {
         val initList = mutableListOf<Sampler>()
-        for (i in 0..Preferences.bootstrappingPeers.size) {
+        for (i in 0 until max(Preferences.bootstrappingPeers.size, Preferences.degree)) {
             val peer = Preferences.bootstrappingPeers.getOrNull(i)
             initList.add(Sampler(peer))
         }

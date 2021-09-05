@@ -15,4 +15,10 @@ class APIModule(val port: Int) {
     override fun hashCode(): Int {
         return port
     }
+
+    override fun toString(): String {
+        return "APIModule(port=$port)"
+    }
+
+
 }

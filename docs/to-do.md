@@ -5,9 +5,11 @@
 - receive msgs as Thread or Coroutine?
 - pull request with challenge
 - set def charset
-- make P2PMessage an Interface
 - thread safe
-- https?
+- synchronize
+- encrypt netw traffic
+- read parameters from config
+- useful difficulty
 
 ### For testing:
 

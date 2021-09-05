@@ -3,9 +3,9 @@ package networking.client
 import json.JsonMapper
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
+import main.ParametersReader
 import messaging.api.GossipAnnounce
 import messaging.p2p.PushMsg
-import utils.ParametersReader
 import kotlin.time.ExperimentalTime
 
 @ExperimentalSerializationApi

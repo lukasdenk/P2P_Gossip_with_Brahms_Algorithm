@@ -44,7 +44,7 @@ object PushManager : P2PMsgListener {
     }
 
     private fun validate(msg: PushMsg): Boolean {
-        for (i in 0..4) {
+        for (i in 0 until 4) {
             if (PoW.buildPoW(System.currentTimeMillis() - 60000L * i, msg.sender, Preferences.self, msg.nonce)
                     .startsWithXLeadingZeroes(Preferences.difficulty)
             ) {

@@ -15,7 +15,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalSerializationApi
 @ExperimentalTime
 object GossipManager : APIMsgListener, P2PMsgListener {
-    val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
+    private val dataTypeToSubscribers: MutableMap<DataType, MutableSet<APIModule>> = ConcurrentHashMap()
 
     @Synchronized
     override fun receive(msg: APIMsg, sender: APIModule) {
@@ -36,8 +36,9 @@ object GossipManager : APIMsgListener, P2PMsgListener {
         }
     }
 
+    @Synchronized
     fun spread(msg: SpreadMsg) {
-        println("[P2P-SP] ${View.view}")
+//        println("[P2P-SP] ${View.view}")
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 
@@ -57,6 +58,7 @@ object GossipManager : APIMsgListener, P2PMsgListener {
         }
     }
 
+    @Synchronized
     override fun channelClosed(module: APIModule) {
         dataTypeToSubscribers.forEach { (_, u) ->
             u.remove(module)
