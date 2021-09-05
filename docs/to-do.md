@@ -14,7 +14,8 @@
 ### final report
 
 - process architecture
-- class -> singleton
+- security
+- reread
 
 ### For testing:
 

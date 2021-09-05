@@ -261,13 +261,13 @@ Message type string: *PushMsg*
 | nonce      | byte array | The nonce proofing the sender's work. |
 
 
-### Changelog
+### Changes to our assumptions in the midterm report
 
-**To Be Done**
+None.
 
-## Future Work. Features We Could Not Finish So Far.
+## Future Work.
 
-
+None.
 
 ## Workload Distribution
 
@@ -294,14 +294,17 @@ modules.
   - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
   - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
 
-After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes 
-and jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 
-3 hours were invested into documenting everything for internal use.
+After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes and
+jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 3
+hours were invested into documenting everything for internal use.
 
 ### Lukas Denk
 
-Lukas Denk spent about 3 hours for research and design, about 30 hours for the implementation, about 12 hours for
-documentation and about 5 hours for testing and debugging.
+**Before Midterm:** About 3 hours for research and design, about 12 hours for the implementation, about 8 hours for
+documentation.
+
+**After Midterm:** About 8 hours for the implementation, about 4 hours for documentation and about 5 hours for testing
+and debugging.
 
 ## Used libraries
 
