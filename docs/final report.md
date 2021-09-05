@@ -242,6 +242,10 @@ Message type integer: 5
 
 Empty body
 
+### Changelog
+
+**To Be Done**
+
 ## Future Work. Features We Could Not Finish So Far.
 
 - We are planning to add functionality for one-message-connections, to get or initiate a connection, receive or send a
@@ -249,8 +253,8 @@ Empty body
 - After that, we combine communication and peer-to-peer protocol modules.
 - Furthermore, we will use thread-safe libraries and synchronization to protect data which is used in different threads.
 - We will further write tests to
-    - eliminate crashes of our module
-    - find good parameters for timeouts, needed proof of work and similar
+  - eliminate crashes of our module
+  - find good parameters for timeouts, needed proof of work and similar
     - protect our peer from attacks
 
 ## Workload Distribution
@@ -283,9 +287,9 @@ modules.
 Lukas Denk spent about 3 hours for research and design, about 12 hours for the implementation and about 8 hours for the
 midterm report.
 
-## Changelog
-
 ### Defined libraries in use
 
 We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
 for networking connections management, and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
+
+# Build, Deploy and Run
