@@ -153,15 +153,7 @@ class P2PService(
                 return
             }
             val byteArray = readToArray(buffer)
-            log(byteArray)
             readCompleted.invoke(byteArray)
-        }
-
-        private fun log(arr: ByteArray) {
-//            println(
-//                "[${this::class.simpleName}] incoming msg (${arr.size}): " +
-//                        arr.map(Byte::toInt).joinToString(" ") { String.format("%02X", it) }
-//            )
         }
 
         private fun readToArray(buffer: ByteBuffer): ByteArray {

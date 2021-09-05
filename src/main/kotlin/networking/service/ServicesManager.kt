@@ -46,15 +46,11 @@ object ServicesManager {
         p2pService = P2PService(
             address = p2pAddress,
             port = p2pPort,
-            read = { address: SocketAddress, data: ByteArray ->
+            read = { _: SocketAddress, data: ByteArray ->
                 val message = JsonMapper.mapFromJson(data) ?: return@P2PService
                 P2PCommunicator.receive(
                     message
                 )
-//                println(
-//                    "Received message of type: ${message.javaClass.name} from " +
-//                            socketAddressToString(socketAddress = address)
-//                )
             }
         )
         p2pService.start()

@@ -155,30 +155,6 @@ class APIService(
 
     }
 
-    private class WriteHandler(
-        private val writeCompleted: () -> Unit = {},
-        private val writeFailed: () -> Unit = {}
-    ) : CompletionHandler<Int, ByteArray> {
-
-        override fun completed(result: Int, attachment: ByteArray) {
-            log(attachment)
-            writeCompleted.invoke()
-        }
-
-        private fun log(bytes: ByteArray) {
-//            println(
-//                "[${this::class.simpleName}] sent " +
-//                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
-//            )
-        }
-
-        override fun failed(exc: Throwable, attachment: ByteArray) {
-            println("[${this::class.simpleName}] write failed")
-            writeFailed.invoke()
-        }
-
-    }
-
     private class ReadHandler(
         private val readCompleted: (ByteArray) -> Unit = {},
         private val closeChannel: () -> Unit

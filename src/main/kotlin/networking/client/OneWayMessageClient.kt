@@ -120,15 +120,7 @@ class OneWayMessageClient(
     ) : CompletionHandler<Int, ByteArray> {
 
         override fun completed(result: Int, attachment: ByteArray) {
-            log(attachment) // TODO remove later
             writeCompleted.invoke()
-        }
-
-        private fun log(bytes: ByteArray) {
-//            println(
-//                "[${this::class.simpleName}] sent " +
-//                        bytes.map(Byte::toInt).joinToString(separator = " ") { String.format("%02X", it) }
-//            )
         }
 
         override fun failed(exc: Throwable, attachment: ByteArray) {
