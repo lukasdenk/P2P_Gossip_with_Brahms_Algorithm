@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import utils.ipFromSocketAddress
+import utils.isLocalhost
 import utils.socketAddressToString
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -122,8 +124,11 @@ class APIService(
         ) {
             successfulConnectionAttempt.invoke(clientChannel)
             this.socketChannel = clientChannel
-//            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
-            readData()
+            if (!isLocalhost(ipFromSocketAddress(clientChannel.remoteAddress))) {
+                closeChannel()
+            } else {
+                readData()
+            }
         }
 
         private fun readData() {

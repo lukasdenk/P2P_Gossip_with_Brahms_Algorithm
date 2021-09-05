@@ -30,10 +30,6 @@ object ServicesManager {
                     apiMessage,
                     portFromSocketAddressAsInt(address)
                 )
-//                println(
-//                    "Received message of type: ${apiMessage.javaClass.name} from " +
-//                            socketAddressToString(socketAddress = address)
-//                )
             },
             connectionClosed = { socketAddress ->
                 APICommunicator.channelClosed(portFromSocketAddressAsInt(socketAddress = socketAddress))

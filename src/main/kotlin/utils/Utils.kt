@@ -52,3 +52,7 @@ fun portFromSocketAddressAsInt(socketAddress: String): Int {
 fun socketAddressToString(socketAddress: SocketAddress): String {
     return "${ipFromSocketAddress(socketAddress)}:${portFromSocketAddressAsString(socketAddress)}"
 }
+
+fun isLocalhost(ipAddress: String): Boolean {
+    return ipAddress == "localhost" || ipAddress == "127.0.0.1"
+}

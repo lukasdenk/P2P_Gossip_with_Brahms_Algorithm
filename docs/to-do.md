@@ -21,10 +21,10 @@
 
 ## Kyrylo
 
-- check if APIMessage is from own computer (for security reasons). If not, remove.
+- check if APIMessage is from own computer (for security reasons). If not, remove. (+)
 - log when incoming P2P msg cannot be converted to a P2PMessage obj. Don't crash but ignore the msg then. (for sec
   reasons) (+)
-- call channel broken
+- call channel broken (+)
 
 ### final report:
 

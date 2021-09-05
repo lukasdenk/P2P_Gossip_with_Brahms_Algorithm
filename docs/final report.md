@@ -68,6 +68,8 @@ If API channel is closed `api.manager.GossipManager` gets notified about it with
 
 ##### API messages
 
+Socket connections not from our own machine are refused. So attackers cannot fake our own modules.
+
 To map API messages into objects we manually parse ByteBuffer's content into APIMsg object with `fromByteBuffer` static
 function that implemented in every APIMsg class.
 
