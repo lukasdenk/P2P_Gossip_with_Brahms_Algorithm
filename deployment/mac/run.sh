@@ -1,1 +1,1 @@
-java -jar deployment/mac/Gossip.jar -c deployment/mac/service.ini
+java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/service.ini
