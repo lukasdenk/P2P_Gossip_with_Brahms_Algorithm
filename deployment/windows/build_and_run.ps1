@@ -16,4 +16,4 @@ Remove-Item deployment\windows\test_inis -Recurse
 Copy-Item -Path build\libs\Gossip-1.0-SNAPSHOT-all.jar -Destination deployment\windows\ -PassThru
 Copy-Item -Path build\resources\main\service.ini -Destination deployment\windows\ -PassThru
 Copy-Item -Path build\resources\main\test_inis -Destination deployment\windows\ -Recurse
-java -jar deployment/windows/Gossip-1.0-SNAPSHOT-all.jar -c deployment/windows/service.ini
+java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini
