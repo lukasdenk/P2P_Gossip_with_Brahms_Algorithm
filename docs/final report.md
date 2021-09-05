@@ -292,4 +292,26 @@ midterm report.
 We found it useful to use [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
 for networking connections management, and [Ini4j](http://ini4j.sourceforge.net) for Windows INI files reading.
 
-# Build, Deploy and Run
+# How to build and run project
+
+1. To build the project:
+   1. For MacOS Terminal
+      1. Run from the project root folder `sh deployment/mac/build.sh`
+   2. For Windows PowerShell
+      1. Run from the project root folder `.\deployment\windows\build_and_run.ps1`
+   3. For Windows CMD
+      1. Run from root project folder `.\deployment\windows\build_and_run.cmd`
+2. Then, if you need to provide your own `.ini` settings, you have two options
+   1. Change existing `settings.ini` file
+      1. For MacOS Terminal
+         1. in `deployment/mac/service.ini`
+      2. For Windows
+         1. in `deployment\windows\service.ini`
+   2. Create your own `ini` settings file
+3. Run jar file
+   1. For MacOS Terminal
+      1. `java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/service.ini`
+         1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/service.ini`.
+   2. For Windows
+      1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini`
+         1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`.
