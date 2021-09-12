@@ -344,14 +344,15 @@ architecture*. |
 2. Then, if you need to provide your own `.ini` settings, you have two options
    1. Change existing `settings.ini` file
       1. For MacOS Terminal
-         1. in `deployment/mac/service.ini`
+         1. in `deployment/mac/settings.ini`
       2. For Windows
-         1. in `deployment\windows\service.ini`
+          1. in `deployment\windows\settings.ini`
    2. Create your own `ini` settings file
 3. Run jar file
-   1. For MacOS Terminal
-      1. `java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/service.ini`
-         1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/service.ini`.
-   2. For Windows
-      1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini`
-         1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`.
+    1. For MacOS Terminal
+        1. `java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/settings.ini`
+            1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/settings.ini`.
+    2. For Windows
+        1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\settings.ini`
+            1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\settings.ini`
+               .
