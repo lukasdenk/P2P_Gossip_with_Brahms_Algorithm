@@ -3,7 +3,9 @@ package main
 import java.security.MessageDigest
 import kotlin.math.min
 
-
+/**
+ * Hashes a ByteArray
+ */
 fun ByteArray.sha256(): ByteArray {
     val sha256Instance = MessageDigest.getInstance("SHA256")
     val digest = sha256Instance.digest(this)
@@ -13,6 +15,10 @@ fun ByteArray.sha256(): ByteArray {
     return digest
 }
 
+
+/**
+ * Compares two ByteArray according to the binary number they present.
+ */
 operator fun ByteArray.compareTo(other: ByteArray?): Int {
     if (other == null) {
         return 1

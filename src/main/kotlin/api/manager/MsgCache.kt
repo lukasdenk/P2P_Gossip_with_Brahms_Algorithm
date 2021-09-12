@@ -5,7 +5,9 @@ import messaging.api.MsgId
 import messaging.p2p.SpreadMsg
 import java.util.*
 
-//Threadsafe
+/**
+ * Thread-Safe message cache
+ */
 object MsgCache {
     private val msgCache: MutableMap<MsgId, Pair<SpreadMsg, Long>> = HashMap()
     private val msgTimeMillis: SortedMap<Long, MsgId> = TreeMap()
