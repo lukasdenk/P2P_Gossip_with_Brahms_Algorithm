@@ -7,8 +7,8 @@
 Our project consists of five packages:
 
 1. The `main` package serves as setup function for our service and reads specified console and ini file parameters.
-1. The `networking` package serves as transport functionality for module-to-module and Peer-To-Peer (P2P) communication.
-1. The `messaging` package, which contains a package for API- and one for P2P messaging.
+1. The `networking` package serves as transport functionality for API and Peer-To-Peer (P2P) communication.
+1. The `messaging` package, which contains a package for API- messaging as well as one for P2P messaging.
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
@@ -82,32 +82,16 @@ Socket connections not from our own machine are refused. So attackers cannot fak
 To map API messages into objects we manually parse ByteBuffer's content into APIMsg object with `fromByteBuffer` static
 function that implemented in every APIMsg class.
 
-To map API messages to byte array, we manually create byte array from objects according to the protocol specification 
+To map API messages to byte array, we manually create byte array from objects according to the protocol specification
 with `toByteArray()` function that implemented in every APIMsg object.
 
 ##### P2P messages
 
-To map P2P messages into objects we use `json.JsonMapper` that makes use of `kotlinx.serialization` library.
-We convert our objects into json, which is string format, then it is converted into byte array and sent over 
-the network.
+To map P2P messages into objects we use `json.JsonMapper` that makes use of `kotlinx.serialization` library. We convert
+our objects into json, which is string format, then it is converted into byte array and sent over the network.
 
-To map P2P messages to byte array, we use `json.JsonMapper` that makes use of `kotlinx.serialization` library.
-We convert our byte arrays to string, then we convert resulting json into P2PMsg with `Json.mapFromJson` function. 
-
-### The API Package
-
-The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *
-specification* paper.  
-To receive messaging coming from other modules, the manager implements the `APIMsgListener` interface.  
-The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
-Therefore, it also implements the `P2PMsgListener` interface. The `networking` package is also liable for calling
-the `GossipManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
-the `GossipManager` then unsubscribes the corresponding module.  
-To send messages to other modules, the manager uses the `APICommunicator`, which forwards the message to
-the `networking` package. Furthermore, it forwards validated knowledge of *Gossip Notification*s with a so called *
-spread message* (see section `p2p` package). The `APICommunicator` serves as an abstraction layer between the `api`
-and `networking` package. The `networking` package also uses it to forward incoming API messages to the `APIMsgListener`
-s.
+To map P2P messages to byte array, we use `json.JsonMapper` that makes use of `kotlinx.serialization` library. We
+convert our byte arrays to string, then we convert resulting json into P2PMsg with `Json.mapFromJson` function.
 
 ### The Messaging Package
 
@@ -119,13 +103,31 @@ and `p2p` *main* packages). They each contain:
   to the *`p2p` package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
-  respectively. The `APICommunicator` or `P2PCommunicator's` calls this function to pass an incoming API or P2P
-  messages, whenever it receives one from the `networking` package.
+  respectively. The `APICommunicator` (see subsection _The API Package_) or `P2PCommunicator` (see subsection _The P2P
+  Package_) calls this function to pass an incoming API or P2P message, whenever it receives one from the `networking`
+  package.
+- The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between
+  the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send
+  an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards
+  them to the `APICommunicator` or `P2PCommunicator`, respectively. They then forward the message to all instances
+  implementing the `APIMsgListener` or `P2PMsgListener`, respectively.
 
-The reason for separating the messages into an own package is that our module uses them across multiple packages.
+The reason for separating these classes into an own package is that our module uses them across multiple packages.
 
 The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
 contains the address of the socket the peer is listening on.
+
+### The API Package
+
+The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *
+specification* paper. It has the following responsibilities:
+To receive messaging coming from other modules, the manager implements the `APIMsgListener` interface. The manager is
+also responsible for forwarding knowledge coming from other modules which have subscribed for it. Therefore, it
+implements the `P2PMsgListener` interface.  
+The `networking` package is liable for calling the `GossipManager`'s `channelClosed` method whenever the connection to
+another module breaks. If necessary, the `GossipManager` then unsubscribes the corresponding module.  
+Furthermore, the manager forwards validated knowledge of *Gossip Notification*s with a so called *spread message* (see
+section `p2p` package).
 
 ### The P2P Package
 
