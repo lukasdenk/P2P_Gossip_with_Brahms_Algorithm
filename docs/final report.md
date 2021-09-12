@@ -322,10 +322,12 @@ and debugging.
 | Library                                                                                                                                     | Usage                                                        |
 |---------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
 | [org.jetbrains.kotlin.jvm](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)                                                      | Compiles Kotlin code to the JVM.                             |
-| [org.jetbrains.kotlin.plugin.serialization' version  '1.5.30](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.serialization) | Maps P2P messages to kotlin objects  and vice versa.         |
+| [org.jetbrains.kotlin.plugin.serialization' version  '1.5.30](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.serialization) | Maps P2P messages to kotlin objects  and vice versa.          |
 | [org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2](https://github.com/Kotlin/kotlinx.serialization)                                   | See above.                                                   |
 | [org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt](https://github.com/Kotlin/kotlinx.coroutines)                               | Provides coroutines, as described in section **Coroutines**
 architecture*. |
+| [com.github.johnrengelman.shadow](https://github.com/johnrengelman/shadow)                                                                  | Plugin to build jar file.                                    |
+
 
 ## Testing
 
@@ -360,5 +362,4 @@ architecture*. |
             1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/service.ini`.
     2. For Windows
         1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini`
-            1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`
-               .
+            1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`.

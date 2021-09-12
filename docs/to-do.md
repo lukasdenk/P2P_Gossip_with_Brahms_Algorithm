@@ -34,8 +34,6 @@
 - state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg (
   check with my explanation to avoid explaining the same twice)
 - explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
-- include the libraries u used in library table
-- describe how to only run the project
 
 ### For testing:
 
