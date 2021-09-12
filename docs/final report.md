@@ -170,7 +170,7 @@ singleton from three sources:
 - `PullManager.pull`. A set consisting of the peers from all the pull responses since the last update round.
 - The current random subset of the history, provided by the `History` singleton.
 
-The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for randomly selecting one of all the peers our module has ever received.  The `Sampler` class is implemented similar to the pseudocode in the
+The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for randomly selecting one of all the peers that our module has ever received.  The `Sampler` class is implemented similar to the pseudocode in the
 Brahms paper. It holds the peer it is currently selecting as well as a random number.   
 For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'s `next` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
 selecting a peer, the received peer becomes the selected peer. Otherwise, the function hashes the peer's address as well

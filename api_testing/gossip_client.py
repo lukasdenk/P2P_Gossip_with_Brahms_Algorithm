@@ -6,8 +6,9 @@ import socket
 import struct
 import threading
 import time
-from gossip_testing.util import connect_socket, sync_read_message
 from typing import List
+
+from util import connect_socket, sync_read_message
 
 GOSSIP_ANNOUNCE = 500
 GOSSIP_NOTIFY = 501
