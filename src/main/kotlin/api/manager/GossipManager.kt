@@ -64,10 +64,6 @@ object GossipManager : APIMsgListener, P2PMsgListener {
             u.remove(module)
         }
         dataTypeToSubscribers.entries.removeIf { it.value.isEmpty() }
-//        TODO: remove after testing
-        if (!dataTypeToSubscribers.filterValues { it.isEmpty() }.isEmpty()) {
-            throw IllegalStateException("check stmt above")
-        }
     }
 
 

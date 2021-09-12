@@ -3,7 +3,6 @@ package main
 import messaging.p2p.Peer
 
 object Preferences {
-    //    TODO: find good value
     val difficulty: Int = 4
 
     val probeInterval = 5000L

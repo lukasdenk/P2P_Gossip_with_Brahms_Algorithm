@@ -32,7 +32,6 @@ class Sampler(peer: Peer? = null) {
     }
 
     fun initialize() {
-//        TODO: sophisticated value
         rand.set(Random.nextBytes(32))
         atomicPeer.set(null)
         peerHash.set(null)

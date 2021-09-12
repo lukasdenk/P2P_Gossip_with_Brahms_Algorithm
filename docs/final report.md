@@ -148,7 +148,7 @@ this view from three sources:
 
 Our module represents every message of the P2P protocol in two formats: As the instance of a message class or as a Json
 object. The module operates with the first format for passing a message internally while it uses the second format on
-the network layer. We describe the latter format in the *P2P protocol* section. When we mention a message in the *Architecture* section, we always talk about the instance of a message class. The message classes are:
+the network layer. We describe the latter format in the *The P2P Protocol* section. When we mention a message in the *Architecture* section, we always talk about the instance of a message class. The message classes are:
 
 - `SpreadMsg`
 - `PullRequest` and `PullResponse`
@@ -195,7 +195,7 @@ precision, as well as a nonce. The nonce must be chosen so that the resulting ha
 leading 0 bits. Every time the `PushManager` receives a push request, it validates whether hashing the mentioned values
 results in a correct hash. It tries the last few minutes as the time parameter. Only then it updates the `View.vPush` set.
 
-### P2P Protocol
+### The P2P Protocol
 
 In this section, we provide a definition of the message formats on the network layer. The peers transport them
 as Json objects. The `networking` package maps an incoming Json message to an instance of the message class the Json
@@ -285,7 +285,7 @@ This applies to the following parameters:
 - Difficulty: The number of leading 0 bits the hash of a `PushMsg` must have.
 - Update Interval: The frequency with which our module updates its view.
 - Probe Interval: The regularity in which a `Sampler` probes the peer it is currently selecting. 
-
+- Push Limit: The maximal number of push messages we accept in an update round. If the incoming push messages exceed this limit, the view does not update in this round.
 
 ### Disclaimer
 Our module sends network traffic as plain text. For this reason, message encryption and authentication must be done on a lower layer.

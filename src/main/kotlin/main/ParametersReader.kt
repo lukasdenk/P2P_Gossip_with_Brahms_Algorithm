@@ -19,19 +19,6 @@ class ParametersReader {
                 "-c" -> {
                     iniConfigPath = args.getOrElse(i + 1) { "" }
                 }
-//                TODO: remove client related code
-                "-a" -> {
-                    clientMode = ClientMode.Announce
-                }
-                "-n" -> {
-                    clientMode = ClientMode.Notify
-                }
-                "-d" -> {
-                    gossipServiceAddress = args.getOrElse(i + 1) { "localhost" }
-                }
-                "-p" -> {
-                    gossipServicePort = Integer.parseInt(args.getOrElse(i + 1) { "7001" })
-                }
             }
         }
     }

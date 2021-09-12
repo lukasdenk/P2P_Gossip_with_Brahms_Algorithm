@@ -31,8 +31,8 @@ object View {
         while (true) {
             PushManager.reset()
             PullManager.reset()
-            PushManager.push(view.randomSubSet(pushFraction))
-            PullManager.pull(view.randomSubSet(pullFraction))
+            PushManager.push(view)
+            PullManager.pull(view)
 
             delay(Preferences.updateInterval)
 
