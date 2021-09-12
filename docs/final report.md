@@ -101,12 +101,12 @@ and `p2p` *main* packages). They each contain:
 
 - Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
   API protocol, we refer to the *specification* paper of this class. For the message types of the P2P protocol, we refer
-  to the *`p2p` package* section.
+  to the *p2p package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
-  respectively. The `APICommunicator` (see subsection _The API Package_) or `P2PCommunicator` (see subsection _The P2P Package_) calls this function to pass an incoming API or P2P
+  respectively. The `APICommunicator` or `P2PCommunicator` calls this function to pass an incoming API or P2P
   message, whenever it receives one from the `networking` package.
-- The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards them to the `APICommunicator` or `P2PCommunicator`, respectively. They then forward the message to all instances implementing the `APIMsgListener` or `P2PMsgListener`, respectively.
+- The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards them to the `APICommunicator` or `P2PCommunicator`. They then forward the message to all instances implementing the `APIMsgListener` or `P2PMsgListener`.
 
 The reason for separating these classes into an own package is that our module uses them across multiple packages.
 
@@ -118,9 +118,9 @@ contains the address of the socket the peer is listening on.
 
 The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *specification* paper. It has the following responsibilities:
 - Receiving messages coming from other modules. For this reason, the manager implements the `APIMsgListener` interface.
-- Keeping track of the data types the other modules have notified for. The manager does so by mapping each module to the data types it has subscribed for. Also, it implements the `channelClosed` method. The `networking` package calls is whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
+- Keeping track of the data types the other modules have notified for. The manager does so by mapping each module to the data types it has subscribed for. Also, it implements the `channelClosed` method. The `networking` package calls it whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
 - Passing knowledge coming from other peers to the modules which have subscribed for it. To receive messages from other peers, it implements the `P2PMsgListener` interface.  
-- Forwarding data to other peers. To do so, the manager stores incoming *spread messages* with a unique ID. It then sends a `GOSSIP NOTIFICATION` message to the modules which have notified for the corresponding data type. If a module sends a `GOSSIP VALIDATION` with the valid flag set to `true`, the manager spreads this message to our peers.
+- Forwarding data to other peers. To do so, the manager stores incoming *spread messages* with a unique ID. It then sends a `GOSSIP NOTIFICATION` message to the modules which have notified for the corresponding data type. If a module sends a `GOSSIP VALIDATION` with the valid flag set to `true`, the manager spreads this message to the peers.
 
 
 ### The P2P Package
@@ -148,7 +148,7 @@ this view from three sources:
 
 Our module represents every message of the P2P protocol in two formats: As the instance of a message class or as a Json
 object. The module operates with the first format for passing a message internally while it uses the second format on
-the network layer. We describe the latter format in the *The P2P Protocol* section. When we mention a message in the *Architecture* section, we always talk about the instance of a message class. The message classes are:
+the network layer. We describe the latter format in the *The P2P Protocol* section. When we mention a message in another section, we always talk about the instance of a message class. The message classes are:
 
 - `SpreadMsg`
 - `PullRequest` and `PullResponse`
@@ -170,8 +170,7 @@ singleton from three sources:
 - `PullManager.pull`. A set consisting of the peers from all the pull responses since the last update round.
 - The current random subset of the history, provided by the `History` singleton.
 
-The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of
-the elements in the current random subset. The `Sampler` class is implemented similar to the pseudocode in the
+The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for randomly selecting one of all the peers our module has ever received.  The `Sampler` class is implemented similar to the pseudocode in the
 Brahms paper. It holds the peer it is currently selecting as well as a random number.   
 For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'s `next` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
 selecting a peer, the received peer becomes the selected peer. Otherwise, the function hashes the peer's address as well
