@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 class GossipNotify(
     val dataType: DataType
-) : APIMsg {
+) : APIMsg() {
 
     companion object {
         fun fromByteBuffer(buffer: ByteBuffer): GossipNotify {

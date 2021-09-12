@@ -6,7 +6,7 @@ import kotlin.experimental.and
 class GossipValidation(
     val messageId: Short,
     val isValid: Boolean
-) : APIMsg {
+) : APIMsg() {
 
     companion object {
         fun fromByteBuffer(buffer: ByteBuffer): APIMsg {
