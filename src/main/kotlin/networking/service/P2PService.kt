@@ -14,6 +14,7 @@ import java.nio.channels.AsynchronousSocketChannel
 import java.nio.channels.CompletionHandler
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.system.exitProcess
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -21,8 +22,8 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 @Suppress("BlockingMethodInNonBlockingContext")
 class P2PService(
-    address: String,
-    port: Int,
+    private val address: String,
+    private val port: Int,
     private val read: (SocketAddress, ByteArray) -> Unit
 ) {
 
@@ -32,7 +33,6 @@ class P2PService(
     private lateinit var serverChannel: AsynchronousServerSocketChannel
 
     suspend fun start() {
-        println("[${this::class.simpleName}] has been started at $socketAddress")
         createServerChannel()
         accept()
         while (true) {
@@ -59,9 +59,15 @@ class P2PService(
 
     private suspend fun createServerChannel() {
         socketConnectionsScope.launch {
-            serverChannel = AsynchronousServerSocketChannel.open()
-            serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-            serverChannel.bind(socketAddress)
+            try {
+                serverChannel = AsynchronousServerSocketChannel.open()
+                serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
+                serverChannel.bind(socketAddress)
+                println("[P2PService] has been started at $socketAddress")
+            } catch (ex: Throwable) {
+                println("[P2PService] wasn't able to start at $address:$port")
+                exitProcess(0);
+            }
         }.join()
     }
 
