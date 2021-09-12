@@ -1,4 +1,3 @@
 # Gossip-8
 
-## Initial report
-Initial report can be found as: [docs/Initial Report.pdf](docs/Initial Report.pdf)
+A detailed report can be found at: [docs/final report.md](docs/final%20report.md)

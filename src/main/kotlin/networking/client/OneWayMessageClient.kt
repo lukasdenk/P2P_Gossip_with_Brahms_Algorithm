@@ -108,7 +108,7 @@ class OneWayMessageClient(
         }
 
         override fun failed(exc: Throwable?, socketChannel: AsynchronousSocketChannel) {
-            println("[${this::class.simpleName}] failed to connect $exc")
+            println("[${this::class.simpleName}] failed to connect to $exc")
             connectionFailed.invoke()
         }
 

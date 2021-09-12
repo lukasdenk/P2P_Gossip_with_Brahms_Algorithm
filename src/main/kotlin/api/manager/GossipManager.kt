@@ -1,13 +1,13 @@
 package api.manager
 
-import api.APICommunicator
 import api.APIModule
 import kotlinx.serialization.ExperimentalSerializationApi
+import messaging.APICommunicator
+import messaging.P2PCommunicator
 import messaging.api.*
 import messaging.p2p.P2PMsg
 import messaging.p2p.P2PMsgListener
 import messaging.p2p.SpreadMsg
-import p2p.P2PCommunicator
 import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime
@@ -52,7 +52,7 @@ object GossipManager : APIMsgListener, P2PMsgListener {
     private fun sendNotification(msg: SpreadMsg) {
         val msgId = MsgIdCounter.increment()
         MsgCache.put(msgId, msg)
-        val notification = GossipNotification(msg.dataType, msgId, msg.data)
+        val notification = GossipNotification(msgId, msg.dataType, msg.data)
         dataTypeToSubscribers[notification.dataType]?.forEach {
             APICommunicator.send(notification, it)
         }
@@ -64,10 +64,6 @@ object GossipManager : APIMsgListener, P2PMsgListener {
             u.remove(module)
         }
         dataTypeToSubscribers.entries.removeIf { it.value.isEmpty() }
-//        TODO: remove after testing
-        if (!dataTypeToSubscribers.filterValues { it.isEmpty() }.isEmpty()) {
-            throw IllegalStateException("check stmt above")
-        }
     }
 
 

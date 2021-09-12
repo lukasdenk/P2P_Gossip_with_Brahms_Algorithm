@@ -1,0 +1,1 @@
+for %%a in ( 0 1 2 ) do START /B .\api_testing\internals\test_server.cmd %%a

@@ -1,14 +1,14 @@
 # Final report
 
-## Architecture
+## Implementation
 
 ### Overview
 
 Our project consists of five packages:
 
 1. The `main` package serves as setup function for our service and reads specified console and ini file parameters.
-1. The `networking` package serves as transport functionality for module-to-module and Peer-To-Peer (P2P) communication.
-1. The `messaging` package, which contains a package for API- and one for P2P messaging.
+1. The `networking` package serves as transport functionality for API and Peer-To-Peer (P2P) communication.
+1. The `messaging` package, which contains a package for API- messaging as well as one for P2P messaging.
 1. The `api` package, which is responsible for the communication to the other modules.
 1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
 
@@ -94,21 +94,6 @@ the network.
 To map P2P messages to byte array, we use `json.JsonMapper` that makes use of `kotlinx.serialization` library.
 We convert our byte arrays to string, then we convert resulting json into P2PMsg with `Json.mapFromJson` function. 
 
-### The API Package
-
-The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *
-specification* paper.  
-To receive messaging coming from other modules, the manager implements the `APIMsgListener` interface.  
-The manager is also responsible for forwarding incoming knowledge to the modules which have subscribed for it.
-Therefore, it also implements the `P2PMsgListener` interface. The `networking` package is also liable for calling
-the `GossipManager`'s `channelClosed` method whenever the connection to another module breaks. If necessary,
-the `GossipManager` then unsubscribes the corresponding module.  
-To send messages to other modules, the manager uses the `APICommunicator`, which forwards the message to
-the `networking` package. Furthermore, it forwards validated knowledge of *Gossip Notification*s with a so called *
-spread message* (see section `p2p` package). The `APICommunicator` serves as an abstraction layer between the `api`
-and `networking` package. The `networking` package also uses it to forward incoming API messages to the `APIMsgListener`
-s.
-
 ### The Messaging Package
 
 The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be confused with the `api`
@@ -119,24 +104,30 @@ and `p2p` *main* packages). They each contain:
   to the *`p2p` package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
-  respectively. The `APICommunicator` or `P2PCommunicator's` calls this function to pass an incoming API or P2P
-  messages, whenever it receives one from the `networking` package.
+  respectively. The `APICommunicator` (see subsection _The API Package_) or `P2PCommunicator` (see subsection _The P2P Package_) calls this function to pass an incoming API or P2P
+  message, whenever it receives one from the `networking` package.
+- The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards them to the `APICommunicator` or `P2PCommunicator`, respectively. They then forward the message to all instances implementing the `APIMsgListener` or `P2PMsgListener`, respectively.
 
-The reason for separating the messages into an own package is that our module uses them across multiple packages.
+The reason for separating these classes into an own package is that our module uses them across multiple packages.
 
 The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
 contains the address of the socket the peer is listening on.
 
+
+### The API Package
+
+The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *specification* paper. It has the following responsibilities:
+- Receiving messages coming from other modules. For this reason, the manager implements the `APIMsgListener` interface.
+- Keeping track of the data types the other modules have notified for. The manager does so by mapping each module to the data types it has subscribed for. Also, it implements the `channelClosed` method. The `networking` package calls is whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
+- Passing knowledge coming from other peers to the modules which have subscribed for it. To receive messages from other peers, it implements the `P2PMsgListener` interface.  
+- Forwarding data to other peers. To do so, the manager stores incoming *spread messages* with a unique ID. It then sends a `GOSSIP NOTIFICATION` message to the modules which have notified for the corresponding data type. If a module sends a `GOSSIP VALIDATION` with the valid flag set to `true`, the manager spreads this message to our peers.
+
+
 ### The P2P Package
 
-The `p2p` package consists of the `P2PCommunicator` class, as well as the `brahms` package. Similar to
-the `APICommunicator`, the `P2PCommunicator` assists as an abstraction layer between the `P2PMsgListener`s and
-the `networking` package. To send a P2P message, the `P2PMsgListener`s call the `P2PCommunicator`'s `send` function. The
-communicator then uses the `networking` package to send them. Vice versa, the `networking` package forwards incoming P2P
-messages to the communicator, which then calls each `P2PMsgListener`s `receive` function.   
-The `brahms` subpackage maintains the peer's neighbourhood by implementing a simplified version of the Brahms algorithm
+The `p2p` package maintains the peer's neighbourhood by implementing a simplified version of the Brahms algorithm
 specified in [*Brahms: byzantine resilient random membership sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772)
-by Edward Bortnikov et al..
+by Edward Bortnikov et al.. We chose this approach since the Brahms algorithm provides a solid resilience against Byzantine and Crash faults (see the aforementioned paper).
 
 #### The Brahms Algorithm
 
@@ -157,8 +148,7 @@ this view from three sources:
 
 Our module represents every message of the P2P protocol in two formats: As the instance of a message class or as a Json
 object. The module operates with the first format for passing a message internally while it uses the second format on
-the network layer. We describe the latter format in the *P2P protocol* section. When we mention a message in the *
-Architecture* section, we always talk about the instance of a message class. The message classes are:
+the network layer. We describe the latter format in the *The P2P Protocol* section. When we mention a message in the *Architecture* section, we always talk about the instance of a message class. The message classes are:
 
 - `SpreadMsg`
 - `PullRequest` and `PullResponse`
@@ -182,39 +172,38 @@ singleton frequently updates its view from three sources:
 
 The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instance is responsible for selecting one of
 the elements in the current random subset. The `Sampler` class is implemented similar to the pseudocode in the
-aforementioned paper. It holds the peer it is currently selecting as well as a random number.   
-For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'
-s `next(<peer>)` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
+Brahms paper. It holds the peer it is currently selecting as well as a random number.   
+For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'s `next` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
 selecting a peer, the received peer becomes the selected peer. Otherwise, the function hashes the peer's address as well
 as the random number with the SHA256 algorithm. If this hash is smaller than the hash of the currently selected peer,
 the received peer becomes the new selected peer. With this strategy, a `Sampler` always holds a peer selected uniformly
 at random from all the peers it has received so far. The random number ensures that the different `Sampler`s choose
 different peers.  
 Additionally, a `Sampler` must check the availability status of the peer it holds. This is done with a coroutine which
-periodically tries to connect to the peer. The `Sampler`'s construction phase launches the coroutine. Whenever the
+periodically tries to connect to the peer. The `Sampler`'s construction phase launches this coroutine. Whenever the
 associated peer is offline, the `Sampler` resets itself. It removes the peer and creates a new random number.
 
 The remaining classes in the `brahms` package are the aforementioned `Pull`- and `PushManager`. They are responsible for
 handling the sending and/or receiving of pull or push messages, respectively. They both implement the `P2PMsgListener`
 interface. The `PullManager` frequently sends pull requests to the peer's neighbours. If it does not receive an answer
-after a timeout, it sends the peer as offline and removes it from the current view. Otherwise, it adds the peers
+after a timeout, it removes it from the current view. Otherwise, it adds the peers
 contained in the pull response to the `View.vPull` set.  
 The `PushManager` regularly sends push requests to the peer's neighbourhood. To send a push request, the sender must
 always proof some work. This prevents a malicious peer from flooding the network with push responses. Therefore, before
 sending such a request, the manager must first hash the sender and receiver address, the current time, in meticulous
 precision, as well as a nonce. The nonce must be chosen so that the resulting hash starts with a certain number of
 leading 0 bits. Every time the `PushManager` receives a push request, it validates whether hashing the mentioned values
-results in a correct hash. It tries the last few minutes as a time parameter. Only then it updates the `View.vPush` set.
+results in a correct hash. It tries the last few minutes as the time parameter. Only then it updates the `View.vPush` set.
 
-## P2P Protocol
+### The P2P Protocol
 
-In this section, we provide a precise definition of the message formats on the network layer. The peers transport them
+In this section, we provide a definition of the message formats on the network layer. The peers transport them
 as Json objects. The `networking` package maps an incoming Json message to an instance of the message class the Json
-message is associated with. It then forwards the instance to each `APIMsgListener`. When an entity instructs
+message is associated with. It then forwards the instance to the `P2PCommunicator`. When an entity instructs
 the `networking` package to send a message instance, the mapping proceeds in the other direction. In this case, it maps
 the instance to a Json object before sending it to the message's destination.
 
-### Core Message
+#### Core Message
 
 When the `networking` package receives a Json message, it needs to know to which message class it should map the message
 to. Therefore, each Json message starts with the message type. Furthermore, it contains the address on which the sender
@@ -222,7 +211,7 @@ listens to incoming messages. Hence, each message is in the following format:
 
 | Field Name   | Data Type   | Meaning                                            |
 |--------------|-------------|----------------------------------------------------|
-| type | string     | Integer, indicating the type of the message.        |
+| type | string     | The type of the message.        |
 |sender|Peer|As descibed in section *The Messaging Package*.
 | remaining fields         | | Described in the next subsections. |
 
@@ -233,11 +222,11 @@ A peer has the following format:
 | ip address | string    | The IP address of the peer. |
 | port       | integer   | The port number of the peer.    |
 
-### Body Types of the Core Message
+#### Body Types of the Core Message
 
 In this section, we outline the different body formats, representing the different message types.
 
-#### Spread Message
+**_Spread Message:_**
 
 Message type string: *SpreadMsg*
 
@@ -247,7 +236,7 @@ Message type string: *SpreadMsg*
 | ttl        | integer    | The TTL field, as specified in *GOSSIP ANNOUNCE*.                 |
 | data       | byte array | The data field, as specified in *GOSSIP ANNOUNCE*.                |
 
-#### Pull Request
+**_Pull Request:_**
 
 Message type string: *PullRequest*
 
@@ -255,7 +244,7 @@ Message type string: *PullRequest*
 |------------|---------------|----------------------------------------------------------------------------|
 | limit       | integer | The maximum number of peers to send with the corresponding *pull response*. |
 
-#### Pull Response
+**_Pull Response:_**
 
 Message type string: *PullResponse*
 
@@ -263,61 +252,16 @@ Message type string: *PullResponse*
 |------------|---------------|----------------------------------------------------------------------------|
 | view       | list of peers | The peer's view, with a maximum size of the limit of the corresponding *pull request*.|
 
-#### Push Message
+**_Push Message:_**
 
 Message type string: *PushMsg*
 
 | Field Name | Data Type  | Meaning                             |
 |------------|------------|-------------------------------------|
-| nonce      | byte array | The nonce proofing the sender's work. |
+| nonce      | integer | The nonce proofing the sender's work. |
 
 
-### Changes to our assumptions in the midterm report
-
-None.
-
-## Future Work.
-
-None.
-
-## Workload Distribution
-
-### Kyrylo Vasylenko
-
-Kyrylo Vasylenko implements `main` and `networking` packages.
-
-### Lukas Denk
-
-Lukas Denk implements the `messaging`, `p2p` and `api` packages.
-
-## Effort Spent for the Project
-
-### Kyrylo Vasylenko
-
-Kyrylo Vasylenko spent up to 19 hours for `networking` package implementation. About 6 hours were used for studying Java
-Non-Blocking I/O and coroutines approach. About 8 hours were spent on `networking` module manual testing with use of
-python gossip client and gossip mockup. And up to 5 hours were put into command line and windows INI file parsing
-modules.
-
-- Resources that were studied about Async IO in Java and Coroutines approach in Kotlin.
-  - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
-  - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
-  - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
-  - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
-
-After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes and
-jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 3
-hours were invested into documenting everything for internal use.
-
-### Lukas Denk
-
-**Before Midterm:** About 3 hours for research and design, about 12 hours for the implementation, about 8 hours for
-documentation.
-
-**After Midterm:** About 8 hours for the implementation, about 4 hours for documentation and about 5 hours for testing
-and debugging.
-
-## Used libraries
+### Used libraries
 
 | Library                                                                                                                                     | Usage                                                        |
 |---------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
@@ -329,25 +273,35 @@ architecture*. |
 | [com.github.johnrengelman.shadow](https://github.com/johnrengelman/shadow)                                                                  | Plugin to build jar file.                                    |
 
 
-## Testing
 
-**TO BE DONE**
+### Changes to our assumptions in the midterm report
 
-### Networking part
+None.
 
-The `networking` part was tested manually by using test class `ClientMain.kt`.
-`ClientMain.kt` was sending one way messages to `APIService` and `P2PService` and we ensured they
-were encrypted.
+### Future Work
+
+Several configuration parameters were only tested in a small environment. A deeper evaluation could improve the performance and robustness of our module.   
+This applies to the following parameters:
+- Difficulty: The number of leading 0 bits the hash of a `PushMsg` must have.
+- Update Interval: The frequency with which our module updates its view.
+- Probe Interval: The regularity in which a `Sampler` probes the peer it is currently selecting. 
+- Push Limit: The maximal number of push messages we accept in an update round. If the incoming push messages exceed this limit, the view does not update in this round.
+
+### Disclaimer
+Our module sends network traffic as plain text. For this reason, message encryption and authentication must be done on a lower layer.
 
 
-## How to install java on your machine to follow section "How to build and run project"
+
+## Deployment
+
+### How to install java on your machine to follow section "How to build and run project"
 
 1. Download java version 16 following instructions on
    1. https://java.tutorials24x7.com/blog/how-to-install-java-16-on-windows for Windows
    2. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-macos.html#GUID-E8A251B6-D9A9-4276-ABC8-CC0DAD62EA33 for Mac OS
    3. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-linux-platforms.html#GUID-19D58769-FD72-4353-A935-40FCD82A7A81 for Linux
 
-## How to build and run project
+### How to build and run project
 
 1. To build the project:
    1. For MacOS Terminal
@@ -370,3 +324,60 @@ were encrypted.
     2. For Windows
         1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini`
             1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`.
+
+
+## Testing
+
+### API Protocol
+
+**Disclaimer:** Only works on Windows 10.
+
+1. Build the project as described in section *How to build and run project*.
+2. Install Python3 and the latest Pip on your machine. 
+3. Open a terminal with administrator rights and go to the project root.
+4. Install all dependencies with `pip install -r requirements.txt`.
+5. Make sure that port 7000-7002 and 7050-7052 are available. Now, start 3 instances of our module by executing `api_testing/test_servers.cmd`. Wait for about 15 seconds so that the modules can find each other.
+6. Go to the project root and run `./api_testing/gossip_client.py --help`. Read the instructions to test the functionality you want to test.
+
+### Networking part
+
+The `networking` part was tested manually by using test class `ClientMain.kt`.
+`ClientMain.kt` was sending one way messages to `APIService` and `P2PService` and we ensured they
+were encrypted.
+
+## Workload Distribution
+
+### Kyrylo Vasylenko
+
+Kyrylo Vasylenko implements `main` and `networking` packages.
+
+### Lukas Denk
+
+Lukas Denk implements the `messaging`, `p2p` and `api` packages.
+
+## Effort Spent for the Project
+
+### Kyrylo Vasylenko
+
+Kyrylo Vasylenko spent up to 19 hours for `networking` package implementation. About 6 hours were used for studying Java
+Non-Blocking I/O and coroutines approach. About 8 hours were spent on `networking` module manual testing with use of
+python gossip client and gossip mockup. And up to 5 hours were put into command line and windows INI file parsing
+modules.
+
+- Resources that were studied about Async IO in Java and Coroutines approach in Kotlin.
+    - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
+    - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
+    - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
+    - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
+
+After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes and
+jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 3
+hours were invested into documenting everything for internal use.
+
+### Lukas Denk
+
+*Before Midterm:* About 3 hours for research and design, about 12 hours for the implementation, about 8 hours for
+documentation.
+
+*After Midterm:* About 8 hours for the implementation, about 8 hours for documentation and about 8 hours for testing
+and debugging.
