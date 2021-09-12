@@ -35,8 +35,6 @@
   check with my explanation to avoid explaining the same twice)
 - explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
 - include the libraries u used in library table
-- describe how to set JAVA_HOME or link to an article about it.
-- specify the needed JDK version and describe how to install it
 - describe how to only run the project
 
 ### For testing:

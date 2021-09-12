@@ -333,7 +333,7 @@ architecture*. |
 
 ## How to install java on your machine to follow section "How to build and run project"
 
-1. Download java following instructions on
+1. Download java version 16 following instructions on
    1. https://java.tutorials24x7.com/blog/how-to-install-java-16-on-windows for Windows
    2. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-macos.html#GUID-E8A251B6-D9A9-4276-ABC8-CC0DAD62EA33 for Mac OS
    3. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-linux-platforms.html#GUID-19D58769-FD72-4353-A935-40FCD82A7A81 for Linux
