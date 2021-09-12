@@ -333,6 +333,13 @@ architecture*. |
 
 **TO BE DONE**
 
+### Networking part
+
+The `networking` part was tested manually by using test class `ClientMain.kt`.
+`ClientMain.kt` was sending one way messages to `APIService` and `P2PService` and we ensured they
+were encrypted.
+
+
 ## How to install java on your machine to follow section "How to build and run project"
 
 1. Download java version 16 following instructions on
