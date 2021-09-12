@@ -15,6 +15,7 @@
 
 - process architecture
 - security
+  - incoming API connections only own pc
 - reread
 
 ### For testing:
@@ -30,6 +31,7 @@
 - log when incoming P2P msg cannot be converted to a P2PMessage obj. Don't crash but ignore the msg then. (for sec
   reasons) (+)
 - call channel broken (+)
+- write tests for networking
 
 ### final report:
 
