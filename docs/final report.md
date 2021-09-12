@@ -333,7 +333,10 @@ architecture*. |
 
 ## How to install java on your machine to follow section "How to build and run project"
 
-- TODO
+1. Download java following instructions on
+   1. https://java.tutorials24x7.com/blog/how-to-install-java-16-on-windows for Windows
+   2. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-macos.html#GUID-E8A251B6-D9A9-4276-ABC8-CC0DAD62EA33 for Mac OS
+   3. https://docs.oracle.com/en/java/javase/16/install/installation-jdk-linux-platforms.html#GUID-19D58769-FD72-4353-A935-40FCD82A7A81 for Linux
 
 ## How to build and run project
 
@@ -341,21 +344,21 @@ architecture*. |
    1. For MacOS Terminal
       1. Run from the project root folder `sh deployment/mac/build.sh`
    2. For Windows PowerShell
-      1. Run from the project root folder `.\deployment\windows\build_and_run.ps1`
+      1. Run from the project root folder `.\deployment\windows\build.ps1`
    3. For Windows CMD
-      1. Run from root project folder `.\deployment\windows\build_and_run.cmd`
+      1. Run from root project folder `.\deployment\windows\build.cmd`
 2. Then, if you need to provide your own `.ini` settings, you have two options
-   1. Change existing `settings.ini` file
+   1. Change existing `service.ini` file
       1. For MacOS Terminal
-         1. in `deployment/mac/settings.ini`
+         1. in `deployment/mac/service.ini`
       2. For Windows
-          1. in `deployment\windows\settings.ini`
+          1. in `deployment\windows\service.ini`
    2. Create your own `ini` settings file
 3. Run jar file
     1. For MacOS Terminal
-        1. `java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/settings.ini`
-            1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/settings.ini`.
+        1. `java -jar deployment/mac/Gossip-1.0-SNAPSHOT-all.jar -c deployment/mac/service.ini`
+            1. If you use your own `.ini` file, put it in the command above instead of `deployment/mac/service.ini`.
     2. For Windows
-        1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\settings.ini`
-            1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\settings.ini`
+        1. `java -jar deployment\windows\Gossip-1.0-SNAPSHOT-all.jar -c deployment\windows\service.ini`
+            1. If you use your own `.ini` file, put it in the command above instead of `deployment\windows\service.ini`
                .
