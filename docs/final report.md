@@ -324,13 +324,16 @@ and debugging.
 | [org.jetbrains.kotlin.jvm](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm)                                                      | Compiles Kotlin code to the JVM.                             |
 | [org.jetbrains.kotlin.plugin.serialization' version  '1.5.30](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.serialization) | Maps P2P messages to kotlin objects  and vice versa.         |
 | [org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2](https://github.com/Kotlin/kotlinx.serialization)                                   | See above.                                                   |
-| [org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt](https://github.com/Kotlin/kotlinx.coroutines)                               | Provides coroutines, as described in section *
+| [org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt](https://github.com/Kotlin/kotlinx.coroutines)                               | Provides coroutines, as described in section **Coroutines**
 architecture*. |
 
 ## Testing
 
 **TO BE DONE**
 
+## How to install java on your machine to follow section "How to build and run project"
+
+- TODO
 
 ## How to build and run project
 

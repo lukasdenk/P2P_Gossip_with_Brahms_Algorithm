@@ -27,10 +27,6 @@
 
 ## Kyrylo
 
-- check if APIMessage is from own computer (for security reasons). If not, remove. (+)
-- log when incoming P2P msg cannot be converted to a P2PMessage obj. Don't crash but ignore the msg then. (for sec
-  reasons) (+)
-- call channel broken (+)
 - write tests for networking
 
 ### final report:
@@ -38,7 +34,6 @@
 - state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg (
   check with my explanation to avoid explaining the same twice)
 - explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
-  fct or JsonMapper))
 - include the libraries u used in library table
 - describe how to set JAVA_HOME or link to an article about it.
 - specify the needed JDK version and describe how to install it
