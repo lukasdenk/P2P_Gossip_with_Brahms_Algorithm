@@ -31,10 +31,6 @@
 
 ### final report:
 
-- state that networking module calls APICommunicator and P2PCommunicator's receive method when receiving a valid msg (
-  check with my explanation to avoid explaining the same twice)
-- explain how msgs are send and received (mapping them from object to bytearray and vice versa (e.g. with toByteArray
-
 ### For testing:
 
 - make it possible to use only client to listen to incoming p2p msgs
