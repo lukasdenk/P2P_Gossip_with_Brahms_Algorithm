@@ -1,13 +1,11 @@
 package networking.service
 
-import api.APICommunicator
 import json.JsonMapper
 import kotlinx.serialization.ExperimentalSerializationApi
+import messaging.APICommunicator
+import messaging.P2PCommunicator
 import messaging.api.APIMsg
-import messaging.p2p.P2PMsg
 import messaging.p2p.Peer
-import networking.client.ClientsManager
-import p2p.P2PCommunicator
 import utils.MessageParser
 import utils.portFromSocketAddressAsInt
 import java.net.SocketAddress

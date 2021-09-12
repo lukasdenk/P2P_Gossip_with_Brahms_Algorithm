@@ -3,8 +3,8 @@ package p2p.brahms.manager
 import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
+import messaging.P2PCommunicator
 import messaging.p2p.*
-import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.View
 import java.util.*

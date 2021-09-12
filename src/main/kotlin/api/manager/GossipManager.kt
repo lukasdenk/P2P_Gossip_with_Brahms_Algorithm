@@ -1,13 +1,13 @@
 package api.manager
 
-import api.APICommunicator
 import api.APIModule
 import kotlinx.serialization.ExperimentalSerializationApi
+import messaging.APICommunicator
+import messaging.P2PCommunicator
 import messaging.api.*
 import messaging.p2p.P2PMsg
 import messaging.p2p.P2PMsgListener
 import messaging.p2p.SpreadMsg
-import p2p.P2PCommunicator
 import p2p.brahms.View
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.ExperimentalTime

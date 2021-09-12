@@ -6,11 +6,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.startsWithXLeadingZeroes
+import messaging.P2PCommunicator
 import messaging.p2p.P2PMsg
 import messaging.p2p.P2PMsgListener
 import messaging.p2p.Peer
 import messaging.p2p.PushMsg
-import p2p.P2PCommunicator
 import p2p.brahms.History
 import p2p.brahms.PoW
 import java.util.*

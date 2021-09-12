@@ -1,4 +1,4 @@
-package p2p
+package messaging
 
 import api.manager.GossipManager
 import json.JsonMapper

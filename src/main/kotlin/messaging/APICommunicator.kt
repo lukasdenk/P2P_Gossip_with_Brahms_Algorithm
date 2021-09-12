@@ -1,5 +1,6 @@
-package api
+package messaging
 
+import api.APIModule
 import api.manager.GossipManager
 import kotlinx.serialization.ExperimentalSerializationApi
 import messaging.api.APIMsg
