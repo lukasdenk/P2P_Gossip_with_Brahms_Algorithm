@@ -332,11 +332,12 @@ Our module sends network traffic as plain text. For this reason, message encrypt
 
 **Disclaimer:** Only works on Windows 10.
 
-1. Install Python3 and the latest Pip on your machine. 
-2. Open a terminal with administrator rights and go to the project root.
-3. Install all dependencies with `pip install -r requirements.txt`.
-4. Make sure that port 7000-7002 and 7050-7052 are available. Now, start 3 instances of our module by executing `api_testing/test_servers.cmd`. Wait for about 15 seconds so that the modules can find each other.
-5. Go to the project root and run `./api_testing/gossip_client.py --help`. Read the instructions to test the functionality you want to test.
+1. Build the project as described in section *How to build and run project*.
+2. Install Python3 and the latest Pip on your machine. 
+3. Open a terminal with administrator rights and go to the project root.
+4. Install all dependencies with `pip install -r requirements.txt`.
+5. Make sure that port 7000-7002 and 7050-7052 are available. Now, start 3 instances of our module by executing `api_testing/test_servers.cmd`. Wait for about 15 seconds so that the modules can find each other.
+6. Go to the project root and run `./api_testing/gossip_client.py --help`. Read the instructions to test the functionality you want to test.
 
 ### Networking part
 
