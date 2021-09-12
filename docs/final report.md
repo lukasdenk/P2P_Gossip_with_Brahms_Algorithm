@@ -162,8 +162,8 @@ network level by trying to connect to the peer's socket.
 #### Implementation of the Brahms Algorithm
 
 In our implementation, the `View` singleton maintains the peer's current view. At the startup of our module, we
-initialize the view with the bootstrapping peers provided in the INI file. Afterwards, the `View`
-singleton frequently updates its view from three sources:
+initialize the view with the bootstrapping peers provided in the INI file. A coroutine frequently updates the `View`
+singleton from three sources:
 
 - `PushManager.push`. This is a set containing the peers from all the received push requests since the last update
   round.
