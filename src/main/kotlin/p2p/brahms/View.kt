@@ -5,12 +5,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import main.Preferences
 import main.randomSubSet
 import messaging.p2p.Peer
+import networking.service.ServicesManager
 import p2p.brahms.manager.PullManager
 import p2p.brahms.manager.PushManager
 import java.util.*
 import kotlin.time.ExperimentalTime
 
 
+@ExperimentalTime
 @ExperimentalSerializationApi
 object View {
     var view: MutableSet<Peer> = Collections.synchronizedSet(HashSet(Preferences.bootstrappingPeers))
@@ -47,11 +49,17 @@ object View {
                 )
             }
             if ((view intersect oldView).size != (view union oldView).size || i % 10 == 0) {
-                println("View: $view")
+                println("[${Preferences.self.port}] View: $view")
             }
             i++
         }
     }
 
-
+    fun isOnline(peer: Peer): Boolean {
+        val online = ServicesManager.isP2PPeerOnline(peer)
+        if (!online) {
+            view.remove(peer)
+        }
+        return online
+    }
 }

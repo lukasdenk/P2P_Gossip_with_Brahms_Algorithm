@@ -9,7 +9,6 @@ import main.Preferences
 import main.compareTo
 import main.sha256
 import messaging.p2p.Peer
-import networking.service.ServicesManager
 import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
@@ -66,7 +65,7 @@ class Sampler(peer: Peer? = null) {
             while (true) {
                 delay(Preferences.probeInterval)
                 val peerInstance = atomicPeer.get()
-                if (peerInstance != null && !ServicesManager.isP2PPeerOnline(peerInstance)) {
+                if (peerInstance != null && !View.isOnline(peerInstance)) {
                     println("peer ${peerInstance.port} went offline")
                     initialize()
                 }

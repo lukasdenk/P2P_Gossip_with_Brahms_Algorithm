@@ -52,7 +52,7 @@ object GossipManager : APIMsgListener, P2PMsgListener {
     private fun sendNotification(msg: SpreadMsg) {
         val msgId = MsgIdCounter.increment()
         MsgCache.put(msgId, msg)
-        val notification = GossipNotification(msg.dataType, msgId, msg.data)
+        val notification = GossipNotification(msgId, msg.dataType, msg.data)
         dataTypeToSubscribers[notification.dataType]?.forEach {
             APICommunicator.send(notification, it)
         }

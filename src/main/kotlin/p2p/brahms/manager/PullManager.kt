@@ -32,8 +32,10 @@ object PullManager : P2PMsgListener {
 
     override fun receive(msg: P2PMsg) {
         if (msg is PullResponse && requests.containsKey(msg.sender)) {
-            History.next(msg.neighbourSample)
-            pulls.addAll(msg.neighbourSample.filter { it != Preferences.self })
+            val onlineNeighbours: Set<Peer> =
+                msg.neighbourSample.filter { it != Preferences.self }.filter(View::isOnline).toSet()
+            History.next(onlineNeighbours)
+            pulls.addAll(onlineNeighbours)
         } else if (msg is PullRequest) {
             P2PCommunicator.send(
                 PullResponse(
