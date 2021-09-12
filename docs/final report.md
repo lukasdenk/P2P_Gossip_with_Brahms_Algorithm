@@ -328,7 +328,15 @@ Our module sends network traffic as plain text. For this reason, message encrypt
 
 ## Testing
 
-**TO BE DONE**
+### API Protocol
+
+**Disclaimer:** Only works on Windows 10.
+
+1. Install Python3 and the latest Pip on your machine. Now install
+all dependencies with `pip install -r requirements.txt`.
+2. Next, open a terminal with administrator rights and go to the project root.
+Make sure that port 7000-7002 and 7050-7052 are available. Start 3 instances of our module by executing `api_testing/test_servers.cmd`. Wait for about 15 seconds so that the modules can find each other.
+3. Go to the project root and run `./api_testing/gossip_client.py --help`. Read the instructions to test the functionality you want to test.
 
 ### Networking part
 

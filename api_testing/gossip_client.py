@@ -6,10 +6,8 @@ import socket
 import struct
 import threading
 import time
+from gossip_testing.util import connect_socket, sync_read_message
 from typing import List
-
-import util
-from util import connect_socket, sync_read_message
 
 GOSSIP_ANNOUNCE = 500
 GOSSIP_NOTIFY = 501
@@ -21,9 +19,10 @@ class GossipClient:
     def __init__(self, id):
         self.gossip_addr = "127.0.0.1"
         self.port = 7050 + id
-        self.received = {}
+        self.rec = {}
         self.s: socket.socket = connect_socket(self.gossip_addr, self.port)
         self.id = id
+        print(f"init id {id}")
 
     def send_gossip_announce(self, data_cont, data_ttl, data_type, instance):
         """
@@ -58,26 +57,29 @@ class GossipClient:
         print(f"[{self.port}] [+] Sent GOSSIP_NOTIFY for type {data_type}).")
 
     def threaded_wait_notification(self, validation):
-        while True:
-            # Try to read notification for our registered DATA_TYPE
-            buf = sync_read_message(self.s)
-            msize, mtype, mid, dtype = struct.unpack(">HHHH", buf[:8])
-            mdata = buf[8:]
+        try:
+            while True:
+                # Try to read notification for our registered DATA_TYPE
+                buf = sync_read_message(self.s)
+                msize, mtype, mid, dtype = struct.unpack(">HHHH", buf[:8])
+                mdata = buf[8:]
 
-            if mtype != GOSSIP_NOTIFICATION:
-                reason = f"[{self.port}] Wrong packet type: {mtype}"
-                # print(reason)
-                # sync_bad_packet(buf, self.s, reason)
-                continue
+                if mtype != GOSSIP_NOTIFICATION:
+                    reason = f"[{self.port}] Wrong packet type: {mtype}"
+                    # print(reason)
+                    # sync_bad_packet(buf, self.s, reason)
+                    continue
 
-            print(f"[{self.port}] [+] Got GOSSIP_NOTIFICATION: mID = {mid}, type = {dtype}, "
-                  + f"data = {mdata}")
-            self.received[dtype] = self.received.get(dtype, 0) + 1
+                print(f"[{self.port}] [+] Got GOSSIP_NOTIFICATION: mID = {mid}, type = {dtype}, "
+                      + f"data = {mdata}")
+                self.rec[dtype] = self.rec.get(dtype, 0) + 1
 
-            print(f"[{self.port}] Send VALIDATION for {mid}")
-            self.send_gossip_validation(mid, validation)
+                print(f"[{self.port}] Send VALIDATION for {mid}")
+                self.send_gossip_validation(mid, validation)
 
-            hexdump.hexdump(buf)
+                hexdump.hexdump(buf)
+        except (ConnectionAbortedError, UnboundLocalError):
+            pass
 
     def wait_notification(self, validation=True):
         """
@@ -86,8 +88,8 @@ class GossipClient:
             s:          connected socket to listen on
             returns:    message ID of notification message
         """
-        t = threading.Thread(target=self.threaded_wait_notification, args=(validation,))
-        t.start()
+        p = threading.Thread(target=self.threaded_wait_notification, args=(validation,))
+        p.start()
 
     def send_gossip_validation(self, mid, valid):
         """
@@ -109,34 +111,22 @@ class GossipClient:
     def __str__(self) -> str:
         return f'GossipClient(id={self.id})'
 
+    def __repr__(self):
+        return str(self)
+
     def __eq__(self, o: object) -> bool:
         return o is not None and isinstance(o, GossipClient) and o.id == self.id
 
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def reset(self):
-        self.received = {}
+    def client_close(self):
         print(f'closed {self.port}')
         self.s.close()
-        self.s = util.connect_socket(self.gossip_addr, self.port)
-
-
-class GossipPeerTester:
-    def __init__(self, id):
-        self.id = id
-        filepath = f"{id}.ini"
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write("[gossip]\n" +
-                    "degree = 30\n" +
-                    "cache_size = 50\n" +
-                    f"api_address = localhost:{7001 + id * 2}\n" +
-                    f"p2p_address = localhost:{7002 + 2 * id}\n" +
-                    "bootstrapper = localhost:7000")
 
 
 def send_and_wait(instances: List[GossipClient], dtype, validation=True):
-    print(f"Instances {instances} will send 'GOSSIP NOTIFY' for data type {dtype}. "
+    print(f"Instances {instances[1:]} will send 'GOSSIP NOTIFY' for data type {dtype}. "
           f"They will wait for 'GOSSIP NOTIFICATION' messages of this type. "
           f"They will {'' if validation else 'in'}validate these messages.")
     for instance in instances:
@@ -151,11 +141,11 @@ def check_notifications(instances: List[GossipClient], ttl=8):
     dtype = 1
     send_and_wait(instances, dtype)
     instances[0].send_gossip_announce(b"test notifications", 8, 1, 0)
-    time.sleep(3)
+    time.sleep(4)
     failed = False
     for instance in instances[1:]:
-        count = instance.received.get(dtype, 0)
-        if dtype not in instance.received:
+        count = instance.rec.get(dtype, 0)
+        if dtype not in instance.rec:
             print(f'[NOTIFICATIONS] {instance} did not receive {dtype}.')
             failed = True
         else:
@@ -167,48 +157,21 @@ def check_notifications(instances: List[GossipClient], ttl=8):
         print('[NOTIFICATIONS] Test complete. No errors could be detected.')
 
 
-def received(instances: List[GossipClient], expected: List[GossipClient], dtype) -> List[GossipClient]:
-    received = []
-    for instance in instances:
-        if dtype in instance.received:
-            received += [instance]
-    for instance in instances:
-        if instance in received and instance not in expected:
-            print(f"{instance} got unexpected ")
-    return received
-
-
 def check_validation(instances: List[GossipClient]):
     print("Testing if GOSSIP spreads invalid gossip messages...")
     dtype = 2
     send_and_wait(instances, dtype, False)
     instances[0].send_gossip_announce(b"invalid", 8, dtype, 0)
-    time.sleep(2)
-    received = instances[-1].received.get(dtype, 0)
+    time.sleep(3)
+    received = instances[-1].rec.get(dtype, 0)
     if received != 1:
-        print(f'ERROR: Test FAILED. A GOSSIP instance received the wrong number of {dtype} msgs: \n'
+        print(f'ERROR: Test FAILED. {instances[-1]} received the wrong number of data type {dtype} msgs: \n'
               f'\tReceived: {received}\n'
               f'\tExpected: 1 (the message from the instance which has sent the "GOSSIP_ANNOUNCE" to spread the message)')
     else:
         print('Test complete. No errors could be detected.')
 
 
-def check_channel_close(instances: List[GossipClient]):
-    dtype = 4
-    check_notifications(instances)
-    instances[0].send_gossip_announce(b"[UNSUB] receive", 8, dtype, 0)
-    instances[-1].reset()
-    time.sleep(2)
-    send_and_wait(instances, dtype, True)
-    if dtype in instances[-1].received:
-        print(f'[UNSUB] received notification for dtype {dtype} without subscription')
-    print('[UNSUB] ++++++++++++')
-
-
-def check_keep_channel_open(instances: List[GossipClient]):
-    for i in range(10):
-        check_notifications(instances)
-        time.sleep(4)
 
 
 def check_subscriptions(instances: List[GossipClient]):
@@ -223,41 +186,42 @@ def check_subscriptions(instances: List[GossipClient]):
     send_and_wait(instances[:-1], dtype_not_for_last_instance)
     send_and_wait(instances, dtype_for_all_instances)
     instances[0].send_gossip_announce(
-        b'Instance "' + last_instance.to_bytes() + b'" did not subscribe for this datatype.', 8,
+        b'Inval', 8,
         dtype_not_for_last_instance, 0)
-    instances[0].send_gossip_announce(b'Instance "' + last_instance.to_bytes() + b'" did subscribe for this datatype.',
+    instances[0].send_gossip_announce(b'Val',
                                       8, dtype_for_all_instances, 0)
 
     time.sleep(3)
 
     print('Test complete. Results:')
-    if dtype_not_for_last_instance in instances[-1].received:
+    if dtype_not_for_last_instance in instances[-1].rec:
         print(f'ERROR: Instance {last_instance} received {dtype_not_for_last_instance} without subscribing for it.')
-    if dtype_for_all_instances in instances[-1].received:
+    if dtype_for_all_instances in instances[-1].rec:
         print(f'Instance {last_instance} successfully received {dtype_for_all_instances}.')
     else:
-        print(f'WARNING: {last_instance} did not received {dtype_for_all_instances} even though subscribing for it. '
+        print(f'WARNING: {last_instance} did not receive {dtype_for_all_instances} even though subscribing for it. '
               f'Probably an error but could also be to GOSSIP\'s best effort strategy to spread messages.')
+
+
 
 
 def main():
     # parse command line arguments
     usage_string = "Test the Gossip Module"
     cmd = argparse.ArgumentParser(description=usage_string)
-    cmd.add_argument("-i", "--instances", type=int, default=3)
 
     test_modes = ["notifications", "validations", "subscriptions"]
-    cmd.add_argument("-t", "--test_mode", help="Test mode.Possibilities:\n"
-                                               "(default) notifications: Tests if message spreading and 'GOSSIP NOTIFY' works.\n"
-                                               "validations: Tests if GOSSIP spreads invalid gossip messages.\n"
-                                               "subscriptions: Tests if GOSSIP only sends 'GOSSIP NOTIFICATION's for subscribed topics.",
+    cmd.add_argument("-t", "--test_mode", help="Test mode. Possibilities:\n"
+                                               "***(default) notifications: Tests if message spreading and 'GOSSIP NOTIFY' works.***\n"
+                                               "validations: Tests if GOSSIP spreads invalid gossip messages.***\n"
+                                               "subscriptions: Tests if GOSSIP only sends 'GOSSIP NOTIFICATION's for subscribed topics.***",
                      choices=test_modes, default="notifications")
     args = cmd.parse_args()
 
-    # TODO: ini for testing
-    # ports depending on ini
+    number_instances = 3
 
-    number_instances = args.instances
+    print(
+        f"INFO: Testing only works if ports 7000-{6999 + number_instances} and 7050-{7049 + number_instances} are free.")
 
     instances = [GossipClient(id) for id in range(number_instances)]
 
@@ -267,6 +231,10 @@ def main():
         check_validation(instances)
     elif args.test_mode == "subscriptions":
         check_subscriptions(instances)
+
+    for instance in instances:
+        instance.client_close()
+    print("Terminated all clients.")
 
 
 if __name__ == "__main__":
