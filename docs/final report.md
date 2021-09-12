@@ -332,7 +332,7 @@ architecture*. |
 **TO BE DONE**
 
 
-# How to build and run project
+## How to build and run project
 
 1. To build the project:
    1. For MacOS Terminal
