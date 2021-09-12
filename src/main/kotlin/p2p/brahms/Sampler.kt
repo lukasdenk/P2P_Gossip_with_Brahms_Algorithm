@@ -59,6 +59,9 @@ class Sampler(peer: Peer? = null) {
     }
 
     @ExperimentalTime
+            /**
+             * Frequently tests if the currently selected peer is still online.
+             */
     fun probe() {
         CoroutineScope(Dispatchers.Default).launch {
             while (true) {

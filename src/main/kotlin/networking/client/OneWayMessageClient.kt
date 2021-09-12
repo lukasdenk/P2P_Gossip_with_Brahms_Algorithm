@@ -46,7 +46,6 @@ class OneWayMessageClient(
                 write,
                 connectionClosed = {
                     isUp.set(false)
-//                    println("closed the connection")
                 },
                 connectionFailed = { reconnect() }
             ))
@@ -76,7 +75,6 @@ class OneWayMessageClient(
 
         override fun completed(result: Void?, socketChannel: AsynchronousSocketChannel) {
             this.socketChannel = socketChannel
-//            println("[${this::class.simpleName}] Connected to ${socketChannel.remoteAddress}")
             sendFirstMessage()
         }
 

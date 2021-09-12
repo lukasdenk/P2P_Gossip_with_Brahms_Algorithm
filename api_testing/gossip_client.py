@@ -141,7 +141,7 @@ def check_notifications(instances: List[GossipClient], ttl=8):
     dtype = 1
     send_and_wait(instances, dtype)
     instances[0].send_gossip_announce(b"test notifications", 8, 1, 0)
-    time.sleep(4)
+    time.sleep(8)
     failed = False
     for instance in instances[1:]:
         count = instance.rec.get(dtype, 0)
@@ -162,7 +162,7 @@ def check_validation(instances: List[GossipClient]):
     dtype = 2
     send_and_wait(instances, dtype, False)
     instances[0].send_gossip_announce(b"invalid", 8, dtype, 0)
-    time.sleep(3)
+    time.sleep(8)
     received = instances[-1].rec.get(dtype, 0)
     if received != 1:
         print(f'ERROR: Test FAILED. {instances[-1]} received the wrong number of data type {dtype} msgs: \n'
@@ -191,7 +191,7 @@ def check_subscriptions(instances: List[GossipClient]):
     instances[0].send_gossip_announce(b'Val',
                                       8, dtype_for_all_instances, 0)
 
-    time.sleep(3)
+    time.sleep(8)
 
     print('Test complete. Results:')
     if dtype_not_for_last_instance in instances[-1].rec:

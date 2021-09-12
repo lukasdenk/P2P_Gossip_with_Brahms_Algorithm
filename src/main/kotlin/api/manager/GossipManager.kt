@@ -38,7 +38,6 @@ object GossipManager : APIMsgListener, P2PMsgListener {
 
     @Synchronized
     fun spread(msg: SpreadMsg) {
-//        println("[P2P-SP] ${View.view}")
         View.view.stream().forEach { P2PCommunicator.send(msg, it) }
     }
 

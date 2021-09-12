@@ -20,7 +20,6 @@ object PoW {
 
     fun buildPoW(timestamp: Long, sender: Peer, receiver: Peer, nonce: Long): ByteArray {
         val l = timestamp / 60000L
-//        println("[${Preferences.self.port}] $l $sender.ip $receiver.ip $nonce")
         return (l.toString() + sender.ip + receiver.ip + nonce).toByteArray(Charset.forName("utf-8"))
             .sha256()
     }

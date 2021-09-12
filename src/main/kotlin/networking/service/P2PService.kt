@@ -95,7 +95,6 @@ class P2PService(
     }
 
     private fun connectionClosed() {
-//        println("[${this::class.simpleName}] Channel has been closed.")
         accept()
     }
 
@@ -115,7 +114,6 @@ class P2PService(
         ) {
             successfulConnectionAttempt.invoke(clientChannel)
             this.socketChannel = clientChannel
-//            println("[${this::class.simpleName}] ${clientChannel.remoteAddress} has connected")
             readData()
         }
 
