@@ -17,7 +17,7 @@ object Preferences {
         private set
     var p2pServiceAddress: String = "localhost"
         private set
-    var p2pServicePort: Int = 7001
+    var p2pServicePort: Int = 7002
         private set
     var cacheSize: Int = 50
         private set
