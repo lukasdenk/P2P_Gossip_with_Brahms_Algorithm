@@ -355,30 +355,3 @@ Kyrylo Vasylenko implements `main` and `networking` packages.
 ### Lukas Denk
 
 Lukas Denk implements the `messaging`, `p2p` and `api` packages.
-
-## Effort Spent for the Project
-
-### Kyrylo Vasylenko
-
-Kyrylo Vasylenko spent up to 19 hours for `networking` package implementation. About 6 hours were used for studying Java
-Non-Blocking I/O and coroutines approach. About 8 hours were spent on `networking` module manual testing with use of
-python gossip client and gossip mockup. And up to 5 hours were put into command line and windows INI file parsing
-modules.
-
-- Resources that were studied about Async IO in Java and Coroutines approach in Kotlin.
-    - [Java Non-blocking IO](https://www.baeldung.com/java-io-vs-nio)
-    - [Why use coroutines](https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761)
-    - [Structured concurrency](https://elizarov.medium.com/structured-concurrency-722d765aa952)
-    - [How to properly use Coroutine Scope](https://elizarov.medium.com/the-reason-to-avoid-globalscope-835337445abc)
-
-After midterm report Kyrylo Vasylenko spent up to 20 hours on `networking` package further implementation, bug fixes and
-jar file building pipeline. Approximately 17 out of 20 hours went on functionality and scripts creation, and about 3
-hours were invested into documenting everything for internal use.
-
-### Lukas Denk
-
-*Before Midterm:* About 3 hours for research and design, about 12 hours for the implementation, about 8 hours for
-documentation.
-
-*After Midterm:* About 8 hours for the implementation, about 8 hours for documentation and about 8 hours for testing
-and debugging.
