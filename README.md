@@ -1,9 +1,15 @@
 # A Gossip protocol for a P2P network using the Brahms algorithm.
 
+## Project Type
+The project was created as a students project. It was not tested as a real-world application.
+### Workload Distribution
+
+_Kyrylo Vasylenko_ implemented the `main` and `networking` packages.
+
+_Lukas Denk_ implemented the `messaging`, `p2p` and `api` packages.
+
 ## Implementation
 
-### Disclaimer
-The project was created as a students project. It was not tested as a real-world application. 
 
 ### Overview
 
@@ -345,13 +351,3 @@ Our module sends network traffic as plain text. For this reason, message encrypt
 The `networking` part was tested manually by using test class `ClientMain.kt`.
 `ClientMain.kt` was sending one way messages to `APIService` and `P2PService` and we ensured they
 were encrypted.
-
-## Workload Distribution
-
-### Kyrylo Vasylenko
-
-Kyrylo Vasylenko implements `main` and `networking` packages.
-
-### Lukas Denk
-
-Lukas Denk implements the `messaging`, `p2p` and `api` packages.
