@@ -1,10 +1,13 @@
-# Final report
+# A Gossip protocol for a P2P network using the Brahms algorithm.
 
 ## Implementation
 
+### Disclaimer
+The project was created as a students project. It was not tested as a real-world application. 
+
 ### Overview
 
-Our project consists of five packages:
+The project consists of five packages:
 
 1. The `main` package serves as setup function for our service and reads specified console and ini file parameters.
 1. The `networking` package serves as transport functionality for API and Peer-To-Peer (P2P) communication.
