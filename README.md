@@ -1,12 +1,20 @@
 # A Gossip protocol for a P2P network using the Brahms algorithm.
 
-## Project Type
-The project was created as a students project. It was not tested as a real-world application.
-### Workload Distribution
+## Contribution
 
-_Kyrylo Vasylenko_ implemented the `main` and `networking` packages.
+### Documentation 
 
-_Lukas Denk_ implemented the `messaging`, `p2p` and `api` packages.
+_Lukas Denk_: The implementation subsections of the `messaging`, `p2p` and `api` packages as well as the _The P2P protocol_ section.
+
+_Kyrylo Vasylenko_: The implementation subsections of the `main` and `networking` packages as well as the _Deployment_ and _Testing_ section.
+
+
+### Implementation
+
+_Lukas Denk_: The `messaging`, `p2p` and `api` packages.
+
+_Kyrylo Vasylenko_: The `main` and `networking` packages.
+
 
 ## Implementation
 
@@ -280,10 +288,6 @@ Message type string: *PushMsg*
 | [com.github.johnrengelman.shadow](https://github.com/johnrengelman/shadow)                                                                  | Plugin to build jar file.                                    |
 
 
-
-### Changes to our assumptions in the midterm report
-
-None.
 
 ### Future Work
 
