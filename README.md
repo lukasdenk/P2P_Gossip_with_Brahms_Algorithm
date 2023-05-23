@@ -133,9 +133,9 @@ contains the address of the socket the peer is listening on.
 
 ### The API Package
 
-The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the *specification* paper. It has the following responsibilities:
+The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the project specification paper. It has the following responsibilities:
 - Receiving messages coming from other modules. For this reason, the manager implements the `APIMsgListener` interface.
-- Keeping track of the data types the other modules have notified for. The manager does so by mapping each module to the data types it has subscribed for. Also, it implements the `channelClosed` method. The `networking` package calls it whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
+- Keeping a map of modules to the data types they have subscribed for. Furthermore, the manager implements a `channelClosed` method. The `networking` package calls it whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
 - Passing knowledge coming from other peers to the modules which have subscribed for it. To receive messages from other peers, it implements the `P2PMsgListener` interface.  
 - Forwarding data to other peers. To do so, the manager stores incoming *spread messages* with a unique ID. It then sends a `GOSSIP NOTIFICATION` message to the modules which have notified for the corresponding data type. If a module sends a `GOSSIP VALIDATION` with the valid flag set to `true`, the manager spreads this message to the peers.
 
