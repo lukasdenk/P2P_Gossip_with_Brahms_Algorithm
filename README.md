@@ -117,7 +117,7 @@ The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be
 and `p2p` *main* packages). They each contain:
 
 - Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
-  API protocol, we refer to the *specification* paper of this class. For the message types of the P2P protocol, we refer
+  API protocol, we refer to the [*specification* paper](https://dl.acm.org/doi/10.1145/1400751.1400772) of this class. For the message types of the P2P protocol, we refer
   to the *p2p package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
