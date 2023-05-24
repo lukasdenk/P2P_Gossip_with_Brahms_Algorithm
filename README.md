@@ -1,8 +1,8 @@
 # A Gossip protocol for a P2P network using the Brahms algorithm.
 
 ## Project
-  This project is part of a students project where multiple teams implemented a node in a peer-to-peer (P2P) network. The implementation is split into modules. Each module is implemented by a different team. The modules communicate with each other via TCP using an API defined in the project's specification. We cannot share the specification due to copy rights.  
-In our module, we implemented a gossip protocol to spread knowledge across the network. In such a protocol, every peer has a subset of all peers as its neighborhood. To spread information, a peer sends it to its neighbors who then forward it to their neighbors and so on. Peers may join or leave the network, hence the view must be updated frequently. Doing this in a naive way allows attackers to isolate or manipulate peers. To avoid this, we use a simplified version of the Brahms algorithm (see [the Brahms algorithm](https://github.com/lukasdenk/P2P_Gossip_with_Brahms_Algorithm#the-brahms-algorithm)).
+  This repository is part of a students project where multiple teams implemented a peer in a peer-to-peer (P2P) network. Each team implements a different module of the peer. The modules communicate with each other via TCP using an API defined in the project's specification. We cannot share the specification due to copy rights.  
+In our module, we implemented a gossip protocol to spread knowledge across the network. In such a protocol, every peer has a subset of all peers as its neighbors. To spread information, a peer sends it to its neighbors who then forward it to their neighbors and so on. Peers may join or leave the network, hence the view must be updated frequently. Doing this in a naive way allows attackers to isolate or manipulate peers. To avoid this, we use a simplified version of the Brahms algorithm (see [the Brahms algorithm](https://github.com/lukasdenk/P2P_Gossip_with_Brahms_Algorithm#the-brahms-algorithm)).
 
 
 ## Contribution
@@ -30,9 +30,9 @@ The project consists of five packages:
 
 1. The `main` package serves as setup function for our service and reads specified console and ini file parameters.
 1. The `networking` package serves as transport functionality for API and Peer-To-Peer (P2P) communication.
-1. The `messaging` package, which contains a package for API- messaging as well as one for P2P messaging.
-1. The `api` package, which is responsible for the communication to the other modules.
-1. The `p2p` package, which maintains the neighbourhood of the peer and spreads knowledge across the network.
+1. The `messaging` package contains the messages for the API- and P2P-communication as well as an interface to receive API-messages and an interface to receive P2P messages. 
+1. The `api` package is responsible for the communication to the other modules.
+1. The `p2p` package maintains the neighbourhood of the peer and spreads knowledge across the network.
 
 ### The Main Package
 
@@ -118,22 +118,19 @@ We convert our byte arrays to string, then we convert resulting json into P2PMsg
 
 ### The Messaging Package
 
-The `messaging` package consists of the `api` and `p2p` *sub*packages (not to be confused with the `api`
-and `p2p` *main* packages). They each contain:
+The `messaging` package consists of the `api` and `p2p` *sub*packages. The `api` and `p2p` *sub*packages are seperated from the `api` and `p2p` *main* packages because its classes are also used outside the main packages.
+They each contain:
 
 - Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
   API protocol, we refer to the project specification paper of this class. For the message types of the P2P protocol, we refer
   to the *p2p package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
 - The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
-  respectively. The `APICommunicator` or `P2PCommunicator` calls this function to pass an incoming API or P2P
-  message, whenever it receives one from the `networking` package.
+  respectively. 
 - The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards them to the `APICommunicator` or `P2PCommunicator`. They then forward the message to all instances implementing the `APIMsgListener` or `P2PMsgListener`.
-
-The reason for separating these classes into an own package is that our module uses them across multiple packages.
-
-The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
+- The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
 contains the address of the socket the peer is listening on.
+
 
 
 ### The API Package
