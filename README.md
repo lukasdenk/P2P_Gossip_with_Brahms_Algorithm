@@ -118,9 +118,8 @@ We convert our byte arrays to string, then we convert resulting json into P2PMsg
 
 ### The Messaging Package
 
-The `messaging` package consists of the `api` and `p2p` *sub*packages. The `api` and `p2p` *sub*packages are seperated from the `api` and `p2p` *main* packages because its classes are also used outside the main packages.
-They each contain:
-
+The `messaging` package consists of the `api` and `p2p` subpackages. The `api` and `p2p` *sub*packages are seperated from the `api` and `p2p` *main* packages because its classes are also used outside the main packages.  
+The subpackages each contain:
 - Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
   API protocol, we refer to the project specification paper of this class. For the message types of the P2P protocol, we refer
   to the *p2p package* section.
