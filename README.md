@@ -120,15 +120,11 @@ We convert our byte arrays to string, then we convert resulting json into P2PMsg
 
 The `messaging` package consists of the `api` and `p2p` subpackages. The `api` and `p2p` *sub*packages are seperated from the `api` and `p2p` *main* packages because their classes are also used outside the main packages.  
 The subpackages each contain:
-- Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the
-  API protocol, we refer to the project specification paper of this class. For the message types of the P2P protocol, we refer
-  to the *p2p package* section.
+- Classes representing the message types of the API or P2P protocol, respectively. For the concrete message types of the API protocol, we refer to the project specification paper of this class. For the message types of the P2P protocol, we refer to the *p2p package* section.
 - The superclass `APIMsg` or `P2PMsg` from which the API or P2P message classes, respectively, inherit.
-- The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages,
-  respectively. 
+- The interface `APIMsgListener` or `P2PMsgListener`, providing a method `receive` to receive API or P2P messages, respectively. 
 - The singletons `APICommunicator` and `P2PCommunicator`. They each serve as an abstraction layer between the `networking` and the `api` or `p2p` package, respectively. Other classes can use their `send` function to send an `APIMsg` or `P2PMsg`, respectively. Whenever the `networking` package receives an API or P2P message, it forwards them to the `APICommunicator` or `P2PCommunicator`. They then forward the message to all instances implementing the `APIMsgListener` or `P2PMsgListener`.
-- The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It
-contains the address of the socket the peer is listening on.
+- The `p2p` package additionally contains the `Peer` class. An object of this class represents a peer in the network. It contains the address of the socket the peer is listening on.
 
 
 
@@ -136,7 +132,7 @@ contains the address of the socket the peer is listening on.
 
 The main logic of the `api` package is in the `GossipManager`. It implements the API communication as specified in the project specification paper. It has the following responsibilities:
 - Receiving messages coming from other modules. For this reason, the manager implements the `APIMsgListener` interface.
-- Keeping a map of modules to the data types they have subscribed for. Furthermore, the manager implements a `channelClosed` method. The `networking` package calls it whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
+- Keeping a map of modules to the data types the modules have subscribed for. Furthermore, the manager implements a `channelClosed` method. The `networking` package calls it whenever the connection to another module breaks. The `GossipManager` then unsubscribes the corresponding module.
 - Passing knowledge coming from other peers to the modules which have subscribed for it. To receive messages from other peers, it implements the `P2PMsgListener` interface.  
 - Forwarding data to other peers. To do so, the manager stores incoming *spread messages* with a unique ID. It then sends a `GOSSIP NOTIFICATION` message to the modules which have subscribed for the corresponding data type. If a module sends a `GOSSIP VALIDATION` with the valid flag set to `true`, the manager spreads this message to the peers.
 
@@ -144,16 +140,14 @@ The main logic of the `api` package is in the `GossipManager`. It implements the
 ### The P2P Package
 
 The `p2p` package maintains the peer's neighbourhood by implementing a simplified version of the Brahms algorithm
-specified in [*Brahms: byzantine resilient random membership sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772)
-by Edward Bortnikov et al.. We chose this approach since the Brahms algorithm provides a solid resilience against Byzantine and Crash faults (see the aforementioned paper).
+specified in [*Brahms: byzantine resilient random membership sampling*](https://dl.acm.org/doi/10.1145/1400751.1400772). We chose this approach since the Brahms algorithm provides a solid resilience against Byzantine and Crash faults. 
 
 #### The Brahms Algorithm
 
 As in the Brahms paper, we also refer to a peer's neighbourhood as its *view*. The Brahms algorithm frequently updates
 this view from three sources:
 
-- It queries its neighbours about their view with so called *pull request* messages. Honest neighbours then answer with
-  a *pull response* message, containing their view.
+- It queries its neighbours about their view with so called *pull request* messages. Honest neighbours then send their view in a *pull response* message.
 - Additionally, the algorithm listens to other peer's *push request* messages. Each peer uses these requests to ask
   another peer to include it in their view.
 - Finally, each update contains a random subset of the *history* of the peer. This history consists of all the peers
@@ -164,7 +158,7 @@ this view from three sources:
 
 #### Message Types of the P2P Protocol
 
-Our module represents every message of the P2P protocol in two formats: As the instance of a message class or as a Json
+Our module represents every message of the P2P protocol in two formats: As an instance of a message class or as a Json
 object. The module operates with the first format for passing a message internally while it uses the second format on
 the network layer. We describe the latter format in the *The P2P Protocol* section. When we mention a message in another section, we always talk about the instance of a message class. The message classes are:
 
@@ -192,7 +186,7 @@ The `History` singleton holds a list of `Sampler` objects. Each `Sampler` instan
 Brahms paper. It holds the peer it is currently selecting as well as a random number.   
 For each peer received in a *push message* or *pull response*, the `History` singleton calls each `Sampler`'s `next` function. As a function parameter, we hand over the received peer. If the `Sampler` is currently not
 selecting a peer, the received peer becomes the selected peer. Otherwise, the function hashes the peer's address as well
-as the random number with the SHA256 algorithm. If this hash is smaller than the hash of the currently selected peer,
+as the random number with the SHA256 algorithm. If this hash is smaller than the hash of the currently selected peer, then
 the received peer becomes the new selected peer. With this strategy, a `Sampler` always holds a peer selected uniformly
 at random from all the peers it has received so far. The random number ensures that the different `Sampler`s choose
 different peers.  
