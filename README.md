@@ -2,6 +2,7 @@
 
 ## Project
   This repository is part of a students project where multiple teams implemented a peer in a peer-to-peer (P2P) network. Each team implements a different module of the peer. The modules communicate with each other via TCP using an API defined in the project's specification. We cannot share the specification due to copy rights.  
+
 In our module, we implemented a gossip protocol to spread knowledge across the network. In such a protocol, every peer has a subset of all peers as its neighbors. To spread information, a peer sends it to its neighbors who then forward it to their neighbors and so on. Peers may join or leave the network, hence the view must be updated frequently. Doing this in a naive way allows attackers to isolate or manipulate peers. To avoid this, we use a simplified version of the Brahms algorithm (see [the Brahms algorithm](https://github.com/lukasdenk/P2P_Gossip_with_Brahms_Algorithm#the-brahms-algorithm)).
 
 
